@@ -1,7 +1,7 @@
 import enum
 import uuid
-from datetime import date
-from sqlalchemy import Date, Enum, ForeignKey, JSON, String, Text
+from datetime import date, datetime
+from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, JSON, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TenantMixin
@@ -58,6 +58,8 @@ class Patient(TenantMixin, Base):
     photo_url: Mapped[str | None] = mapped_column(String(500))
     registration_source: Mapped[RegistrationSource] = mapped_column(Enum(RegistrationSource), default=RegistrationSource.WALK_IN)
     status: Mapped[PatientStatus] = mapped_column(Enum(PatientStatus), default=PatientStatus.ACTIVE)
+    portal_password_hash: Mapped[str | None] = mapped_column(String(255))
+    last_portal_login: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     user = relationship("User", foreign_keys=[user_id], lazy="selectin")
     assigned_doctor = relationship("User", foreign_keys=[assigned_doctor_id], lazy="selectin")
     assigned_nurse = relationship("User", foreign_keys=[assigned_nurse_id], lazy="selectin")
@@ -69,5 +71,7 @@ class PatientGuardian(TenantMixin, Base):
     patient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
     guardian_user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     relationship_type: Mapped[str | None] = mapped_column(String(100))
+    can_book_appointments: Mapped[bool] = mapped_column(Boolean, default=True)
+    can_view_billing: Mapped[bool] = mapped_column(Boolean, default=True)
     patient = relationship("Patient", back_populates="guardians")
     guardian = relationship("User", foreign_keys=[guardian_user_id], lazy="selectin")

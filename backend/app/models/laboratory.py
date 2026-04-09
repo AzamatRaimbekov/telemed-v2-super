@@ -62,6 +62,7 @@ class LabResult(TenantMixin, Base):
     unit: Mapped[str | None] = mapped_column(String(50))
     reference_range: Mapped[str | None] = mapped_column(String(255))
     is_abnormal: Mapped[bool] = mapped_column(Boolean, default=False)
+    visible_to_patient: Mapped[bool] = mapped_column(Boolean, default=False)
     notes: Mapped[str | None] = mapped_column(Text)
     attachment_url: Mapped[str | None] = mapped_column(String(500))
     status: Mapped[LabResultStatus] = mapped_column(Enum(LabResultStatus), default=LabResultStatus.PRELIMINARY)

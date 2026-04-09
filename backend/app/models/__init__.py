@@ -17,6 +17,7 @@ from app.models.facility import Department, Room, Bed, BedAssignment
 from app.models.telemedicine import TelemedicineSession, Message
 from app.models.face import FaceSnapshot, FaceEmbedding
 from app.models.audit import AuditLog
+from app.models.vital_signs import VitalSign
 
 __all__ = [
     "Base", "Clinic",
@@ -34,4 +35,5 @@ __all__ = [
     "Department", "Room", "Bed", "BedAssignment",
     "TelemedicineSession", "Message",
     "FaceSnapshot", "FaceEmbedding", "AuditLog",
+    "VitalSign",
 ]
