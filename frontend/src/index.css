@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #BDEDE0;
+    --color-primary-foreground: #1A1A2E;
+    --color-secondary: #7E78D2;
+    --color-secondary-foreground: #ffffff;
+    --color-background: #F8FFFE;
+    --color-surface: #FFFFFF;
+    --color-text-primary: #1A1A2E;
+    --color-text-secondary: #6B7280;
+    --color-danger: #EF4444;
+    --color-warning: #F59E0B;
+    --color-success: #10B981;
+    --color-muted: #F1F5F9;
+    --color-border: #E2E8F0;
+    --color-input: #E2E8F0;
+    --color-ring: #7E78D2;
+    --color-accent: #F1F5F9;
+    --color-accent-foreground: #1A1A2E;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --color-primary: #BDEDE0;
+    --color-primary-foreground: #1A1A2E;
+    --color-secondary: #7E78D2;
+    --color-secondary-foreground: #ffffff;
+    --color-background: #0F1117;
+    --color-surface: #1A1D2E;
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-danger: #EF4444;
+    --color-warning: #F59E0B;
+    --color-success: #10B981;
+    --color-muted: #1E293B;
+    --color-border: #334155;
+    --color-input: #334155;
+    --color-ring: #7E78D2;
+    --color-accent: #1E293B;
+    --color-accent-foreground: #F1F5F9;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
