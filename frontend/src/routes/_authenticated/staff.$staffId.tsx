@@ -83,14 +83,23 @@ function StaffDetailPage() {
 
   const qualifications: Record<string, any>[] = staff.qualifications || [];
   const extraFields: Record<string, any>[] = staff.extra_fields || [];
-  const permissions: Record<string, any>[] = permissionsData?.effective || permissionsData || [];
+  // permissionsData = { permissions: ["patients:create", ...] } — array of code strings
+  const permCodes: string[] = Array.isArray(permissionsData?.permissions)
+    ? permissionsData.permissions
+    : Array.isArray(permissionsData) ? permissionsData : [];
 
-  // Group permissions by group name
-  const groupedPermissions: Record<string, Record<string, any>[]> = {};
-  for (const perm of permissions) {
-    const group = perm.group_name || perm.group || "Прочее";
+  // Group permission codes by prefix (e.g. "patients:create" → group "patients")
+  const groupLabels: Record<string, string> = {
+    patients: "Пациенты", medical_card: "Мед. карта", treatment: "Лечение",
+    pharmacy: "Аптека", lab: "Лаборатория", schedule: "Расписание",
+    billing: "Биллинг", staff: "Персонал", reports: "Отчёты",
+  };
+  const groupedPermissions: Record<string, string[]> = {};
+  for (const code of permCodes) {
+    const prefix = code.split(":")[0] || "other";
+    const group = groupLabels[prefix] || prefix;
     if (!groupedPermissions[group]) groupedPermissions[group] = [];
-    groupedPermissions[group].push(perm);
+    groupedPermissions[group].push(code);
   }
 
   // Check qualification expiry
@@ -350,13 +359,9 @@ function StaffDetailPage() {
                     <span className="text-sm text-[var(--color-text-tertiary)]">Шаблон не назначен</span>
                   )}
                 </div>
-                {permissionsData && (
+                {permCodes.length > 0 && (
                   <div className="text-right text-sm text-[var(--color-text-secondary)]">
-                    <span className="text-green-600 font-medium">+{permissionsData.added_count ?? 0}</span>
-                    {" · "}
-                    <span className="text-red-500 font-medium">−{permissionsData.removed_count ?? 0}</span>
-                    {" · Итого: "}
-                    <span className="font-semibold text-foreground">{permissions.length}</span>
+                    Итого: <span className="font-semibold text-foreground">{permCodes.length}</span> прав
                   </div>
                 )}
               </div>
@@ -367,31 +372,24 @@ function StaffDetailPage() {
               <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">
                 <p className="text-[var(--color-text-secondary)]">Нет назначенных прав</p>
               </div>
-            ) : Object.entries(groupedPermissions).map(([group, perms]) => (
+            ) : Object.entries(groupedPermissions).map(([group, codes]) => (
               <div key={group} className="bg-[var(--color-surface)] rounded-2xl border border-border p-5">
                 <h4 className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-3">
-                  {group}
+                  {group} <span className="text-[var(--color-text-tertiary)]/60">({codes.length})</span>
                 </h4>
-                <div className="space-y-2">
-                  {perms.map((perm: Record<string, any>) => (
-                    <div key={perm.code || perm.permission_code} className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        {perm.is_override_add && (
-                          <span className="w-2 h-2 rounded-full bg-success flex-shrink-0" title="Добавлено вручную" />
-                        )}
-                        {perm.is_override_remove && (
-                          <span className="w-2 h-2 rounded-full bg-destructive flex-shrink-0" title="Удалено вручную" />
-                        )}
-                        {!perm.is_override_add && !perm.is_override_remove && (
-                          <span className="w-2 h-2 rounded-full bg-[var(--color-text-tertiary)]/30 flex-shrink-0" />
-                        )}
-                        <span className="text-sm text-foreground">{perm.name || perm.permission_name || perm.code}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {codes.map((code: string) => {
+                    const label = code.split(":")[1]?.replace(/_/g, " ") || code;
+                    return (
+                      <div key={code} className="flex items-center gap-2.5 p-2 rounded-lg bg-secondary/5">
+                        <svg className="w-4 h-4 text-success flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-sm text-foreground capitalize">{label}</span>
+                        <span className="text-[10px] font-mono text-[var(--color-text-tertiary)] ml-auto">{code}</span>
                       </div>
-                      <span className="text-xs font-mono text-[var(--color-text-tertiary)]">
-                        {perm.code || perm.permission_code}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
