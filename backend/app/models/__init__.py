@@ -18,6 +18,8 @@ from app.models.telemedicine import TelemedicineSession, Message
 from app.models.face import FaceSnapshot, FaceEmbedding
 from app.models.audit import AuditLog
 from app.models.vital_signs import VitalSign
+from app.models.rbac import PermissionGroup, PermissionItem, PermissionTemplate, TemplatePermission, TemplateExtraField, UserTemplate, UserPermissionOverride
+from app.models.staff_profile import StaffProfile
 
 __all__ = [
     "Base", "Clinic",
@@ -36,4 +38,6 @@ __all__ = [
     "TelemedicineSession", "Message",
     "FaceSnapshot", "FaceEmbedding", "AuditLog",
     "VitalSign",
+    "PermissionGroup", "PermissionItem", "PermissionTemplate", "TemplatePermission", "TemplateExtraField", "UserTemplate", "UserPermissionOverride",
+    "StaffProfile",
 ]
