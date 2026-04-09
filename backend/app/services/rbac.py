@@ -217,18 +217,23 @@ class RBACService:
             if isinstance(val, str) and val:
                 data[uuid_field] = uuid.UUID(val)
 
-        # Check login unique
-        existing = await self.session.execute(
-            select(User).where(User.email == data["login"], User.is_deleted == False)
-        )
-        if existing.scalar_one_or_none():
-            raise ConflictError("Логин уже занят")
-
         temp_pwd = generate_password()
 
-        # Create user
+        # Login = work_email (always email-based auth)
+        login_email = data.get("work_email") or data.get("login") or data.get("email_personal", "")
+        if not login_email or "@" not in login_email:
+            raise ConflictError("Рабочий email обязателен для входа в систему")
+
+        # Check login unique
+        dup_check = await self.session.execute(
+            select(User).where(User.email == login_email, User.is_deleted == False)
+        )
+        if dup_check.scalar_one_or_none():
+            raise ConflictError(f"Email {login_email} уже используется")
+
+        # Create user (email = login = work_email)
         user = User(
-            id=uuid.uuid4(), email=data["login"],
+            id=uuid.uuid4(), email=login_email,
             hashed_password=hash_password(temp_pwd),
             first_name=data["first_name"], last_name=data["last_name"],
             middle_name=data.get("middle_name"),
@@ -291,7 +296,7 @@ class RBACService:
         # Send credentials via email
         delivery = data.get("delivery_method", "email")
         email_sent = False
-        recipient_email = data.get("work_email") or data.get("email_personal") or data.get("login", "")
+        recipient_email = login_email
 
         if delivery in ("email", "screen") and "@" in recipient_email:
             from app.core.email import send_staff_credentials
@@ -306,7 +311,7 @@ class RBACService:
 
         return {
             "staff_id": str(profile.id), "user_id": str(user.id),
-            "login": data["login"], "temp_password": temp_pwd,
+            "login": login_email, "temp_password": temp_pwd,
             "delivery_method": delivery,
             "email_sent": email_sent,
             "email_to": recipient_email if email_sent else None,

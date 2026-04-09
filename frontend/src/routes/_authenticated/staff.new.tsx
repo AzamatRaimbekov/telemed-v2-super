@@ -413,8 +413,9 @@ function NewStaffPage() {
         employment_end: employmentEnd || undefined,
         extra_fields: Object.keys(extraFieldValues).length ? extraFieldValues : undefined,
         qualifications: qualifications.filter((q) => q.label),
-        login: loginValue || undefined,
-        login_type: loginType,
+        login: loginValue || workEmail || emailPersonal || undefined,
+        work_email: loginValue || workEmail || emailPersonal || undefined,
+        login_type: "email",
         auto_password: autoPassword,
         must_change_password: mustChangePassword,
         active_from: activeFrom || undefined,
@@ -791,41 +792,26 @@ function NewStaffPage() {
           <div>
             <h2 className="text-base font-semibold text-foreground mb-5">Аккаунт</h2>
 
-            {/* Login type toggle */}
-            <div className="mb-4">
-              <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-2">
-                Тип логина
-              </label>
-              <div className="flex gap-2">
-                {(["email", "phone"] as const).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => {
-                      setLoginType(type);
-                      setLoginValue(type === "email" ? workEmail || emailPersonal : workPhone || phonePersonal);
-                    }}
-                    className={cn(
-                      "px-4 py-2 rounded-xl border text-sm font-medium transition-all",
-                      loginType === type
-                        ? "border-secondary bg-secondary/5 text-secondary"
-                        : "border-border text-[var(--color-text-secondary)] hover:border-[var(--color-text-tertiary)]/40"
-                    )}
-                  >
-                    {type === "email" ? "Email" : "Телефон"}
-                  </button>
-                ))}
+            {/* Login = work email */}
+            <div className="p-4 rounded-xl bg-secondary/5 border border-secondary/15 mb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <svg className="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <span className="text-sm font-medium text-secondary">Вход только через email</span>
               </div>
+              <p className="text-xs text-[var(--color-text-tertiary)]">Рабочий email сотрудника является логином для входа в систему</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField
-                label="Логин"
-                value={loginValue}
+                label="Рабочий email (логин для входа) *"
+                value={loginValue || workEmail || emailPersonal}
                 onChange={(e) => setLoginValue(e.target.value)}
-                placeholder={loginType === "email" ? "ivan@medcore.kg" : "+996 XXX XXX XXX"}
-                type={loginType === "email" ? "email" : "tel"}
+                placeholder="ivan@medcore.kg"
+                type="email"
                 className="sm:col-span-2"
+                hint="Этот email будет использоваться для входа в систему и получения пароля"
               />
 
               <div className="sm:col-span-2 space-y-3">
