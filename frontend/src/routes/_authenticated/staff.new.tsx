@@ -286,9 +286,8 @@ function NewStaffPage() {
   });
 
   const { data: permGroupsData } = useQuery({
-    queryKey: ["permission-groups"],
-    queryFn: () => staffApi.listPermissionGroups(),
-    enabled: step === 5,
+    queryKey: ["permissions-all"],
+    queryFn: () => staffApi.listPermissions(),
   });
 
   const templates: Record<string, any>[] = templatesData?.items || templatesData || [];
@@ -307,8 +306,10 @@ function NewStaffPage() {
     try {
       const detail = await staffApi.getTemplate(tpl.id);
       setTemplateDetail(detail);
-      // Pre-fill permissions from template
-      const perms: string[] = detail.permissions?.map((p: Record<string, any>) => p.code || p.permission_code) || [];
+      // Pre-fill permissions from template (API returns array of code strings)
+      const perms: string[] = (detail.permissions || []).map((p: unknown) =>
+        typeof p === "string" ? p : (p as Record<string, string>).code || (p as Record<string, string>).permission_code
+      );
       setTemplatePerms(new Set(perms));
       // Reset overrides
       setPermOverrides({});
@@ -906,7 +907,7 @@ function NewStaffPage() {
                   <div key={group.id || group.name} className="border border-border rounded-xl overflow-hidden">
                     <div className="px-4 py-2.5 bg-[var(--color-muted)]/50 border-b border-border">
                       <h4 className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider">
-                        {group.name}
+                        {group.label_ru || group.name || group.code}
                       </h4>
                     </div>
                     <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -933,7 +934,7 @@ function NewStaffPage() {
                               <span className={cn("w-2 h-2 rounded-full flex-shrink-0", dotClass)} />
                             )}
                             <div className="min-w-0">
-                              <p className="text-sm text-foreground leading-snug">{perm.name || code}</p>
+                              <p className="text-sm text-foreground leading-snug">{perm.label_ru || perm.name || code}</p>
                               {perm.description && (
                                 <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{perm.description}</p>
                               )}
