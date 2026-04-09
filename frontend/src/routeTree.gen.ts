@@ -16,6 +16,7 @@ import { Route as PortalLoginRouteImport } from './routes/portal/login'
 import { Route as PortalPortalRouteImport } from './routes/portal/_portal'
 import { Route as AuthenticatedPatientsRouteImport } from './routes/_authenticated/patients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
 import { Route as PortalPortalResultsRouteImport } from './routes/portal/_portal/results'
 import { Route as PortalPortalMessagesRouteImport } from './routes/portal/_portal/messages'
 import { Route as PortalPortalMedicalCardRouteImport } from './routes/portal/_portal/medical-card'
@@ -60,6 +61,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPatientsIndexRoute =
+  AuthenticatedPatientsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPatientsRoute,
+  } as any)
 const PortalPortalResultsRoute = PortalPortalResultsRouteImport.update({
   id: '/results',
   path: '/results',
@@ -125,12 +132,12 @@ export interface FileRoutesByFullPath {
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
   '/portal/results': typeof PortalPortalResultsRoute
+  '/patients/': typeof AuthenticatedPatientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
   '/portal/results': typeof PortalPortalResultsRoute
+  '/patients': typeof AuthenticatedPatientsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/portal/_portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/_portal/messages': typeof PortalPortalMessagesRoute
   '/portal/_portal/results': typeof PortalPortalResultsRoute
+  '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,12 +189,12 @@ export interface FileRouteTypes {
     | '/portal/medical-card'
     | '/portal/messages'
     | '/portal/results'
+    | '/patients/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/dashboard'
-    | '/patients'
     | '/portal'
     | '/portal/login'
     | '/patients/$patientId'
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/portal/medical-card'
     | '/portal/messages'
     | '/portal/results'
+    | '/patients'
   id:
     | '__root__'
     | '/'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/portal/_portal/medical-card'
     | '/portal/_portal/messages'
     | '/portal/_portal/results'
+    | '/_authenticated/patients/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -275,6 +286,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/patients/': {
+      id: '/_authenticated/patients/'
+      path: '/'
+      fullPath: '/patients/'
+      preLoaderRoute: typeof AuthenticatedPatientsIndexRouteImport
+      parentRoute: typeof AuthenticatedPatientsRoute
     }
     '/portal/_portal/results': {
       id: '/portal/_portal/results'
@@ -345,11 +363,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedPatientsRouteChildren {
   AuthenticatedPatientsPatientIdRoute: typeof AuthenticatedPatientsPatientIdRoute
   AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
+  AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
 }
 
 const AuthenticatedPatientsRouteChildren: AuthenticatedPatientsRouteChildren = {
   AuthenticatedPatientsPatientIdRoute: AuthenticatedPatientsPatientIdRoute,
   AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
+  AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
 }
 
 const AuthenticatedPatientsRouteWithChildren =
