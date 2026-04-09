@@ -53,18 +53,34 @@ async def reset_password(staff_id: uuid.UUID, session: DBSession, current_user: 
     from app.models.user import User
     from app.core.security import hash_password
     from app.services.rbac import generate_password
+    from app.core.email import send_password_reset
     from sqlalchemy import select
+
     result = await session.execute(select(StaffProfile).where(StaffProfile.id == staff_id))
     s = result.scalar_one_or_none()
     if not s:
         from app.core.exceptions import NotFoundError
         raise NotFoundError("Staff")
+
     user_q = await session.execute(select(User).where(User.id == s.user_id))
     user = user_q.scalar_one()
+
     new_pwd = generate_password()
     user.hashed_password = hash_password(new_pwd)
     await session.flush()
-    return {"temp_password": new_pwd}
+
+    # Send new password via email
+    recipient_email = s.work_email or s.email_personal or user.email
+    email_sent = False
+    if recipient_email and "@" in recipient_email:
+        staff_name = f"{s.last_name} {s.first_name}"
+        email_sent = await send_password_reset(recipient_email, staff_name, new_pwd)
+
+    return {
+        "temp_password": new_pwd,
+        "email_sent": email_sent,
+        "email_to": recipient_email if email_sent else None,
+    }
 
 @router.get("/staff/{staff_id}/permissions")
 async def get_staff_permissions(staff_id: uuid.UUID, session: DBSession, current_user: CurrentUser):

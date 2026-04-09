@@ -288,10 +288,28 @@ class RBACService:
 
         await self.session.flush()
 
+        # Send credentials via email
+        delivery = data.get("delivery_method", "email")
+        email_sent = False
+        recipient_email = data.get("work_email") or data.get("email_personal") or data.get("login", "")
+
+        if delivery in ("email", "screen") and "@" in recipient_email:
+            from app.core.email import send_staff_credentials
+            staff_name = f"{data['last_name']} {data['first_name']}"
+            email_sent = await send_staff_credentials(
+                to_email=recipient_email,
+                staff_name=staff_name,
+                login=data["login"],
+                password=temp_pwd,
+                position=data.get("position", ""),
+            )
+
         return {
             "staff_id": str(profile.id), "user_id": str(user.id),
             "login": data["login"], "temp_password": temp_pwd,
-            "delivery_method": data.get("delivery_method", "screen"),
+            "delivery_method": delivery,
+            "email_sent": email_sent,
+            "email_to": recipient_email if email_sent else None,
         }
 
     async def list_staff(self, clinic_id: uuid.UUID, skip: int = 0, limit: int = 20,

@@ -28,6 +28,15 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:80"]
     SENTRY_DSN: str = ""
 
+    # SMTP Email
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@medcore.kg"
+    SMTP_FROM_NAME: str = "MedCore KG"
+    SMTP_USE_TLS: bool = True
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
