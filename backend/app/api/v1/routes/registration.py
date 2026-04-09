@@ -102,12 +102,20 @@ async def validate_patient(
 
 
 # --- Staff lookup with load ---
+# Unified: checks both legacy users table AND new staff_profiles
 @router.get("/doctors")
 async def list_doctors(
     session: DBSession, current_user: CurrentUser,
     with_load: bool = Query(False),
 ):
-    """List doctors for the current clinic with optional patient load info."""
+    """List doctors from both legacy users (role=DOCTOR) and staff_profiles with doctor template."""
+    from app.models.staff_profile import StaffProfile
+    from app.models.rbac import UserTemplate, PermissionTemplate
+
+    seen_user_ids = set()
+    items = []
+
+    # 1. Legacy users with role=DOCTOR
     query = select(User).where(
         User.clinic_id == current_user.clinic_id,
         User.role == UserRole.DOCTOR,
@@ -115,10 +123,8 @@ async def list_doctors(
         User.is_deleted == False,
     )
     result = await session.execute(query)
-    doctors = result.scalars().all()
-
-    items = []
-    for d in doctors:
+    for d in result.scalars().all():
+        seen_user_ids.add(d.id)
         item = {
             "id": str(d.id),
             "first_name": d.first_name,
@@ -135,15 +141,67 @@ async def list_doctors(
             )
             count_r = await session.execute(count_q)
             item["current_patients"] = count_r.scalar_one()
-            item["max_patients"] = 20  # configurable per clinic
+            item["max_patients"] = 20
         items.append(item)
+
+    # 2. New staff_profiles with doctor-like templates (has treatment:create_plan permission)
+    from app.models.rbac import TemplatePermission, PermissionItem
+    doctor_template_q = (
+        select(PermissionTemplate.id)
+        .join(TemplatePermission, PermissionTemplate.id == TemplatePermission.template_id)
+        .join(PermissionItem, TemplatePermission.permission_id == PermissionItem.id)
+        .where(PermissionItem.code == "treatment:create_plan")
+    )
+    doctor_template_r = await session.execute(doctor_template_q)
+    doctor_template_ids = set(r[0] for r in doctor_template_r.all())
+
+    if doctor_template_ids:
+        staff_q = (
+            select(StaffProfile)
+            .join(UserTemplate, StaffProfile.user_id == UserTemplate.user_id)
+            .where(
+                StaffProfile.clinic_id == current_user.clinic_id,
+                StaffProfile.is_deleted == False,
+                UserTemplate.template_id.in_(doctor_template_ids),
+            )
+        )
+        staff_r = await session.execute(staff_q)
+        for s in staff_r.scalars().all():
+            if s.user_id in seen_user_ids:
+                continue
+            seen_user_ids.add(s.user_id)
+            item = {
+                "id": str(s.user_id),
+                "first_name": s.first_name,
+                "last_name": s.last_name,
+                "middle_name": s.middle_name,
+                "specialization": s.specialization or s.position,
+                "avatar_url": s.photo_url,
+            }
+            if with_load:
+                count_q = select(func.count()).select_from(Patient).where(
+                    Patient.assigned_doctor_id == s.user_id,
+                    Patient.status == "ACTIVE",
+                    Patient.is_deleted == False,
+                )
+                count_r = await session.execute(count_q)
+                item["current_patients"] = count_r.scalar_one()
+                item["max_patients"] = s.max_patients or 20
+            items.append(item)
 
     return items
 
 
 @router.get("/nurses")
 async def list_nurses(session: DBSession, current_user: CurrentUser):
-    """List nurses for the current clinic."""
+    """List nurses from both legacy users and staff_profiles."""
+    from app.models.staff_profile import StaffProfile
+    from app.models.rbac import UserTemplate, PermissionTemplate, TemplatePermission, PermissionItem
+
+    seen_user_ids = set()
+    items = []
+
+    # 1. Legacy
     query = select(User).where(
         User.clinic_id == current_user.clinic_id,
         User.role == UserRole.NURSE,
@@ -151,11 +209,35 @@ async def list_nurses(session: DBSession, current_user: CurrentUser):
         User.is_deleted == False,
     )
     result = await session.execute(query)
-    nurses = result.scalars().all()
-    return [
-        {"id": str(n.id), "first_name": n.first_name, "last_name": n.last_name, "middle_name": n.middle_name}
-        for n in nurses
-    ]
+    for n in result.scalars().all():
+        seen_user_ids.add(n.id)
+        items.append({"id": str(n.id), "first_name": n.first_name, "last_name": n.last_name, "middle_name": n.middle_name})
+
+    # 2. New staff with nurse-like template (has medical_card:vitals_record permission)
+    nurse_tpl_q = (
+        select(PermissionTemplate.id)
+        .join(TemplatePermission, PermissionTemplate.id == TemplatePermission.template_id)
+        .join(PermissionItem, TemplatePermission.permission_id == PermissionItem.id)
+        .where(PermissionItem.code == "medical_card:vitals_record")
+    )
+    nurse_tpl_r = await session.execute(nurse_tpl_q)
+    nurse_tpl_ids = set(r[0] for r in nurse_tpl_r.all())
+
+    if nurse_tpl_ids:
+        staff_q = (
+            select(StaffProfile)
+            .join(UserTemplate, StaffProfile.user_id == UserTemplate.user_id)
+            .where(
+                StaffProfile.clinic_id == current_user.clinic_id,
+                StaffProfile.is_deleted == False,
+                UserTemplate.template_id.in_(nurse_tpl_ids),
+            )
+        )
+        for s in (await session.execute(staff_q)).scalars().all():
+            if s.user_id not in seen_user_ids:
+                items.append({"id": str(s.user_id), "first_name": s.first_name, "last_name": s.last_name, "middle_name": s.middle_name})
+
+    return items
 
 
 # --- Facility lookups (cascading) ---
