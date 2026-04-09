@@ -25,6 +25,11 @@ class PatientCreate(BaseModel):
     registration_source: str = "WALK_IN"
     face_snapshot_id: uuid.UUID | None = None
     portal_password: str | None = None
+    bed_id: uuid.UUID | None = None
+    department_id: uuid.UUID | None = None
+    admission_type: str | None = None
+    treatment_form: str | None = None
+    admission_notes: str | None = None
 
 
 class PatientUpdate(BaseModel):

@@ -1,5 +1,6 @@
 import uuid
 from fastapi import APIRouter, Query
+from sqlalchemy import select
 from app.api.deps import CurrentUser, DBSession, require_role
 from app.models.user import UserRole
 from app.schemas.patient import (
@@ -44,7 +45,32 @@ async def create_patient(
 ):
     service = PatientService(session)
     patient = await service.create_patient(data.model_dump(), current_user.clinic_id)
-    return {"id": patient.id, "status": "created", "card_number": (await service.get_medical_card(patient.id)).card_number if await service.get_medical_card(patient.id) else None}
+    card = await service.get_medical_card(patient.id)
+
+    # Get doctor/nurse names if assigned
+    doctor_info = None
+    nurse_info = None
+    if patient.assigned_doctor_id:
+        from app.models.user import User
+        doc_q = select(User).where(User.id == patient.assigned_doctor_id)
+        doc_r = await session.execute(doc_q)
+        doc = doc_r.scalar_one_or_none()
+        if doc:
+            doctor_info = {"id": str(doc.id), "full_name": f"{doc.last_name} {doc.first_name[0]}."}
+    if patient.assigned_nurse_id:
+        nurse_q = select(User).where(User.id == patient.assigned_nurse_id)
+        nurse_r = await session.execute(nurse_q)
+        nur = nurse_r.scalar_one_or_none()
+        if nur:
+            nurse_info = {"id": str(nur.id), "full_name": f"{nur.last_name} {nur.first_name[0]}."}
+
+    return {
+        "patient_id": str(patient.id),
+        "card_number": card.card_number if card else None,
+        "doctor": doctor_info,
+        "nurse": nurse_info,
+        "redirect_url": f"/patients/{patient.id}",
+    }
 
 
 @router.get("/{patient_id}")

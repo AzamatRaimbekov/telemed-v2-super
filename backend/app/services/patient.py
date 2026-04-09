@@ -8,6 +8,7 @@ from app.core.exceptions import NotFoundError, ConflictError
 from app.core.security import hash_password
 from app.models.patient import Patient
 from app.models.medical import MedicalCard, Visit
+from app.models.facility import Bed, BedStatus, BedAssignment
 from app.models.vital_signs import VitalSign
 from app.models.treatment import TreatmentPlan, TreatmentPlanItem
 from app.models.laboratory import LabOrder, LabResult
@@ -59,6 +60,12 @@ class PatientService:
     async def create_patient(self, data: dict, clinic_id: uuid.UUID) -> Patient:
         portal_password = data.pop("portal_password", None)
         face_snapshot_id = data.pop("face_snapshot_id", None)
+        bed_id = data.pop("bed_id", None)
+        # Remove registration-only fields not on the Patient model
+        data.pop("department_id", None)
+        data.pop("admission_type", None)
+        data.pop("treatment_form", None)
+        data.pop("admission_notes", None)
 
         data["clinic_id"] = clinic_id
         data["id"] = uuid.uuid4()
@@ -86,6 +93,22 @@ class PatientService:
             clinic_id=clinic_id,
         )
         self.session.add(card)
+
+        # Bed assignment if provided
+        if bed_id:
+            bed_q = await self.session.execute(select(Bed).where(Bed.id == bed_id))
+            bed = bed_q.scalar_one_or_none()
+            if bed:
+                bed.status = BedStatus.OCCUPIED
+                assignment = BedAssignment(
+                    id=uuid.uuid4(),
+                    bed_id=bed_id,
+                    patient_id=patient.id,
+                    assigned_at=datetime.now(timezone.utc),
+                    clinic_id=clinic_id,
+                )
+                self.session.add(assignment)
+
         await self.session.flush()
         await self.session.refresh(patient)
         return patient
