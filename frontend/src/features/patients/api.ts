@@ -34,4 +34,19 @@ export const patientsApi = {
 
   // Visits
   getVisits: (patientId: string) => apiClient.get(`/patients/${patientId}/visits`).then(r => r.data),
+
+  // Registration helpers
+  ocrPassport: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiClient.post("/ocr/passport", formData, { headers: { "Content-Type": "multipart/form-data" } }).then(r => r.data);
+  },
+  getDetectedFaces: (clinicId: string) => apiClient.get(`/camera/faces?clinic_id=${clinicId}`).then(r => r.data),
+  validatePatient: (params: { inn?: string; passport_number?: string }) => apiClient.get("/patients/validate", { params }).then(r => r.data),
+  getDoctorsWithLoad: () => apiClient.get("/doctors?with_load=true").then(r => r.data),
+  getNurses: () => apiClient.get("/nurses").then(r => r.data),
+  getDepartments: () => apiClient.get("/departments").then(r => r.data),
+  getRooms: (departmentId: string) => apiClient.get(`/rooms?department_id=${departmentId}`).then(r => r.data),
+  getBeds: (roomId: string) => apiClient.get(`/beds?room_id=${roomId}&status=AVAILABLE`).then(r => r.data),
+  emergencyRegistration: (data: Record<string, unknown>) => apiClient.post("/patients/emergency", null, { params: data }).then(r => r.data),
 };
