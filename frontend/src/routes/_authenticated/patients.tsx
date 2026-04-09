@@ -3,6 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { patientsApi } from "@/features/patients/api";
 import { useState } from "react";
 import { formatDate } from "@/lib/utils";
+import { InputField } from "@/components/ui/input-field";
+import { CustomSelect } from "@/components/ui/select-custom";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/patients")({
   component: PatientsPage,
@@ -11,6 +14,19 @@ export const Route = createFileRoute("/_authenticated/patients")({
 const statusLabels: Record<string, string> = { ACTIVE: "Активен", DISCHARGED: "Выписан", DECEASED: "Умер", TRANSFERRED: "Переведён" };
 const statusColors: Record<string, string> = { ACTIVE: "bg-success/10 text-success", DISCHARGED: "bg-[var(--color-muted)] text-[var(--color-text-secondary)]", TRANSFERRED: "bg-warning/10 text-warning" };
 const genderLabels: Record<string, string> = { MALE: "М", FEMALE: "Ж", OTHER: "—" };
+
+const statusOptions = [
+  { value: "", label: "Все статусы" },
+  { value: "ACTIVE", label: "Активен" },
+  { value: "DISCHARGED", label: "Выписан" },
+  { value: "TRANSFERRED", label: "Переведён" },
+];
+
+const searchIcon = (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+  </svg>
+);
 
 function PatientsPage() {
   const [search, setSearch] = useState("");
@@ -42,18 +58,20 @@ function PatientsPage() {
 
       {/* Filters */}
       <div className="flex gap-3 mb-4 animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
-        <div className="relative flex-1 max-w-md">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} placeholder="Поиск по ФИО, ИНН, паспорту, телефону..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-[var(--color-surface)] text-foreground text-sm placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-secondary/40 input-glow transition-all" />
-        </div>
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
-          className="px-4 py-2.5 rounded-xl border border-border bg-[var(--color-surface)] text-foreground text-sm focus:outline-none focus:border-secondary/40">
-          <option value="">Все статусы</option>
-          <option value="ACTIVE">Активен</option>
-          <option value="DISCHARGED">Выписан</option>
-          <option value="TRANSFERRED">Переведён</option>
-        </select>
+        <InputField
+          icon={searchIcon}
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+          placeholder="Поиск по ФИО, ИНН, паспорту, телефону..."
+          className="flex-1 max-w-md"
+        />
+        <CustomSelect
+          value={statusFilter}
+          onChange={(v) => { setStatusFilter(v); setPage(0); }}
+          options={statusOptions}
+          placeholder="Все статусы"
+          className="w-44"
+        />
       </div>
 
       {/* Table */}
@@ -114,10 +132,8 @@ function PatientsPage() {
           <div className="flex items-center justify-between p-4 border-t border-border">
             <p className="text-sm text-[var(--color-text-tertiary)]">Стр. {page + 1} из {Math.ceil(total / limit)}</p>
             <div className="flex gap-2">
-              <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0}
-                className="px-3 py-1.5 rounded-lg border border-border text-sm disabled:opacity-50 hover:bg-[var(--color-muted)] transition-colors">Назад</button>
-              <button onClick={() => setPage(page + 1)} disabled={(page + 1) * limit >= total}
-                className="px-3 py-1.5 rounded-lg border border-border text-sm disabled:opacity-50 hover:bg-[var(--color-muted)] transition-colors">Далее</button>
+              <Button variant="outline" size="sm" onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0}>Назад</Button>
+              <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={(page + 1) * limit >= total}>Далее</Button>
             </div>
           </div>
         )}
