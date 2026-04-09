@@ -40,8 +40,8 @@ function ExercisesPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-[24px] font-bold text-foreground tracking-tight mb-2 animate-float-up" style={{ opacity: 0 }}>Упражнения</h1>
-      <p className="text-[var(--color-text-secondary)] text-sm mb-6 animate-float-up" style={{ animationDelay: '50ms', opacity: 0 }}>Программа реабилитации</p>
+      <h1 className="text-[24px] font-bold text-foreground tracking-tight mb-2 animate-float-up">Упражнения</h1>
+      <p className="text-[var(--color-text-secondary)] text-sm mb-6 animate-float-up" style={{ animationDelay: '50ms' }}>Программа реабилитации</p>
 
       {/* Progress stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -51,7 +51,7 @@ function ExercisesPage() {
           { label: "Точность", value: `${progress?.avg_accuracy ?? 0}%`, sub: "средняя" },
           { label: "Повторений", value: String(progress?.total_reps ?? 0), sub: "всего" },
         ].map((s, i) => (
-          <div key={s.label} className="bg-[var(--color-surface)] rounded-xl border border-border p-4 animate-float-up" style={{ animationDelay: `${100 + i * 50}ms`, opacity: 0 }}>
+          <div key={s.label} className="bg-[var(--color-surface)] rounded-xl border border-border p-4 animate-float-up" style={{ animationDelay: `${100 + i * 50}ms` }}>
             <p className="text-xl font-bold text-foreground">{s.value}</p>
             <p className="text-xs text-[var(--color-text-secondary)]">{s.label}</p>
             <p className="text-[10px] text-[var(--color-text-tertiary)]">{s.sub}</p>
@@ -60,7 +60,7 @@ function ExercisesPage() {
       </div>
 
       {/* Category filter */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-2 animate-float-up" style={{ animationDelay: '250ms', opacity: 0 }}>
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2 animate-float-up" style={{ animationDelay: '250ms' }}>
         {categories.map((cat) => (
           <button key={cat} onClick={() => setFilter(cat)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${filter === cat ? "bg-secondary text-white" : "bg-[var(--color-muted)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"}`}>
@@ -70,7 +70,7 @@ function ExercisesPage() {
       </div>
 
       {/* Exercise cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-float-up" style={{ animationDelay: '300ms', opacity: 0 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-float-up" style={{ animationDelay: '300ms' }}>
         {(filtered as Array<Record<string, any>> || []).map((ex: Record<string, any>) => {
           const color = categoryColors[ex.category] || "#7E78D2";
           const sessionCount = (sessions as Array<Record<string, any>> || []).filter((s: Record<string, any>) => s.exercise_id === ex.id).length;

@@ -35,7 +35,7 @@ function StatCard({
   return (
     <div
       className="stat-card bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up cursor-default"
-      style={{ animationDelay: `${delay}ms`, opacity: 0 }}
+      style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between mb-4">
         <div
@@ -86,7 +86,7 @@ function QuickAction({
   return (
     <button
       className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-[var(--color-surface)] hover:border-[var(--color-text-tertiary)]/30 transition-all duration-300 text-left w-full animate-float-up"
-      style={{ animationDelay: `${delay}ms`, opacity: 0 }}
+      style={{ animationDelay: `${delay}ms` }}
     >
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
@@ -152,7 +152,7 @@ function ActivityItem({
   return (
     <div
       className="flex items-center gap-3 py-3 animate-slide-in-right"
-      style={{ animationDelay: `${delay}ms`, opacity: 0 }}
+      style={{ animationDelay: `${delay}ms` }}
     >
       <div
         className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -181,7 +181,7 @@ function DashboardPage() {
   return (
     <div className="max-w-7xl">
       {/* Header */}
-      <div className="mb-8 animate-float-up" style={{ animationDelay: '0ms', opacity: 0 }}>
+      <div className="mb-8 animate-float-up" style={{ animationDelay: '0ms' }}>
         <h1 className="text-[26px] font-bold text-foreground tracking-tight">
           {greeting}{user ? `, ${user.first_name}` : ""} 👋
         </h1>
@@ -258,7 +258,7 @@ function DashboardPage() {
         <div className="xl:col-span-1 space-y-3">
           <h2
             className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-4 animate-float-up"
-            style={{ animationDelay: '400ms', opacity: 0 }}
+            style={{ animationDelay: '400ms' }}
           >
             Быстрые действия
           </h2>
@@ -325,13 +325,13 @@ function DashboardPage() {
         <div className="xl:col-span-2">
           <h2
             className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-4 animate-float-up"
-            style={{ animationDelay: '400ms', opacity: 0 }}
+            style={{ animationDelay: '400ms' }}
           >
             Последняя активность
           </h2>
           <div
             className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-scale-in"
-            style={{ animationDelay: '450ms', opacity: 0 }}
+            style={{ animationDelay: '450ms' }}
           >
             <div className="divide-y divide-border">
               <ActivityItem title="Пациент Уметов А.Б. — приём завершён" time="10:24" type="patient" delay={550} />

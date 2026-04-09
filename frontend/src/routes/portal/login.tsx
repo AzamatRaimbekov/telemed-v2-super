@@ -39,7 +39,7 @@ function PortalLoginPage() {
       <div className="absolute w-[400px] h-[400px] -bottom-32 -left-32 rounded-full blur-3xl bg-secondary/10 animate-[pulse-ring_10s_ease-in-out_infinite_1s] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-[440px] px-6">
-        <div className="text-center mb-10 animate-float-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
+        <div className="text-center mb-10 animate-float-up" style={{ animationDelay: '0.1s' }}>
           <div className="inline-flex items-center justify-center mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-[var(--color-primary-deep)] flex items-center justify-center shadow-lg shadow-primary/20">
               <svg className="w-8 h-8 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -56,7 +56,7 @@ function PortalLoginPage() {
           <p className="text-muted-foreground mt-2 text-[15px]">MedCore KG</p>
         </div>
 
-        <div className="glass-card rounded-2xl p-8 animate-float-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
+        <div className="glass-card rounded-2xl p-8 animate-float-up" style={{ animationDelay: '0.3s' }}>
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-foreground">Вход</h2>
             <p className="text-sm text-muted-foreground mt-1">Введите номер телефона и пароль</p>
@@ -101,7 +101,7 @@ function PortalLoginPage() {
           </form>
         </div>
 
-        <p className="text-center mt-8 text-xs text-[var(--color-text-tertiary)] animate-float-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
+        <p className="text-center mt-8 text-xs text-[var(--color-text-tertiary)] animate-float-up" style={{ animationDelay: '0.5s' }}>
           Портал пациента MedCore KG v1.0
         </p>
       </div>

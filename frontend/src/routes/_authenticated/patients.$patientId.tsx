@@ -39,12 +39,12 @@ function PatientDetailPage() {
   return (
     <div className="max-w-6xl">
       {/* Back + header */}
-      <Link to="/patients" className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-foreground mb-4 transition-colors animate-float-up" style={{ opacity: 0 }}>
+      <Link to="/patients" className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-foreground mb-4 transition-colors animate-float-up">
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
         К списку пациентов
       </Link>
 
-      <div className="flex items-center gap-4 mb-6 animate-float-up" style={{ animationDelay: '50ms', opacity: 0 }}>
+      <div className="flex items-center gap-4 mb-6 animate-float-up" style={{ animationDelay: '50ms' }}>
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-[var(--color-primary-deep)] flex items-center justify-center text-lg font-bold text-primary-foreground shadow-sm">
           {patient.first_name?.[0]}{patient.last_name?.[0]}
         </div>
@@ -59,14 +59,14 @@ function PatientDetailPage() {
 
       {/* Allergy banner */}
       {patient.allergies && patient.allergies.length > 0 && (
-        <div className="mb-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 animate-float-up" style={{ animationDelay: '80ms', opacity: 0 }}>
+        <div className="mb-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 animate-float-up" style={{ animationDelay: '80ms' }}>
           <svg className="w-5 h-5 text-destructive flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
           <p className="text-sm text-destructive"><strong>Аллергии:</strong> {patient.allergies.join(", ")}</p>
         </div>
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 overflow-x-auto animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
+      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 overflow-x-auto animate-float-up" style={{ animationDelay: '100ms' }}>
         {TABS.map((t, i) => (
           <button key={t} onClick={() => setTab(i)}
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${tab === i ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)] hover:text-foreground"}`}>
@@ -75,7 +75,7 @@ function PatientDetailPage() {
         ))}
       </div>
 
-      <div className="animate-float-up" style={{ animationDelay: '150ms', opacity: 0 }}>
+      <div className="animate-float-up" style={{ animationDelay: '150ms' }}>
         {/* Profile tab */}
         {tab === 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

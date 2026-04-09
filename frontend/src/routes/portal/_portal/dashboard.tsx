@@ -32,7 +32,7 @@ function PortalDashboard() {
   return (
     <div className="max-w-4xl">
       {/* Greeting */}
-      <div className="mb-8 animate-float-up" style={{ animationDelay: '0ms', opacity: 0 }}>
+      <div className="mb-8 animate-float-up" style={{ animationDelay: '0ms' }}>
         <div className="flex items-center gap-3 mb-1">
           <h1 className="text-[24px] font-bold text-foreground tracking-tight">
             {greeting}{patient ? `, ${patient.first_name}` : ""}
@@ -48,7 +48,7 @@ function PortalDashboard() {
 
       {/* Next appointment */}
       {nextAppt && (
-        <div className="mb-6 animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
+        <div className="mb-6 animate-float-up" style={{ animationDelay: '100ms' }}>
           <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-2xl border border-secondary/20 p-6">
             <div className="flex items-center gap-2 mb-3">
               <svg className="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -70,7 +70,7 @@ function PortalDashboard() {
           { label: "Уведомления", value: String(unreadCount), sub: "непрочитано", color: "#F59E0B" },
           { label: "Лечение", value: String((todayTreatment as unknown[] || []).length), sub: "задач сегодня", color: "#3B82F6" },
         ].map((s, i) => (
-          <div key={s.label} className="stat-card bg-[var(--color-surface)] rounded-xl border border-border p-4 animate-float-up" style={{ animationDelay: `${200 + i * 80}ms`, opacity: 0 }}>
+          <div key={s.label} className="stat-card bg-[var(--color-surface)] rounded-xl border border-border p-4 animate-float-up" style={{ animationDelay: `${200 + i * 80}ms` }}>
             <p className="text-[22px] font-bold text-foreground">{s.value}</p>
             <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{s.label}</p>
             <p className="text-[10px] text-[var(--color-text-tertiary)]">{s.sub}</p>
@@ -79,7 +79,7 @@ function PortalDashboard() {
       </div>
 
       {/* Quick actions */}
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-3 animate-float-up" style={{ animationDelay: '500ms', opacity: 0 }}>Быстрые действия</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-3 animate-float-up" style={{ animationDelay: '500ms' }}>Быстрые действия</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         {[
           { label: "Начать упражнение", icon: "M22 12h-4l-3 9L9 3l-3 9H2", color: "#10B981", to: "/portal/exercises" },
@@ -88,7 +88,7 @@ function PortalDashboard() {
         ].map((a, i) => (
           <a key={a.label} href={a.to}
             className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-[var(--color-surface)] hover:border-[var(--color-text-tertiary)]/30 transition-all animate-float-up"
-            style={{ animationDelay: `${600 + i * 80}ms`, opacity: 0 }}>
+            style={{ animationDelay: `${600 + i * 80}ms` }}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${a.color}15`, color: a.color }}>
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d={a.icon} />
@@ -101,7 +101,7 @@ function PortalDashboard() {
 
       {/* Today's treatment plan */}
       {(todayTreatment as unknown[] || []).length > 0 && (
-        <div className="animate-float-up" style={{ animationDelay: '800ms', opacity: 0 }}>
+        <div className="animate-float-up" style={{ animationDelay: '800ms' }}>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-3">План на сегодня</h2>
           <div className="bg-[var(--color-surface)] rounded-xl border border-border divide-y divide-border">
             {(todayTreatment as Array<Record<string, unknown>>).map((item) => (

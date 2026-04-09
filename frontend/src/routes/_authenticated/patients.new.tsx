@@ -597,7 +597,7 @@ function NewPatientPage() {
       )}
 
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-6 animate-float-up" style={{ opacity: 0 }}>
+      <div className="flex items-center justify-between mb-6 animate-float-up">
         <div className="flex items-center gap-3">
           <a href="/patients" className="flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] hover:text-foreground transition-colors">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
@@ -624,7 +624,7 @@ function NewPatientPage() {
       </div>
 
       {/* Progress */}
-      <div className="animate-float-up" style={{ animationDelay: "50ms", opacity: 0 }}>
+      <div className="animate-float-up" style={{ animationDelay: "50ms" }}>
         <ProgressIndicator current={completedSections.length + 1} completed={completedSections} />
       </div>
 
@@ -635,7 +635,7 @@ function NewPatientPage() {
           <div className="flex-1 min-w-0 space-y-5">
 
             {/* ── Section 1: Паспорт и OCR ─────────────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "100ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "100ms" }}>
               <SectionHeader num={1} title="Паспорт и OCR" completed={completedSections.includes(1)} />
 
               {!passportFile ? (
@@ -737,7 +737,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Section 2: Личные данные ──────────────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "150ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "150ms" }}>
               <SectionHeader num={2} title="Личные данные" completed={completedSections.includes(2)} />
 
               <div className="grid grid-cols-3 gap-4">
@@ -819,7 +819,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Section 3: Контакты ───────────────────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "200ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "200ms" }}>
               <SectionHeader num={3} title="Контакты" completed={completedSections.includes(3)} />
 
               <div className="grid grid-cols-2 gap-4">
@@ -841,7 +841,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Section 4: Медицинская информация ────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "250ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "250ms" }}>
               <SectionHeader num={4} title="Медицинская информация" completed={completedSections.includes(4)} />
 
               <div className="grid grid-cols-2 gap-4">
@@ -888,7 +888,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Section 5: Страховка ──────────────────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "300ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "300ms" }}>
               <SectionHeader num={5} title="Страховка" completed={completedSections.includes(5)} />
 
               <div className="mb-4">
@@ -910,7 +910,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Section 6: Госпитализация ─────────────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "350ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "350ms" }}>
               <SectionHeader num={6} title="Госпитализация" completed={completedSections.includes(6)} />
 
               {/* Admission type radio cards */}
@@ -1023,7 +1023,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Section 7: Назначение персонала ──────────────────────── */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "400ms", opacity: 0 }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 animate-float-up" style={{ animationDelay: "400ms" }}>
               <SectionHeader num={7} title="Назначение персонала" completed={completedSections.includes(7)} />
 
               <div className="grid grid-cols-2 gap-4">
@@ -1045,7 +1045,7 @@ function NewPatientPage() {
             </div>
 
             {/* ── Bottom actions ─────────────────────────────────────────── */}
-            <div className="flex items-center justify-between py-4 animate-float-up" style={{ animationDelay: "450ms", opacity: 0 }}>
+            <div className="flex items-center justify-between py-4 animate-float-up" style={{ animationDelay: "450ms" }}>
               <Button type="button" variant="outline" size="lg" onClick={() => navigate({ to: "/patients" })}>
                 Отмена
               </Button>
@@ -1061,7 +1061,7 @@ function NewPatientPage() {
           </div>
 
           {/* Right column — AI Camera panel (30%) */}
-          <div className="w-[280px] flex-shrink-0 animate-float-up" style={{ animationDelay: "200ms", opacity: 0 }}>
+          <div className="w-[280px] flex-shrink-0 animate-float-up" style={{ animationDelay: "200ms" }}>
             <AICameraPanel selectedFaceId={selectedFaceId} onSelectFace={setSelectedFaceId} />
           </div>
         </div>

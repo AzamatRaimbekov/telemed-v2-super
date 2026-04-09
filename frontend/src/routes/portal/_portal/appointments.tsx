@@ -25,15 +25,15 @@ function AppointmentsPage() {
   return (
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[24px] font-bold text-foreground tracking-tight animate-float-up" style={{ opacity: 0 }}>Записи на приём</h1>
-        <button className="px-4 py-2 rounded-xl bg-secondary text-white text-sm font-medium hover:bg-secondary/90 transition-colors animate-float-up" style={{ animationDelay: '50ms', opacity: 0 }}>
+        <h1 className="text-[24px] font-bold text-foreground tracking-tight animate-float-up">Записи на приём</h1>
+        <button className="px-4 py-2 rounded-xl bg-secondary text-white text-sm font-medium hover:bg-secondary/90 transition-colors animate-float-up" style={{ animationDelay: '50ms' }}>
           + Записаться
         </button>
       </div>
 
       {/* Upcoming */}
       {upcoming.length > 0 && (
-        <div className="mb-6 animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
+        <div className="mb-6 animate-float-up" style={{ animationDelay: '100ms' }}>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-3">Предстоящие</h2>
           <div className="space-y-3">
             {upcoming.map((a: Record<string, any>) => (
@@ -58,7 +58,7 @@ function AppointmentsPage() {
       )}
 
       {/* Past */}
-      <div className="animate-float-up" style={{ animationDelay: '200ms', opacity: 0 }}>
+      <div className="animate-float-up" style={{ animationDelay: '200ms' }}>
         <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-3">История</h2>
         {past.length === 0 && !isLoading ? (
           <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">

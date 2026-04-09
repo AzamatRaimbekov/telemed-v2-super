@@ -18,14 +18,14 @@ function MedicalCardPage() {
   return (
     <div className="max-w-4xl">
       {/* Header */}
-      <div className="mb-6 animate-float-up" style={{ opacity: 0 }}>
+      <div className="mb-6 animate-float-up">
         <h1 className="text-[24px] font-bold text-foreground tracking-tight">Медицинская карта</h1>
         {card && <p className="text-sm text-[var(--color-text-secondary)] mt-1">Карта №{(card as Record<string, any>).card_number}</p>}
       </div>
 
       {/* Allergy banner */}
       {(card as Record<string, any>)?.allergies && (card as Record<string, any>).allergies.length > 0 && (
-        <div className="mb-4 p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 animate-float-up" style={{ animationDelay: '50ms', opacity: 0 }}>
+        <div className="mb-4 p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 animate-float-up" style={{ animationDelay: '50ms' }}>
           <svg className="w-5 h-5 text-destructive flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
           </svg>
@@ -37,7 +37,7 @@ function MedicalCardPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
+      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 animate-float-up" style={{ animationDelay: '100ms' }}>
         {TABS.map((t, i) => (
           <button key={t} onClick={() => setTab(i)}
             className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${tab === i ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)] hover:text-foreground"}`}>
@@ -47,7 +47,7 @@ function MedicalCardPage() {
       </div>
 
       {/* Tab content */}
-      <div className="animate-float-up" style={{ animationDelay: '150ms', opacity: 0 }}>
+      <div className="animate-float-up" style={{ animationDelay: '150ms' }}>
         {tab === 0 && <OverviewTab vitals={vitals} diagnoses={diagnoses} card={card} />}
         {tab === 1 && <VitalsTab vitals={vitals} />}
         {tab === 2 && <DiagnosesTab diagnoses={diagnoses} />}

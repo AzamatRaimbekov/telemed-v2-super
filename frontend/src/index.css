@@ -114,18 +114,22 @@
 }
 
 .animate-float-up {
+  opacity: 0;
   animation: float-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-scale-in {
+  opacity: 0;
   animation: scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-fade-in {
+  opacity: 0;
   animation: fade-in 0.5s ease forwards;
 }
 
 .animate-slide-in-right {
+  opacity: 0;
   animation: slide-in-right 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 

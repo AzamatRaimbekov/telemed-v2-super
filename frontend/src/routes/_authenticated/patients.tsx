@@ -46,18 +46,18 @@ function PatientsPage() {
     <div className="max-w-7xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div className="animate-float-up" style={{ opacity: 0 }}>
+        <div className="animate-float-up">
           <h1 className="text-[26px] font-bold text-foreground tracking-tight">Пациенты</h1>
           <p className="text-[var(--color-text-secondary)] text-sm mt-1">{total} пациентов</p>
         </div>
-        <Link to="/patients/new" className="px-5 py-2.5 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-secondary/90 transition-colors flex items-center gap-2 animate-float-up" style={{ animationDelay: '50ms', opacity: 0 }}>
+        <Link to="/patients/new" className="px-5 py-2.5 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-secondary/90 transition-colors flex items-center gap-2 animate-float-up" style={{ animationDelay: '50ms' }}>
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
           Новый пациент
         </Link>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-4 animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
+      <div className="flex gap-3 mb-4 animate-float-up" style={{ animationDelay: '100ms' }}>
         <InputField
           icon={searchIcon}
           value={search}
@@ -75,7 +75,7 @@ function PatientsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden animate-float-up" style={{ animationDelay: '150ms', opacity: 0 }}>
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden animate-float-up" style={{ animationDelay: '150ms' }}>
         {isLoading ? (
           <div className="p-6 space-y-3">{[1,2,3,4,5].map(i => <div key={i} className="h-14 bg-[var(--color-muted)] rounded-xl animate-pulse" />)}</div>
         ) : patients.length === 0 ? (

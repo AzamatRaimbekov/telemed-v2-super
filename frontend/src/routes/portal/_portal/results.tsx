@@ -18,10 +18,10 @@ function ResultsPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-[24px] font-bold text-foreground tracking-tight mb-6 animate-float-up" style={{ opacity: 0 }}>Результаты анализов</h1>
+      <h1 className="text-[24px] font-bold text-foreground tracking-tight mb-6 animate-float-up">Результаты анализов</h1>
 
       {selectedId && detail ? (
-        <div className="animate-scale-in" style={{ opacity: 0 }}>
+        <div className="animate-scale-in">
           <button onClick={() => setSelectedId(null)} className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-foreground mb-4 transition-colors">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
             Назад к списку
@@ -60,7 +60,7 @@ function ResultsPage() {
           </div>
         </div>
       ) : (
-        <div className="space-y-2 animate-float-up" style={{ animationDelay: '100ms', opacity: 0 }}>
+        <div className="space-y-2 animate-float-up" style={{ animationDelay: '100ms' }}>
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => <div key={i} className="h-16 bg-[var(--color-muted)] rounded-xl animate-pulse" />)}

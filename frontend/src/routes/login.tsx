@@ -61,7 +61,7 @@ function LoginPage() {
 
       <div className="relative z-10 w-full max-w-[440px] px-6">
         {/* Logo & Branding */}
-        <div className="text-center mb-10 animate-float-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
+        <div className="text-center mb-10 animate-float-up" style={{ animationDelay: '0.1s' }}>
           <div className="inline-flex items-center justify-center mb-6">
             <div className="relative">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-deep flex items-center justify-center shadow-lg shadow-primary/20">
@@ -92,7 +92,7 @@ function LoginPage() {
         {/* Login Card */}
         <div
           className="glass-card rounded-2xl p-8 animate-float-up"
-          style={{ animationDelay: '0.3s', opacity: 0 }}
+          style={{ animationDelay: '0.3s' }}
         >
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-foreground">Вход в систему</h2>
@@ -107,7 +107,7 @@ function LoginPage() {
         {/* Footer */}
         <div
           className="text-center mt-8 animate-float-up"
-          style={{ animationDelay: '0.5s', opacity: 0 }}
+          style={{ animationDelay: '0.5s' }}
         >
           <p className="text-xs text-[var(--color-text-tertiary)]">
             MedCore KG v1.0 &middot; Бишкек, Кыргызстан

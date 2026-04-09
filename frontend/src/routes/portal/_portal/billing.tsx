@@ -33,7 +33,7 @@ function BillingPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-[24px] font-bold text-foreground tracking-tight mb-6 animate-float-up" style={{ opacity: 0 }}>Финансы и счета</h1>
+      <h1 className="text-[24px] font-bold text-foreground tracking-tight mb-6 animate-float-up">Финансы и счета</h1>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -43,7 +43,7 @@ function BillingPage() {
           { label: "Страховка", value: s?.insurance_covered ?? 0, color: "text-secondary" },
           { label: "К оплате", value: s?.patient_balance ?? 0, color: s?.patient_balance && s.patient_balance > 0 ? "text-destructive" : "text-foreground" },
         ].map((item, i) => (
-          <div key={item.label} className="stat-card bg-[var(--color-surface)] rounded-xl border border-border p-4 animate-float-up" style={{ animationDelay: `${100 + i * 60}ms`, opacity: 0 }}>
+          <div key={item.label} className="stat-card bg-[var(--color-surface)] rounded-xl border border-border p-4 animate-float-up" style={{ animationDelay: `${100 + i * 60}ms` }}>
             <p className="text-xs text-[var(--color-text-tertiary)] mb-1">{item.label}</p>
             <p className={`text-xl font-bold ${item.color}`}>{formatCurrency(item.value)}</p>
           </div>
@@ -51,12 +51,12 @@ function BillingPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-4 animate-float-up" style={{ animationDelay: '300ms', opacity: 0 }}>
+      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-4 animate-float-up" style={{ animationDelay: '300ms' }}>
         <button onClick={() => setTab("invoices")} className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${tab === "invoices" ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)]"}`}>Счета</button>
         <button onClick={() => setTab("payments")} className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${tab === "payments" ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)]"}`}>Платежи</button>
       </div>
 
-      <div className="animate-float-up" style={{ animationDelay: '350ms', opacity: 0 }}>
+      <div className="animate-float-up" style={{ animationDelay: '350ms' }}>
         {tab === "invoices" ? (
           <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
             {(invoices as Array<Record<string, any>> || []).length === 0 ? (
