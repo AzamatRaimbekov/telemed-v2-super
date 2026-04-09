@@ -49,4 +49,7 @@ export const patientsApi = {
   getRooms: (departmentId: string) => apiClient.get(`/rooms?department_id=${departmentId}`).then(r => r.data),
   getBeds: (roomId: string) => apiClient.get(`/beds?room_id=${roomId}&status=AVAILABLE`).then(r => r.data),
   emergencyRegistration: (data: Record<string, unknown>) => apiClient.post("/patients/emergency", null, { params: data }).then(r => r.data),
+
+  // User info
+  getUser: (userId: string) => apiClient.get(`/users/${userId}`).then(r => r.data),
 };

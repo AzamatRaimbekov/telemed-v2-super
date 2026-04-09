@@ -1,27 +1,53 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { patientsApi } from "@/features/patients/api";
-import { useState } from "react";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/patients/$patientId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as string) || "profile",
+  }),
   component: PatientDetailPage,
 });
 
-const TABS = ["Профиль", "Показатели", "Анализы", "Лечение", "Упражнения", "Визиты"];
+const TABS = [
+  { key: "profile", label: "Профиль" },
+  { key: "vitals", label: "Показатели" },
+  { key: "results", label: "Анализы" },
+  { key: "treatment", label: "Лечение" },
+  { key: "exercises", label: "Упражнения" },
+  { key: "visits", label: "Визиты" },
+];
 
 function PatientDetailPage() {
   const { patientId } = Route.useParams();
-  const [tab, setTab] = useState(0);
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const setTab = (newTab: string) => {
+    navigate({ search: { tab: newTab }, replace: true });
+  };
+
   const { data: patient, isLoading } = useQuery({ queryKey: ["patient", patientId], queryFn: () => patientsApi.get(patientId) });
-  const { data: vitals } = useQuery({ queryKey: ["patient-vitals", patientId], queryFn: () => patientsApi.getVitals(patientId), enabled: tab === 1 });
-  const { data: labResults } = useQuery({ queryKey: ["patient-results", patientId], queryFn: () => patientsApi.getLabResults(patientId), enabled: tab === 2 });
-  const { data: plans } = useQuery({ queryKey: ["patient-plans", patientId], queryFn: () => patientsApi.getTreatmentPlans(patientId), enabled: tab === 3 });
-  const { data: exerciseSessions } = useQuery({ queryKey: ["patient-exercises", patientId], queryFn: () => patientsApi.getExerciseSessions(patientId), enabled: tab === 4 });
-  const { data: visits } = useQuery({ queryKey: ["patient-visits", patientId], queryFn: () => patientsApi.getVisits(patientId), enabled: tab === 5 });
+  const { data: vitals } = useQuery({ queryKey: ["patient-vitals", patientId], queryFn: () => patientsApi.getVitals(patientId), enabled: tab === "vitals" });
+  const { data: labResults } = useQuery({ queryKey: ["patient-results", patientId], queryFn: () => patientsApi.getLabResults(patientId), enabled: tab === "results" });
+  const { data: plans } = useQuery({ queryKey: ["patient-plans", patientId], queryFn: () => patientsApi.getTreatmentPlans(patientId), enabled: tab === "treatment" });
+  const { data: exerciseSessions } = useQuery({ queryKey: ["patient-exercises", patientId], queryFn: () => patientsApi.getExerciseSessions(patientId), enabled: tab === "exercises" });
+  const { data: visits } = useQuery({ queryKey: ["patient-visits", patientId], queryFn: () => patientsApi.getVisits(patientId), enabled: tab === "visits" });
+
+  // Doctor and nurse data for profile tab
+  const { data: doctorData } = useQuery({
+    queryKey: ["user", patient?.assigned_doctor_id],
+    queryFn: () => patientsApi.getUser(patient!.assigned_doctor_id),
+    enabled: tab === "profile" && !!patient?.assigned_doctor_id,
+  });
+  const { data: nurseData } = useQuery({
+    queryKey: ["user", patient?.assigned_nurse_id],
+    queryFn: () => patientsApi.getUser(patient!.assigned_nurse_id),
+    enabled: tab === "profile" && !!patient?.assigned_nurse_id,
+  });
 
   const approveMutation = useMutation({
     mutationFn: ({ resultId, visible }: { resultId: string; visible: boolean }) => patientsApi.approveResult(resultId, visible),
@@ -67,17 +93,19 @@ function PatientDetailPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 overflow-x-auto animate-float-up" style={{ animationDelay: '100ms' }}>
-        {TABS.map((t, i) => (
-          <button key={t} onClick={() => setTab(i)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${tab === i ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)] hover:text-foreground"}`}>
-            {t}
+        {TABS.map((t) => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+              tab === t.key ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)] hover:text-foreground"
+            }`}>
+            {t.label}
           </button>
         ))}
       </div>
 
       <div className="animate-float-up" style={{ animationDelay: '150ms' }}>
         {/* Profile tab */}
-        {tab === 0 && (
+        {tab === "profile" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6">
               <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">Личные данные</h3>
@@ -111,11 +139,81 @@ function PatientDetailPage() {
                 </div>
               </div>
             </div>
+
+            {/* Assigned staff section */}
+            {(patient.assigned_doctor_id || patient.assigned_nurse_id) && (
+              <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 lg:col-span-2">
+                <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">Закреплённый персонал</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Doctor card */}
+                  {patient.assigned_doctor_id && (
+                    <Link
+                      to="/staff/$staffId"
+                      params={{ staffId: doctorData?.id || patient.assigned_doctor_id }}
+                      search={{ tab: "profile" }}
+                      className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-secondary/30 transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                          <path d="M12 11v4M10 13h4"/>
+                        </svg>
+                      </div>
+                      <div className="min-w-0">
+                        {doctorData ? (
+                          <>
+                            <p className="text-sm font-medium text-foreground truncate">{doctorData.last_name} {doctorData.first_name}</p>
+                            <p className="text-xs text-[var(--color-text-tertiary)]">{doctorData.specialization || "Врач"}</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-foreground">Лечащий врач</p>
+                            <p className="text-xs text-[var(--color-text-tertiary)] font-mono">{patient.assigned_doctor_id}</p>
+                          </>
+                        )}
+                      </div>
+                    </Link>
+                  )}
+
+                  {/* Nurse card */}
+                  {patient.assigned_nurse_id && (
+                    <Link
+                      to="/staff/$staffId"
+                      params={{ staffId: nurseData?.id || patient.assigned_nurse_id }}
+                      search={{ tab: "profile" }}
+                      className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-secondary/30 transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                          <path d="M12 3v4M10 5h4"/>
+                        </svg>
+                      </div>
+                      <div className="min-w-0">
+                        {nurseData ? (
+                          <>
+                            <p className="text-sm font-medium text-foreground truncate">{nurseData.last_name} {nurseData.first_name}</p>
+                            <p className="text-xs text-[var(--color-text-tertiary)]">{nurseData.specialization || "Медсестра"}</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-foreground">Медсестра</p>
+                            <p className="text-xs text-[var(--color-text-tertiary)] font-mono">{patient.assigned_nurse_id}</p>
+                          </>
+                        )}
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Vitals tab */}
-        {tab === 1 && (
+        {tab === "vitals" && (
           <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden">
             {(vitals || []).length === 0 ? (
               <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет записей показателей</p></div>
@@ -146,7 +244,7 @@ function PatientDetailPage() {
         )}
 
         {/* Lab Results tab with approve button */}
-        {tab === 2 && (
+        {tab === "results" && (
           <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
             {(labResults || []).length === 0 ? (
               <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет результатов анализов</p></div>
@@ -176,7 +274,7 @@ function PatientDetailPage() {
         )}
 
         {/* Treatment Plans tab */}
-        {tab === 3 && (
+        {tab === "treatment" && (
           <div className="space-y-4">
             {(plans || []).length === 0 ? (
               <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет планов лечения</p></div>
@@ -196,7 +294,7 @@ function PatientDetailPage() {
         )}
 
         {/* Exercise Sessions tab */}
-        {tab === 4 && (
+        {tab === "exercises" && (
           <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden">
             {(exerciseSessions || []).length === 0 ? (
               <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Пациент ещё не выполнял упражнения</p></div>
@@ -224,7 +322,7 @@ function PatientDetailPage() {
         )}
 
         {/* Visits tab */}
-        {tab === 5 && (
+        {tab === "visits" && (
           <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
             {(visits || []).length === 0 ? (
               <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет визитов</p></div>

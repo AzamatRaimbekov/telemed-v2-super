@@ -1,17 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { staffApi } from "@/features/staff/api";
-import { useState } from "react";
+import { patientsApi } from "@/features/patients/api";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/staff/$staffId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as string) || "profile",
+  }),
   component: StaffDetailPage,
 });
 
-const TABS = ["Профиль", "Квалификация", "Доступ"];
+const TABS = [
+  { key: "profile", label: "Профиль" },
+  { key: "qualifications", label: "Квалификация" },
+  { key: "patients", label: "Пациенты" },
+  { key: "permissions", label: "Доступ" },
+];
 
 const employmentTypeLabels: Record<string, string> = {
   FULL: "Полная занятость",
@@ -35,8 +43,13 @@ function templateColorClass(name: string): string {
 
 function StaffDetailPage() {
   const { staffId } = Route.useParams();
-  const [tab, setTab] = useState(0);
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const setTab = (newTab: string) => {
+    navigate({ search: { tab: newTab }, replace: true });
+  };
 
   const { data: staff, isLoading } = useQuery({
     queryKey: ["staff", staffId],
@@ -46,14 +59,21 @@ function StaffDetailPage() {
   const { data: permissionsData } = useQuery({
     queryKey: ["staff-permissions", staffId],
     queryFn: () => staffApi.getPermissions(staffId),
-    enabled: tab === 2,
+    enabled: tab === "permissions",
   });
 
   // Load ALL permissions for the matrix
   const { data: allPermsData } = useQuery({
     queryKey: ["all-permissions"],
     queryFn: () => staffApi.listPermissions(),
-    enabled: tab === 2,
+    enabled: tab === "permissions",
+  });
+
+  // Load assigned patients
+  const { data: assignedPatients } = useQuery({
+    queryKey: ["staff-patients", staff?.user_id],
+    queryFn: () => patientsApi.list({ doctor_id: staff!.user_id }),
+    enabled: tab === "patients" && !!staff?.user_id,
   });
 
   const grantMutation = useMutation({
@@ -140,6 +160,9 @@ function StaffDetailPage() {
     return "ok";
   }
 
+  const patientStatusLabels: Record<string, string> = { ACTIVE: "Активен", DISCHARGED: "Выписан" };
+  const patientStatusColors: Record<string, string> = { ACTIVE: "bg-success/10 text-success", DISCHARGED: "bg-[var(--color-muted)] text-[var(--color-text-secondary)]" };
+
   return (
     <div className="max-w-6xl">
       {/* Back */}
@@ -216,25 +239,25 @@ function StaffDetailPage() {
         className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 overflow-x-auto animate-float-up"
         style={{ animationDelay: "100ms" }}
       >
-        {TABS.map((t, i) => (
+        {TABS.map((t) => (
           <button
-            key={t}
-            onClick={() => setTab(i)}
+            key={t.key}
+            onClick={() => setTab(t.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-              tab === i
+              tab === t.key
                 ? "bg-[var(--color-surface)] text-foreground shadow-sm"
                 : "text-[var(--color-text-secondary)] hover:text-foreground"
             }`}
           >
-            {t}
+            {t.label}
           </button>
         ))}
       </div>
 
       <div className="animate-float-up" style={{ animationDelay: "150ms" }}>
 
-        {/* ── Tab 0: Профиль ── */}
-        {tab === 0 && (
+        {/* ── Tab: Профиль ── */}
+        {tab === "profile" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Personal data */}
             <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6">
@@ -311,8 +334,8 @@ function StaffDetailPage() {
           </div>
         )}
 
-        {/* ── Tab 1: Квалификация ── */}
-        {tab === 1 && (
+        {/* ── Tab: Квалификация ── */}
+        {tab === "qualifications" && (
           <div className="space-y-3">
             {qualifications.length === 0 ? (
               <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">
@@ -368,8 +391,73 @@ function StaffDetailPage() {
           </div>
         )}
 
-        {/* ── Tab 2: Доступ (интерактивная матрица) ── */}
-        {tab === 2 && (() => {
+        {/* ── Tab: Пациенты ── */}
+        {tab === "patients" && (
+          <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden">
+            {!assignedPatients ? (
+              <div className="p-8 text-center">
+                <div className="animate-pulse space-y-2">
+                  {[1,2,3].map(i => <div key={i} className="h-12 bg-[var(--color-muted)] rounded-lg" />)}
+                </div>
+              </div>
+            ) : (assignedPatients?.items || assignedPatients || []).length === 0 ? (
+              <div className="p-8 text-center">
+                <svg className="w-10 h-10 mx-auto mb-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <p className="text-[var(--color-text-secondary)]">Нет прикреплённых пациентов</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      {["Пациент", "Дата рождения", "Статус", ""].map(h => (
+                        <th key={h} className="text-left p-3 text-xs font-semibold text-[var(--color-text-tertiary)] uppercase">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {((assignedPatients?.items || assignedPatients) as Array<Record<string, any>>).map((p: Record<string, any>) => (
+                      <tr key={p.id} className="hover:bg-[var(--color-muted)]/50">
+                        <td className="p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center text-xs font-bold text-[var(--color-primary-deep)] flex-shrink-0">
+                              {p.first_name?.[0]}{p.last_name?.[0]}
+                            </div>
+                            <span className="font-medium text-foreground">{p.last_name} {p.first_name} {p.middle_name || ""}</span>
+                          </div>
+                        </td>
+                        <td className="p-3 text-[var(--color-text-secondary)]">
+                          {p.date_of_birth ? formatDate(p.date_of_birth) : "—"}
+                        </td>
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${patientStatusColors[p.status] || "bg-[var(--color-muted)] text-[var(--color-text-secondary)]"}`}>
+                            {patientStatusLabels[p.status] || p.status}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          <Link
+                            to="/patients/$patientId"
+                            params={{ patientId: p.id }}
+                            search={{ tab: "profile" }}
+                            className="text-xs text-secondary hover:text-secondary/80 font-medium transition-colors"
+                          >
+                            Открыть
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Tab: Доступ (интерактивная матрица) ── */}
+        {tab === "permissions" && (() => {
           const allGroups: Record<string, any>[] = Array.isArray(allPermsData) ? allPermsData : [];
           const activePerms = new Set(permCodes);
           const totalActive = permCodes.length;
