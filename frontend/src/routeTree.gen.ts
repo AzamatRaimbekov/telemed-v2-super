@@ -11,7 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as PortalLoginRouteImport } from './routes/portal/login'
+import { Route as PortalPortalRouteImport } from './routes/portal/_portal'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as PortalPortalResultsRouteImport } from './routes/portal/_portal/results'
+import { Route as PortalPortalMessagesRouteImport } from './routes/portal/_portal/messages'
+import { Route as PortalPortalMedicalCardRouteImport } from './routes/portal/_portal/medical-card'
+import { Route as PortalPortalExercisesRouteImport } from './routes/portal/_portal/exercises'
+import { Route as PortalPortalDashboardRouteImport } from './routes/portal/_portal/dashboard'
+import { Route as PortalPortalBillingRouteImport } from './routes/portal/_portal/billing'
+import { Route as PortalPortalAppointmentsRouteImport } from './routes/portal/_portal/appointments'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -22,39 +31,151 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalLoginRoute = PortalLoginRouteImport.update({
+  id: '/portal/login',
+  path: '/portal/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalPortalRoute = PortalPortalRouteImport.update({
+  id: '/portal/_portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const PortalPortalResultsRoute = PortalPortalResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalMessagesRoute = PortalPortalMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalMedicalCardRoute = PortalPortalMedicalCardRouteImport.update({
+  id: '/medical-card',
+  path: '/medical-card',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalExercisesRoute = PortalPortalExercisesRouteImport.update({
+  id: '/exercises',
+  path: '/exercises',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalDashboardRoute = PortalPortalDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalBillingRoute = PortalPortalBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalAppointmentsRoute =
+  PortalPortalAppointmentsRouteImport.update({
+    id: '/appointments',
+    path: '/appointments',
+    getParentRoute: () => PortalPortalRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/portal': typeof PortalPortalRouteWithChildren
+  '/portal/login': typeof PortalLoginRoute
+  '/portal/appointments': typeof PortalPortalAppointmentsRoute
+  '/portal/billing': typeof PortalPortalBillingRoute
+  '/portal/dashboard': typeof PortalPortalDashboardRoute
+  '/portal/exercises': typeof PortalPortalExercisesRoute
+  '/portal/medical-card': typeof PortalPortalMedicalCardRoute
+  '/portal/messages': typeof PortalPortalMessagesRoute
+  '/portal/results': typeof PortalPortalResultsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/portal': typeof PortalPortalRouteWithChildren
+  '/portal/login': typeof PortalLoginRoute
+  '/portal/appointments': typeof PortalPortalAppointmentsRoute
+  '/portal/billing': typeof PortalPortalBillingRoute
+  '/portal/dashboard': typeof PortalPortalDashboardRoute
+  '/portal/exercises': typeof PortalPortalExercisesRoute
+  '/portal/medical-card': typeof PortalPortalMedicalCardRoute
+  '/portal/messages': typeof PortalPortalMessagesRoute
+  '/portal/results': typeof PortalPortalResultsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/portal/_portal': typeof PortalPortalRouteWithChildren
+  '/portal/login': typeof PortalLoginRoute
+  '/portal/_portal/appointments': typeof PortalPortalAppointmentsRoute
+  '/portal/_portal/billing': typeof PortalPortalBillingRoute
+  '/portal/_portal/dashboard': typeof PortalPortalDashboardRoute
+  '/portal/_portal/exercises': typeof PortalPortalExercisesRoute
+  '/portal/_portal/medical-card': typeof PortalPortalMedicalCardRoute
+  '/portal/_portal/messages': typeof PortalPortalMessagesRoute
+  '/portal/_portal/results': typeof PortalPortalResultsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/portal'
+    | '/portal/login'
+    | '/portal/appointments'
+    | '/portal/billing'
+    | '/portal/dashboard'
+    | '/portal/exercises'
+    | '/portal/medical-card'
+    | '/portal/messages'
+    | '/portal/results'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard'
-  id: '__root__' | '/_authenticated' | '/login' | '/_authenticated/dashboard'
+  to:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/portal'
+    | '/portal/login'
+    | '/portal/appointments'
+    | '/portal/billing'
+    | '/portal/dashboard'
+    | '/portal/exercises'
+    | '/portal/medical-card'
+    | '/portal/messages'
+    | '/portal/results'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/dashboard'
+    | '/portal/_portal'
+    | '/portal/login'
+    | '/portal/_portal/appointments'
+    | '/portal/_portal/billing'
+    | '/portal/_portal/dashboard'
+    | '/portal/_portal/exercises'
+    | '/portal/_portal/medical-card'
+    | '/portal/_portal/messages'
+    | '/portal/_portal/results'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PortalPortalRoute: typeof PortalPortalRouteWithChildren
+  PortalLoginRoute: typeof PortalLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -73,12 +194,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/login': {
+      id: '/portal/login'
+      path: '/portal/login'
+      fullPath: '/portal/login'
+      preLoaderRoute: typeof PortalLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/_portal': {
+      id: '/portal/_portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/portal/_portal/results': {
+      id: '/portal/_portal/results'
+      path: '/results'
+      fullPath: '/portal/results'
+      preLoaderRoute: typeof PortalPortalResultsRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/messages': {
+      id: '/portal/_portal/messages'
+      path: '/messages'
+      fullPath: '/portal/messages'
+      preLoaderRoute: typeof PortalPortalMessagesRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/medical-card': {
+      id: '/portal/_portal/medical-card'
+      path: '/medical-card'
+      fullPath: '/portal/medical-card'
+      preLoaderRoute: typeof PortalPortalMedicalCardRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/exercises': {
+      id: '/portal/_portal/exercises'
+      path: '/exercises'
+      fullPath: '/portal/exercises'
+      preLoaderRoute: typeof PortalPortalExercisesRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/dashboard': {
+      id: '/portal/_portal/dashboard'
+      path: '/dashboard'
+      fullPath: '/portal/dashboard'
+      preLoaderRoute: typeof PortalPortalDashboardRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/billing': {
+      id: '/portal/_portal/billing'
+      path: '/billing'
+      fullPath: '/portal/billing'
+      preLoaderRoute: typeof PortalPortalBillingRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/appointments': {
+      id: '/portal/_portal/appointments'
+      path: '/appointments'
+      fullPath: '/portal/appointments'
+      preLoaderRoute: typeof PortalPortalAppointmentsRouteImport
+      parentRoute: typeof PortalPortalRoute
     }
   }
 }
@@ -95,9 +279,35 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface PortalPortalRouteChildren {
+  PortalPortalAppointmentsRoute: typeof PortalPortalAppointmentsRoute
+  PortalPortalBillingRoute: typeof PortalPortalBillingRoute
+  PortalPortalDashboardRoute: typeof PortalPortalDashboardRoute
+  PortalPortalExercisesRoute: typeof PortalPortalExercisesRoute
+  PortalPortalMedicalCardRoute: typeof PortalPortalMedicalCardRoute
+  PortalPortalMessagesRoute: typeof PortalPortalMessagesRoute
+  PortalPortalResultsRoute: typeof PortalPortalResultsRoute
+}
+
+const PortalPortalRouteChildren: PortalPortalRouteChildren = {
+  PortalPortalAppointmentsRoute: PortalPortalAppointmentsRoute,
+  PortalPortalBillingRoute: PortalPortalBillingRoute,
+  PortalPortalDashboardRoute: PortalPortalDashboardRoute,
+  PortalPortalExercisesRoute: PortalPortalExercisesRoute,
+  PortalPortalMedicalCardRoute: PortalPortalMedicalCardRoute,
+  PortalPortalMessagesRoute: PortalPortalMessagesRoute,
+  PortalPortalResultsRoute: PortalPortalResultsRoute,
+}
+
+const PortalPortalRouteWithChildren = PortalPortalRoute._addFileChildren(
+  PortalPortalRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  PortalPortalRoute: PortalPortalRouteWithChildren,
+  PortalLoginRoute: PortalLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
