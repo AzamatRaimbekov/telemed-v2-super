@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 interface SelectOption {
@@ -21,15 +22,46 @@ interface CustomSelectProps {
 export function CustomSelect({ value, onChange, options, placeholder = "Выберите...", label, className, disabled }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const selected = options.find(o => o.value === value);
   const filtered = search ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase())) : options;
 
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + 6,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      updatePosition();
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("resize", updatePosition);
+      return () => {
+        window.removeEventListener("scroll", updatePosition, true);
+        window.removeEventListener("resize", updatePosition);
+      };
+    }
+  }, [open, updatePosition]);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (
+        triggerRef.current && !triggerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
+        setOpen(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -39,10 +71,64 @@ export function CustomSelect({ value, onChange, options, placeholder = "Выбе
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
+  const dropdown = open ? createPortal(
+    <div
+      ref={dropdownRef}
+      className="fixed bg-[var(--color-surface)] border border-border rounded-xl shadow-xl shadow-black/10 overflow-hidden animate-scale-in"
+      style={{
+        top: dropdownPos.top,
+        left: dropdownPos.left,
+        width: dropdownPos.width,
+        zIndex: 9999,
+        opacity: 1,
+      }}
+    >
+      {options.length > 6 && (
+        <div className="p-2 border-b border-border">
+          <input
+            ref={inputRef}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Поиск..."
+            className="w-full px-3 py-2 rounded-lg bg-[var(--color-muted)]/50 text-sm text-foreground placeholder:text-[var(--color-text-tertiary)] focus:outline-none"
+          />
+        </div>
+      )}
+      <div className="max-h-[240px] overflow-y-auto py-1">
+        {filtered.length === 0 ? (
+          <div className="px-4 py-3 text-sm text-[var(--color-text-tertiary)] text-center">Ничего не найдено</div>
+        ) : filtered.map(option => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => { onChange(option.value); setOpen(false); setSearch(""); }}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors hover:bg-[var(--color-muted)]/70",
+              option.value === value && "bg-secondary/8 text-secondary font-medium",
+            )}
+          >
+            {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
+            <div className="flex-1 min-w-0">
+              <p className={cn("truncate", option.value === value ? "text-secondary" : "text-foreground")}>{option.label}</p>
+              {option.description && <p className="text-xs text-[var(--color-text-tertiary)] truncate">{option.description}</p>}
+            </div>
+            {option.value === value && (
+              <svg className="w-4 h-4 text-secondary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>,
+    document.body,
+  ) : null;
+
   return (
-    <div ref={ref} className={cn("relative", className)}>
+    <div className={className}>
       {label && <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1.5">{label}</label>}
       <button
+        ref={triggerRef}
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
@@ -62,48 +148,7 @@ export function CustomSelect({ value, onChange, options, placeholder = "Выбе
           <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
-
-      {open && (
-        <div className="absolute z-50 mt-1.5 w-full bg-[var(--color-surface)] border border-border rounded-xl shadow-lg shadow-black/8 overflow-hidden animate-scale-in" style={{ opacity: 1 }}>
-          {options.length > 6 && (
-            <div className="p-2 border-b border-border">
-              <input
-                ref={inputRef}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Поиск..."
-                className="w-full px-3 py-2 rounded-lg bg-[var(--color-muted)]/50 text-sm text-foreground placeholder:text-[var(--color-text-tertiary)] focus:outline-none"
-              />
-            </div>
-          )}
-          <div className="max-h-[240px] overflow-y-auto py-1">
-            {filtered.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-[var(--color-text-tertiary)] text-center">Ничего не найдено</div>
-            ) : filtered.map(option => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => { onChange(option.value); setOpen(false); setSearch(""); }}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors hover:bg-[var(--color-muted)]/70",
-                  option.value === value && "bg-secondary/8 text-secondary font-medium",
-                )}
-              >
-                {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
-                <div className="flex-1 min-w-0">
-                  <p className={cn("truncate", option.value === value ? "text-secondary" : "text-foreground")}>{option.label}</p>
-                  {option.description && <p className="text-xs text-[var(--color-text-tertiary)] truncate">{option.description}</p>}
-                </div>
-                {option.value === value && (
-                  <svg className="w-4 h-4 text-secondary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {dropdown}
     </div>
   );
 }
