@@ -204,6 +204,19 @@ class RBACService:
 
     # --- Staff ---
     async def create_staff(self, data: dict, actor_id: uuid.UUID, clinic_id: uuid.UUID) -> dict:
+        # Convert string dates to date objects
+        from datetime import date as date_type
+        for date_field in ["date_of_birth", "employment_start", "employment_end"]:
+            val = data.get(date_field)
+            if isinstance(val, str) and val:
+                data[date_field] = date_type.fromisoformat(val)
+
+        # Convert string UUIDs
+        for uuid_field in ["department_id", "template_id"]:
+            val = data.get(uuid_field)
+            if isinstance(val, str) and val:
+                data[uuid_field] = uuid.UUID(val)
+
         # Check login unique
         existing = await self.session.execute(
             select(User).where(User.email == data["login"], User.is_deleted == False)
@@ -253,9 +266,10 @@ class RBACService:
         self.session.add(profile)
 
         # Assign template
+        tpl_id = data["template_id"] if isinstance(data["template_id"], uuid.UUID) else uuid.UUID(data["template_id"])
         self.session.add(UserTemplate(
             id=uuid.uuid4(), user_id=user.id,
-            template_id=uuid.UUID(data["template_id"]),
+            template_id=tpl_id,
             assigned_by=actor_id,
         ))
 
