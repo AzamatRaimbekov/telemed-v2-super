@@ -35,10 +35,9 @@ class User(TenantMixin, Base):
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False)
     avatar_url: Mapped[str | None] = mapped_column(String(500))
     specialization: Mapped[str | None] = mapped_column(String(255))
-    department_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("departments.id"))
+    department_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("departments.id", use_alter=True))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    clinic = relationship("Clinic", back_populates="users", lazy="selectin")
 
 class Role(TenantMixin, Base):
     __tablename__ = "roles"

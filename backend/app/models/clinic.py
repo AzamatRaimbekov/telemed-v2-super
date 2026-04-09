@@ -26,4 +26,3 @@ class Clinic(BaseMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     settings: Mapped[dict | None] = mapped_column(JSON)
     clinic_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
-    users = relationship("User", back_populates="clinic", lazy="selectin")
