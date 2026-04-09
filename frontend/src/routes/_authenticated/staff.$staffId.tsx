@@ -49,6 +49,31 @@ function StaffDetailPage() {
     enabled: tab === 2,
   });
 
+  // Load ALL permissions for the matrix
+  const { data: allPermsData } = useQuery({
+    queryKey: ["all-permissions"],
+    queryFn: () => staffApi.listPermissions(),
+    enabled: tab === 2,
+  });
+
+  const grantMutation = useMutation({
+    mutationFn: (code: string) => staffApi.grantPermission(staffId, { permission_code: code }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["staff-permissions", staffId] });
+      toast.success("Право добавлено");
+    },
+    onError: () => toast.error("Ошибка"),
+  });
+
+  const revokeMutation = useMutation({
+    mutationFn: (code: string) => staffApi.revokePermission(staffId, { permission_code: code }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["staff-permissions", staffId] });
+      toast.success("Право отозвано");
+    },
+    onError: () => toast.error("Ошибка"),
+  });
+
   const deactivateMutation = useMutation({
     mutationFn: () => staffApi.deactivate(staffId),
     onSuccess: () => {
@@ -343,58 +368,118 @@ function StaffDetailPage() {
           </div>
         )}
 
-        {/* ── Tab 2: Доступ ── */}
-        {tab === 2 && (
-          <div className="space-y-4">
-            {/* Template info */}
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-foreground mb-1">Шаблон доступа</p>
-                  {staff.template_name ? (
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${templateColorClass(staff.template_name)}`}>
-                      {staff.template_name}
-                    </span>
-                  ) : (
-                    <span className="text-sm text-[var(--color-text-tertiary)]">Шаблон не назначен</span>
-                  )}
-                </div>
-                {permCodes.length > 0 && (
-                  <div className="text-right text-sm text-[var(--color-text-secondary)]">
-                    Итого: <span className="font-semibold text-foreground">{permCodes.length}</span> прав
-                  </div>
-                )}
-              </div>
-            </div>
+        {/* ── Tab 2: Доступ (интерактивная матрица) ── */}
+        {tab === 2 && (() => {
+          const allGroups: Record<string, any>[] = Array.isArray(allPermsData) ? allPermsData : [];
+          const activePerms = new Set(permCodes);
+          const totalActive = permCodes.length;
+          const totalAll = allGroups.reduce((sum, g) => sum + (g.permissions?.length || 0), 0);
 
-            {/* Grouped permissions */}
-            {Object.keys(groupedPermissions).length === 0 ? (
-              <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">
-                <p className="text-[var(--color-text-secondary)]">Нет назначенных прав</p>
-              </div>
-            ) : Object.entries(groupedPermissions).map(([group, codes]) => (
-              <div key={group} className="bg-[var(--color-surface)] rounded-2xl border border-border p-5">
-                <h4 className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-3">
-                  {group} <span className="text-[var(--color-text-tertiary)]/60">({codes.length})</span>
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {codes.map((code: string) => {
-                    const label = code.split(":")[1]?.replace(/_/g, " ") || code;
-                    return (
-                      <div key={code} className="flex items-center gap-2.5 p-2 rounded-lg bg-secondary/5">
-                        <svg className="w-4 h-4 text-success flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-sm text-foreground capitalize">{label}</span>
-                        <span className="text-[10px] font-mono text-[var(--color-text-tertiary)] ml-auto">{code}</span>
-                      </div>
-                    );
-                  })}
+          return (
+            <div className="space-y-4">
+              {/* Header */}
+              <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground mb-1">Матрица доступа</p>
+                    <div className="flex items-center gap-2">
+                      {staff.template?.name ? (
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium`}
+                          style={{ background: `${staff.template.color || '#7E78D2'}15`, color: staff.template.color || '#7E78D2' }}>
+                          {staff.template.name}
+                        </span>
+                      ) : staff.template_name ? (
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${templateColorClass(staff.template_name)}`}>
+                          {staff.template_name}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-[var(--color-text-tertiary)]">Шаблон не назначен</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-foreground">{totalActive}<span className="text-sm font-normal text-[var(--color-text-tertiary)]">/{totalAll}</span></p>
+                    <p className="text-xs text-[var(--color-text-tertiary)]">прав активно</p>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* Info */}
+              <div className="flex items-center gap-2 px-1 text-xs text-[var(--color-text-tertiary)]">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+                </svg>
+                Нажмите на переключатель чтобы добавить или отозвать право доступа
+              </div>
+
+              {/* Permission matrix by group */}
+              {allGroups.length === 0 ? (
+                <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">
+                  <p className="text-[var(--color-text-secondary)]">Загрузка прав...</p>
+                </div>
+              ) : allGroups.map((group: Record<string, any>) => {
+                const perms: Record<string, any>[] = group.permissions || [];
+                const activeInGroup = perms.filter(p => activePerms.has(p.code)).length;
+                return (
+                  <div key={group.id || group.code} className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden">
+                    <div className="px-5 py-3 bg-[var(--color-muted)]/40 border-b border-border flex items-center justify-between">
+                      <h4 className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider">
+                        {group.label_ru || group.code}
+                      </h4>
+                      <span className="text-xs text-[var(--color-text-tertiary)]">
+                        <span className="font-semibold text-foreground">{activeInGroup}</span>/{perms.length}
+                      </span>
+                    </div>
+                    <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {perms.map((perm: Record<string, any>) => {
+                        const isActive = activePerms.has(perm.code);
+                        const isToggling = grantMutation.isPending || revokeMutation.isPending;
+                        return (
+                          <label
+                            key={perm.code}
+                            className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+                              isActive
+                                ? "bg-secondary/6 hover:bg-secondary/10"
+                                : "hover:bg-[var(--color-muted)]/60"
+                            } ${isToggling ? "opacity-60 pointer-events-none" : ""}`}
+                          >
+                            {/* Custom toggle */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (isActive) {
+                                  revokeMutation.mutate(perm.code);
+                                } else {
+                                  grantMutation.mutate(perm.code);
+                                }
+                              }}
+                              className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${
+                                isActive ? "bg-secondary" : "bg-[var(--color-border)]"
+                              }`}
+                            >
+                              <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                                isActive ? "translate-x-4" : "translate-x-0"
+                              }`} />
+                            </button>
+                            <div className="min-w-0 flex-1">
+                              <p className={`text-sm leading-snug ${isActive ? "text-foreground font-medium" : "text-[var(--color-text-secondary)]"}`}>
+                                {perm.label_ru || perm.code}
+                              </p>
+                              {perm.description && (
+                                <p className="text-[10px] text-[var(--color-text-tertiary)] truncate mt-0.5">{perm.description}</p>
+                              )}
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
