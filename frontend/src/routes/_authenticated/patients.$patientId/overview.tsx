@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { Badge } from "@/components/ui/badge";
 import { CustomSelect } from "@/components/ui/select-custom";
-import { RecoveryDashboard } from "@/features/recovery/components/RecoveryDashboard";
+
 
 export const Route = createFileRoute(
   "/_authenticated/patients/$patientId/overview"
@@ -674,9 +674,6 @@ function OverviewPage() {
           </div>
         </div>
       )}
-
-      {/* Recovery Dynamics Dashboard */}
-      <RecoveryDashboard patientId={patientId} />
 
       {/* Portal password section */}
       <PortalPasswordSection patientId={patientId} />

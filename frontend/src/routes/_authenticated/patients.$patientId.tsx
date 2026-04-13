@@ -1,345 +1,335 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { patientsApi } from "@/features/patients/api";
-import { formatDate, formatDateTime } from "@/lib/utils";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/patients/$patientId")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    tab: (search.tab as string) || "profile",
-  }),
-  component: PatientDetailPage,
+  component: PatientDetailLayout,
 });
 
 const TABS = [
-  { key: "profile", label: "Профиль" },
-  { key: "vitals", label: "Показатели" },
-  { key: "results", label: "Анализы" },
-  { key: "treatment", label: "Лечение" },
-  { key: "exercises", label: "Упражнения" },
-  { key: "visits", label: "Визиты" },
-];
+  { path: "overview",    label: "Обзор",           icon: GridIcon },
+  { path: "dynamics",   label: "Динамика",         icon: TrendingUpIcon },
+  { path: "history",     label: "История болезни",  icon: ClockIcon },
+  { path: "diagnoses",   label: "Диагнозы",         icon: StethoscopeIcon },
+  { path: "treatment",   label: "План лечения",     icon: ClipboardIcon },
+  { path: "labs",        label: "Анализы",           icon: FlaskIcon },
+  { path: "procedures",  label: "Процедуры",         icon: ActivityIcon },
+  { path: "medications", label: "Препараты",         icon: PillIcon },
+  { path: "stroke",      label: "Инсульт",           icon: BrainIcon },
+  { path: "rooms",       label: "Палаты",            icon: BedIcon },
+  { path: "documents",   label: "Документы",         icon: FileIcon },
+  { path: "billing",     label: "Биллинг",           icon: DollarIcon },
+  { path: "ai",          label: "ИИ Ассистент",     icon: SparklesIcon },
+] as const;
 
-function PatientDetailPage() {
+type TabPath = (typeof TABS)[number]["path"];
+
+function PatientDetailLayout() {
   const { patientId } = Route.useParams();
-  const { tab } = Route.useSearch();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const matchRoute = useMatchRoute();
 
-  const setTab = (newTab: string) => {
-    navigate({ search: { tab: newTab }, replace: true });
-  };
-
-  const { data: patient, isLoading } = useQuery({ queryKey: ["patient", patientId], queryFn: () => patientsApi.get(patientId) });
-  const { data: vitals } = useQuery({ queryKey: ["patient-vitals", patientId], queryFn: () => patientsApi.getVitals(patientId), enabled: tab === "vitals" });
-  const { data: labResults } = useQuery({ queryKey: ["patient-results", patientId], queryFn: () => patientsApi.getLabResults(patientId), enabled: tab === "results" });
-  const { data: plans } = useQuery({ queryKey: ["patient-plans", patientId], queryFn: () => patientsApi.getTreatmentPlans(patientId), enabled: tab === "treatment" });
-  const { data: exerciseSessions } = useQuery({ queryKey: ["patient-exercises", patientId], queryFn: () => patientsApi.getExerciseSessions(patientId), enabled: tab === "exercises" });
-  const { data: visits } = useQuery({ queryKey: ["patient-visits", patientId], queryFn: () => patientsApi.getVisits(patientId), enabled: tab === "visits" });
-
-  // Doctor and nurse data for profile tab
-  const { data: doctorData } = useQuery({
-    queryKey: ["user", patient?.assigned_doctor_id],
-    queryFn: () => patientsApi.getUser(patient!.assigned_doctor_id),
-    enabled: tab === "profile" && !!patient?.assigned_doctor_id,
-  });
-  const { data: nurseData } = useQuery({
-    queryKey: ["user", patient?.assigned_nurse_id],
-    queryFn: () => patientsApi.getUser(patient!.assigned_nurse_id),
-    enabled: tab === "profile" && !!patient?.assigned_nurse_id,
+  const { data: patient, isLoading } = useQuery({
+    queryKey: ["patient", patientId],
+    queryFn: () => patientsApi.get(patientId),
   });
 
-  const approveMutation = useMutation({
-    mutationFn: ({ resultId, visible }: { resultId: string; visible: boolean }) => patientsApi.approveResult(resultId, visible),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["patient-results", patientId] }); toast.success("Результат обновлён"); },
-  });
+  const activeTab: TabPath | null = (() => {
+    for (const tab of TABS) {
+      if (matchRoute({ to: `/patients/$patientId/${tab.path}`, params: { patientId }, fuzzy: true })) {
+        return tab.path;
+      }
+    }
+    return null;
+  })();
 
   if (isLoading) {
-    return <div className="space-y-4 animate-pulse"><div className="h-8 w-64 bg-[var(--color-muted)] rounded-lg" /><div className="h-48 bg-[var(--color-muted)] rounded-xl" /></div>;
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-8 w-64 bg-[var(--color-muted)] rounded-lg" />
+        <div className="h-20 bg-[var(--color-muted)] rounded-2xl" />
+        <div className="h-12 bg-[var(--color-muted)] rounded-xl" />
+        <div className="h-48 bg-[var(--color-muted)] rounded-xl" />
+      </div>
+    );
   }
-  if (!patient) return <div>Пациент не найден</div>;
 
-  const statusLabels: Record<string, string> = { ACTIVE: "Активен", DISCHARGED: "Выписан" };
-  const statusColors: Record<string, string> = { ACTIVE: "bg-success/10 text-success", DISCHARGED: "bg-[var(--color-muted)] text-[var(--color-text-secondary)]" };
+  if (!patient) {
+    return (
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-12 text-center">
+        <p className="text-[var(--color-text-secondary)]">Пациент не найден</p>
+      </div>
+    );
+  }
+
+  const statusLabels: Record<string, string> = {
+    ACTIVE: "Активен",
+    DISCHARGED: "Выписан",
+    DECEASED: "Умер",
+  };
+  const statusColors: Record<string, string> = {
+    ACTIVE: "bg-success/10 text-success",
+    DISCHARGED: "bg-[var(--color-muted)] text-[var(--color-text-secondary)]",
+    DECEASED: "bg-destructive/10 text-destructive",
+  };
 
   return (
-    <div className="max-w-6xl">
-      {/* Back + header */}
-      <Link to="/patients" className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-foreground mb-4 transition-colors animate-float-up">
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    <div className="w-full">
+      {/* Back link */}
+      <Link
+        to="/patients"
+        className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-foreground mb-4 transition-colors animate-float-up"
+      >
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="m12 19-7-7 7-7" />
+          <path d="M19 12H5" />
+        </svg>
         К списку пациентов
       </Link>
 
-      <div className="flex items-center gap-4 mb-6 animate-float-up" style={{ animationDelay: '50ms' }}>
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-[var(--color-primary-deep)] flex items-center justify-center text-lg font-bold text-primary-foreground shadow-sm">
-          {patient.first_name?.[0]}{patient.last_name?.[0]}
+      {/* Patient header */}
+      <div className="flex items-center gap-4 mb-4 animate-float-up" style={{ animationDelay: "50ms" }}>
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-[var(--color-primary-deep)] flex items-center justify-center text-lg font-bold text-primary-foreground shadow-sm flex-shrink-0">
+          {patient.first_name?.[0]}
+          {patient.last_name?.[0]}
         </div>
-        <div>
-          <h1 className="text-[22px] font-bold text-foreground">{patient.last_name} {patient.first_name} {patient.middle_name || ""}</h1>
-          <div className="flex items-center gap-3 mt-1">
-            {patient.medical_card && <span className="text-xs font-mono text-[var(--color-text-tertiary)]">Карта {patient.medical_card.card_number}</span>}
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[patient.status] || ""}`}>{statusLabels[patient.status] || patient.status}</span>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-[22px] font-bold text-foreground leading-tight">
+            {patient.last_name} {patient.first_name} {patient.middle_name || ""}
+          </h1>
+          <div className="flex items-center gap-3 mt-1 flex-wrap">
+            {patient.medical_card && (
+              <span className="text-xs font-mono text-[var(--color-text-tertiary)]">
+                Карта {patient.medical_card.card_number}
+              </span>
+            )}
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                statusColors[patient.status] || "bg-[var(--color-muted)] text-[var(--color-text-secondary)]"
+              }`}
+            >
+              {statusLabels[patient.status] || patient.status}
+            </span>
+            {patient.date_of_birth && (
+              <span className="text-xs text-[var(--color-text-tertiary)]">
+                {calculateAge(patient.date_of_birth)} лет
+              </span>
+            )}
+            {patient.blood_type && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-medium">
+                {patient.blood_type}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       {/* Allergy banner */}
       {patient.allergies && patient.allergies.length > 0 && (
-        <div className="mb-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 animate-float-up" style={{ animationDelay: '80ms' }}>
-          <svg className="w-5 h-5 text-destructive flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-          <p className="text-sm text-destructive"><strong>Аллергии:</strong> {patient.allergies.join(", ")}</p>
+        <div
+          className="mb-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 animate-float-up"
+          style={{ animationDelay: "80ms" }}
+        >
+          <svg
+            className="w-5 h-5 text-destructive flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+            <path d="M12 9v4" />
+            <path d="M12 17h.01" />
+          </svg>
+          <p className="text-sm text-destructive">
+            <strong>Аллергии:</strong> {patient.allergies.join(", ")}
+          </p>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl mb-6 overflow-x-auto animate-float-up" style={{ animationDelay: '100ms' }}>
-        {TABS.map((t) => (
-          <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-              tab === t.key ? "bg-[var(--color-surface)] text-foreground shadow-sm" : "text-[var(--color-text-secondary)] hover:text-foreground"
-            }`}>
-            {t.label}
-          </button>
-        ))}
+      {/* Tab navigation */}
+      <div className="relative mb-6 animate-float-up" style={{ animationDelay: "100ms" }}>
+        {/* Fade indicators for scroll */}
+        <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none rounded-l-xl opacity-0 transition-opacity" id="tab-fade-left" />
+        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none rounded-r-xl" id="tab-fade-right" />
+        <div
+          className="flex gap-1 p-1 bg-[var(--color-muted)] rounded-xl overflow-x-auto"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+        >
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.path;
+            const Icon = tab.icon;
+            return (
+              <Link
+                key={tab.path}
+                to={`/patients/$patientId/${tab.path}` as never}
+                params={{ patientId } as never}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                  isActive
+                    ? "bg-[var(--color-surface)] text-foreground shadow-sm"
+                    : "text-[var(--color-text-secondary)] hover:text-foreground"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="animate-float-up" style={{ animationDelay: '150ms' }}>
-        {/* Profile tab */}
-        {tab === "profile" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6">
-              <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">Личные данные</h3>
-              <div className="space-y-3">
-                {[
-                  { label: "Дата рождения", value: formatDate(patient.date_of_birth) },
-                  { label: "Пол", value: patient.gender === "MALE" ? "Мужской" : patient.gender === "FEMALE" ? "Женский" : "Не указан" },
-                  { label: "Паспорт", value: patient.passport_number || "—" },
-                  { label: "ИНН", value: patient.inn || "—" },
-                  { label: "Адрес", value: patient.address || "—" },
-                  { label: "Телефон", value: patient.phone || "—" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex justify-between">
-                    <span className="text-sm text-[var(--color-text-secondary)]">{label}</span>
-                    <span className="text-sm font-medium text-foreground">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6">
-              <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">Медицинская информация</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between"><span className="text-sm text-[var(--color-text-secondary)]">Группа крови</span><span className="text-sm font-medium text-foreground">{patient.blood_type}</span></div>
-                <div className="flex justify-between"><span className="text-sm text-[var(--color-text-secondary)]">Страховка</span><span className="text-sm font-medium text-foreground">{patient.insurance_provider || "—"}</span></div>
-                <div className="flex justify-between"><span className="text-sm text-[var(--color-text-secondary)]">Полис</span><span className="text-sm font-medium text-foreground">{patient.insurance_number || "—"}</span></div>
-                <div><span className="text-sm text-[var(--color-text-secondary)]">Хронические заболевания</span>
-                  <div className="flex flex-wrap gap-1 mt-1">{(patient.chronic_conditions || []).map((c: string, i: number) => <span key={i} className="px-2 py-0.5 bg-warning/10 text-warning text-xs rounded-full">{c}</span>)}</div>
-                </div>
-                <div><span className="text-sm text-[var(--color-text-secondary)]">Экстренный контакт</span>
-                  <p className="text-sm font-medium text-foreground mt-0.5">{patient.emergency_contact_name || "—"} {patient.emergency_contact_phone ? `· ${patient.emergency_contact_phone}` : ""}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Assigned staff section */}
-            {(patient.assigned_doctor_id || patient.assigned_nurse_id) && (
-              <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6 lg:col-span-2">
-                <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">Закреплённый персонал</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Doctor card */}
-                  {patient.assigned_doctor_id && (
-                    <Link
-                      to="/staff/$staffId"
-                      params={{ staffId: doctorData?.id || patient.assigned_doctor_id }}
-                      search={{ tab: "profile" }}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-secondary/30 transition-all"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                          <path d="M12 11v4M10 13h4"/>
-                        </svg>
-                      </div>
-                      <div className="min-w-0">
-                        {doctorData ? (
-                          <>
-                            <p className="text-sm font-medium text-foreground truncate">{doctorData.last_name} {doctorData.first_name}</p>
-                            <p className="text-xs text-[var(--color-text-tertiary)]">{doctorData.specialization || "Врач"}</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-sm font-medium text-foreground">Лечащий врач</p>
-                            <p className="text-xs text-[var(--color-text-tertiary)] font-mono">{patient.assigned_doctor_id}</p>
-                          </>
-                        )}
-                      </div>
-                    </Link>
-                  )}
-
-                  {/* Nurse card */}
-                  {patient.assigned_nurse_id && (
-                    <Link
-                      to="/staff/$staffId"
-                      params={{ staffId: nurseData?.id || patient.assigned_nurse_id }}
-                      search={{ tab: "profile" }}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-secondary/30 transition-all"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
-                          <path d="M12 3v4M10 5h4"/>
-                        </svg>
-                      </div>
-                      <div className="min-w-0">
-                        {nurseData ? (
-                          <>
-                            <p className="text-sm font-medium text-foreground truncate">{nurseData.last_name} {nurseData.first_name}</p>
-                            <p className="text-xs text-[var(--color-text-tertiary)]">{nurseData.specialization || "Медсестра"}</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-sm font-medium text-foreground">Медсестра</p>
-                            <p className="text-xs text-[var(--color-text-tertiary)] font-mono">{patient.assigned_nurse_id}</p>
-                          </>
-                        )}
-                      </div>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Vitals tab */}
-        {tab === "vitals" && (
-          <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden">
-            {(vitals || []).length === 0 ? (
-              <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет записей показателей</p></div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead><tr className="border-b border-border">
-                    {["Дата", "АД", "Пульс", "Темп.", "SpO2", "Вес", "ЧДД", "Глюкоза"].map(h => <th key={h} className="text-left p-3 text-xs font-semibold text-[var(--color-text-tertiary)] uppercase">{h}</th>)}
-                  </tr></thead>
-                  <tbody className="divide-y divide-border">
-                    {(vitals as Array<Record<string, any>>).map((v: Record<string, any>, i: number) => (
-                      <tr key={i} className="hover:bg-[var(--color-muted)]/50">
-                        <td className="p-3 font-mono text-xs">{formatDateTime(v.recorded_at)}</td>
-                        <td className="p-3">{v.systolic_bp && v.diastolic_bp ? `${v.systolic_bp}/${v.diastolic_bp}` : "—"}</td>
-                        <td className="p-3">{v.pulse ?? "—"}</td>
-                        <td className="p-3">{v.temperature ?? "—"}</td>
-                        <td className="p-3">{v.spo2 ?? "—"}</td>
-                        <td className="p-3">{v.weight ?? "—"}</td>
-                        <td className="p-3">{v.respiratory_rate ?? "—"}</td>
-                        <td className="p-3">{v.blood_glucose ?? "—"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Lab Results tab with approve button */}
-        {tab === "results" && (
-          <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
-            {(labResults || []).length === 0 ? (
-              <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет результатов анализов</p></div>
-            ) : (labResults as Array<Record<string, any>>).map((r: Record<string, any>) => (
-              <div key={r.id} className="flex items-center gap-4 p-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${r.is_abnormal ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-[var(--color-primary-deep)]"}`}>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2v6a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"/><path d="M10 2v3.3a4 4 0 0 1-1.17 2.83L4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6l-4.83-4.87A4 4 0 0 1 14 5.3V2"/></svg>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{r.test_name}</p>
-                  <p className="text-xs text-[var(--color-text-tertiary)]">{r.test_code} · {formatDateTime(r.resulted_at)}</p>
-                </div>
-                <div className="text-right mr-4">
-                  <p className={`text-sm font-bold ${r.is_abnormal ? "text-destructive" : "text-foreground"}`}>{r.value} {r.unit || ""}</p>
-                  {r.reference_range && <p className="text-[10px] text-[var(--color-text-tertiary)]">Норма: {r.reference_range}</p>}
-                </div>
-                {/* Approve/hide button */}
-                <button
-                  onClick={() => approveMutation.mutate({ resultId: r.id, visible: !r.visible_to_patient })}
-                  disabled={approveMutation.isPending}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${r.visible_to_patient ? "bg-success/10 text-success hover:bg-destructive/10 hover:text-destructive" : "bg-secondary/10 text-secondary hover:bg-secondary/20"}`}>
-                  {r.visible_to_patient ? "Скрыть" : "Открыть пациенту"}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Treatment Plans tab */}
-        {tab === "treatment" && (
-          <div className="space-y-4">
-            {(plans || []).length === 0 ? (
-              <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет планов лечения</p></div>
-            ) : (plans as Array<Record<string, any>>).map((p: Record<string, any>) => (
-              <div key={p.id} className="bg-[var(--color-surface)] rounded-2xl border border-border p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-semibold text-foreground">{p.title}</h3>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.status === "ACTIVE" ? "bg-success/10 text-success" : p.status === "DRAFT" ? "bg-warning/10 text-warning" : "bg-[var(--color-muted)] text-[var(--color-text-secondary)]"}`}>
-                    {p.status === "ACTIVE" ? "Активный" : p.status === "DRAFT" ? "Черновик" : p.status === "COMPLETED" ? "Завершён" : p.status}
-                  </span>
-                </div>
-                {p.description && <p className="text-xs text-[var(--color-text-tertiary)] mb-2">{p.description}</p>}
-                <p className="text-xs text-[var(--color-text-tertiary)]">{formatDate(p.start_date)} {p.end_date ? `→ ${formatDate(p.end_date)}` : ""}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Exercise Sessions tab */}
-        {tab === "exercises" && (
-          <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden">
-            {(exerciseSessions || []).length === 0 ? (
-              <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Пациент ещё не выполнял упражнения</p></div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead><tr className="border-b border-border">
-                    {["Дата", "Повторения", "Подходы", "Точность", "Длительность"].map(h => <th key={h} className="text-left p-3 text-xs font-semibold text-[var(--color-text-tertiary)] uppercase">{h}</th>)}
-                  </tr></thead>
-                  <tbody className="divide-y divide-border">
-                    {(exerciseSessions as Array<Record<string, any>>).map((s: Record<string, any>) => (
-                      <tr key={s.id} className="hover:bg-[var(--color-muted)]/50">
-                        <td className="p-3 font-mono text-xs">{formatDateTime(s.started_at)}</td>
-                        <td className="p-3">{s.reps_completed}</td>
-                        <td className="p-3">{s.sets_completed}</td>
-                        <td className="p-3"><span className={`font-medium ${s.accuracy_score >= 0.8 ? "text-success" : s.accuracy_score >= 0.5 ? "text-warning" : "text-destructive"}`}>{Math.round(s.accuracy_score * 100)}%</span></td>
-                        <td className="p-3">{Math.floor(s.duration_seconds / 60)} мин {s.duration_seconds % 60} сек</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Visits tab */}
-        {tab === "visits" && (
-          <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
-            {(visits || []).length === 0 ? (
-              <div className="p-8 text-center"><p className="text-[var(--color-text-secondary)]">Нет визитов</p></div>
-            ) : (visits as Array<Record<string, any>>).map((v: Record<string, any>) => (
-              <div key={v.id} className="p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-foreground">{v.visit_type === "CONSULTATION" ? "Консультация" : v.visit_type === "FOLLOW_UP" ? "Повторный" : v.visit_type}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${v.status === "COMPLETED" ? "bg-success/10 text-success" : "bg-secondary/10 text-secondary"}`}>{v.status === "COMPLETED" ? "Завершён" : v.status}</span>
-                </div>
-                {v.chief_complaint && <p className="text-sm text-[var(--color-text-secondary)]">{v.chief_complaint}</p>}
-                {v.diagnosis_text && <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Диагноз: {v.diagnosis_text}</p>}
-                <p className="text-xs text-[var(--color-text-tertiary)] mt-1">{v.started_at ? formatDateTime(v.started_at) : "—"}</p>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Child route content */}
+      <div className="animate-float-up" style={{ animationDelay: "150ms" }}>
+        <Outlet />
       </div>
     </div>
+  );
+}
+
+function calculateAge(dateOfBirth: string): number {
+  const today = new Date();
+  const birth = new Date(dateOfBirth);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+// ─── Tab Icons ────────────────────────────────────────────────────────────────
+
+function GridIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="7" height="7" x="3" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="14" rx="1" />
+      <rect width="7" height="7" x="3" y="14" rx="1" />
+    </svg>
+  );
+}
+
+function ClockIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function StethoscopeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" />
+      <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" />
+      <circle cx="20" cy="10" r="2" />
+    </svg>
+  );
+}
+
+function ClipboardIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M12 11h4" />
+      <path d="M12 16h4" />
+      <path d="M8 11h.01" />
+      <path d="M8 16h.01" />
+    </svg>
+  );
+}
+
+function FlaskIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2v6a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2" />
+      <path d="M10 2v3.3a4 4 0 0 1-1.17 2.83L4 13v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6l-4.83-4.87A4 4 0 0 1 14 5.3V2" />
+    </svg>
+  );
+}
+
+function ActivityIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  );
+}
+
+function PillIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+      <path d="m8.5 8.5 7 7" />
+    </svg>
+  );
+}
+
+function BrainIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+      <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
+      <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
+      <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+      <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5" />
+      <path d="M3.477 10.896a4 4 0 0 1 .585-.396" />
+      <path d="M19.938 10.5a4 4 0 0 1 .585.396" />
+      <path d="M6 18a4 4 0 0 1-1.967-.516" />
+      <path d="M19.967 17.484A4 4 0 0 1 18 18" />
+    </svg>
+  );
+}
+
+function BedIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 4v16" />
+      <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+      <path d="M2 17h20" />
+      <path d="M6 8v9" />
+    </svg>
+  );
+}
+
+function FileIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    </svg>
+  );
+}
+
+function DollarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" x2="12" y1="2" y2="22" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </svg>
+  );
+}
+
+function TrendingUpIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+      <polyline points="16 7 22 7 22 13" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+      <path d="M20 3v4" />
+      <path d="M22 5h-4" />
+      <path d="M4 17v2" />
+      <path d="M5 18H3" />
+    </svg>
   );
 }
