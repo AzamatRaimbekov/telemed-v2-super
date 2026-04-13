@@ -20,6 +20,9 @@ from app.models.audit import AuditLog
 from app.models.vital_signs import VitalSign
 from app.models.rbac import PermissionGroup, PermissionItem, PermissionTemplate, TemplatePermission, TemplateExtraField, UserTemplate, UserPermissionOverride
 from app.models.staff_profile import StaffProfile
+from app.models.medical_history import MedicalHistoryEntry
+from app.models.room_assignment import RoomAssignment
+from app.models.recovery import RecoveryGoal, RecoveryDomainWeight
 
 __all__ = [
     "Base", "Clinic",
@@ -40,4 +43,7 @@ __all__ = [
     "VitalSign",
     "PermissionGroup", "PermissionItem", "PermissionTemplate", "TemplatePermission", "TemplateExtraField", "UserTemplate", "UserPermissionOverride",
     "StaffProfile",
+    "MedicalHistoryEntry",
+    "RoomAssignment",
+    "RecoveryGoal", "RecoveryDomainWeight",
 ]
