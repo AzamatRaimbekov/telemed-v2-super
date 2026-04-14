@@ -21,11 +21,13 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedMedicineSettingsRouteImport } from './routes/_authenticated/medicine-settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
 import { Route as PortalPortalTreatmentRouteImport } from './routes/portal/_portal/treatment'
 import { Route as PortalPortalScheduleRouteImport } from './routes/portal/_portal/schedule'
 import { Route as PortalPortalResultsRouteImport } from './routes/portal/_portal/results'
+import { Route as PortalPortalRecoveryRouteImport } from './routes/portal/_portal/recovery'
 import { Route as PortalPortalProfileRouteImport } from './routes/portal/_portal/profile'
 import { Route as PortalPortalMessagesRouteImport } from './routes/portal/_portal/messages'
 import { Route as PortalPortalMedicalCardRouteImport } from './routes/portal/_portal/medical-card'
@@ -119,6 +121,11 @@ const AuthenticatedAuditRoute = AuthenticatedAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedStaffIndexRoute = AuthenticatedStaffIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -143,6 +150,11 @@ const PortalPortalScheduleRoute = PortalPortalScheduleRouteImport.update({
 const PortalPortalResultsRoute = PortalPortalResultsRouteImport.update({
   id: '/results',
   path: '/results',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalRecoveryRoute = PortalPortalRecoveryRouteImport.update({
+  id: '/recovery',
+  path: '/recovery',
   getParentRoute: () => PortalPortalRoute,
 } as any)
 const PortalPortalProfileRoute = PortalPortalProfileRouteImport.update({
@@ -327,6 +339,7 @@ const AuthenticatedPatientsPatientIdHistoryEntryIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
@@ -350,6 +363,7 @@ export interface FileRoutesByFullPath {
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
   '/portal/profile': typeof PortalPortalProfileRoute
+  '/portal/recovery': typeof PortalPortalRecoveryRoute
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
@@ -376,6 +390,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
@@ -396,6 +411,7 @@ export interface FileRoutesByTo {
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
   '/portal/profile': typeof PortalPortalProfileRoute
+  '/portal/recovery': typeof PortalPortalRecoveryRoute
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
@@ -423,6 +439,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
@@ -446,6 +463,7 @@ export interface FileRoutesById {
   '/portal/_portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/_portal/messages': typeof PortalPortalMessagesRoute
   '/portal/_portal/profile': typeof PortalPortalProfileRoute
+  '/portal/_portal/recovery': typeof PortalPortalRecoveryRoute
   '/portal/_portal/results': typeof PortalPortalResultsRoute
   '/portal/_portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/_portal/treatment': typeof PortalPortalTreatmentRoute
@@ -474,6 +492,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/analytics'
     | '/audit'
     | '/dashboard'
     | '/medicine-settings'
@@ -497,6 +516,7 @@ export interface FileRouteTypes {
     | '/portal/medical-card'
     | '/portal/messages'
     | '/portal/profile'
+    | '/portal/recovery'
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
@@ -523,6 +543,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/analytics'
     | '/audit'
     | '/dashboard'
     | '/medicine-settings'
@@ -543,6 +564,7 @@ export interface FileRouteTypes {
     | '/portal/medical-card'
     | '/portal/messages'
     | '/portal/profile'
+    | '/portal/recovery'
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
@@ -569,6 +591,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/analytics'
     | '/_authenticated/audit'
     | '/_authenticated/dashboard'
     | '/_authenticated/medicine-settings'
@@ -592,6 +615,7 @@ export interface FileRouteTypes {
     | '/portal/_portal/medical-card'
     | '/portal/_portal/messages'
     | '/portal/_portal/profile'
+    | '/portal/_portal/recovery'
     | '/portal/_portal/results'
     | '/portal/_portal/schedule'
     | '/portal/_portal/treatment'
@@ -710,6 +734,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/staff/': {
       id: '/_authenticated/staff/'
       path: '/'
@@ -743,6 +774,13 @@ declare module '@tanstack/react-router' {
       path: '/results'
       fullPath: '/portal/results'
       preLoaderRoute: typeof PortalPortalResultsRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/recovery': {
+      id: '/portal/_portal/recovery'
+      path: '/recovery'
+      fullPath: '/portal/recovery'
+      preLoaderRoute: typeof PortalPortalRecoveryRouteImport
       parentRoute: typeof PortalPortalRoute
     }
     '/portal/_portal/profile': {
@@ -1074,6 +1112,7 @@ const AuthenticatedStaffRouteWithChildren =
   AuthenticatedStaffRoute._addFileChildren(AuthenticatedStaffRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMedicineSettingsRoute: typeof AuthenticatedMedicineSettingsRoute
@@ -1084,6 +1123,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMedicineSettingsRoute: AuthenticatedMedicineSettingsRoute,
@@ -1108,6 +1148,7 @@ interface PortalPortalRouteChildren {
   PortalPortalMedicalCardRoute: typeof PortalPortalMedicalCardRoute
   PortalPortalMessagesRoute: typeof PortalPortalMessagesRoute
   PortalPortalProfileRoute: typeof PortalPortalProfileRoute
+  PortalPortalRecoveryRoute: typeof PortalPortalRecoveryRoute
   PortalPortalResultsRoute: typeof PortalPortalResultsRoute
   PortalPortalScheduleRoute: typeof PortalPortalScheduleRoute
   PortalPortalTreatmentRoute: typeof PortalPortalTreatmentRoute
@@ -1124,6 +1165,7 @@ const PortalPortalRouteChildren: PortalPortalRouteChildren = {
   PortalPortalMedicalCardRoute: PortalPortalMedicalCardRoute,
   PortalPortalMessagesRoute: PortalPortalMessagesRoute,
   PortalPortalProfileRoute: PortalPortalProfileRoute,
+  PortalPortalRecoveryRoute: PortalPortalRecoveryRoute,
   PortalPortalResultsRoute: PortalPortalResultsRoute,
   PortalPortalScheduleRoute: PortalPortalScheduleRoute,
   PortalPortalTreatmentRoute: PortalPortalTreatmentRoute,

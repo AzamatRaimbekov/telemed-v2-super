@@ -116,6 +116,18 @@ const navItems = [
     ),
   },
   {
+    label: "Аналитика",
+    to: "/analytics" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <line x1="18" x2="18" y1="20" y2="10" />
+        <line x1="12" x2="12" y1="20" y2="4" />
+        <line x1="6" x2="6" y1="20" y2="14" />
+        <line x1="2" x2="22" y1="20" y2="20" />
+      </svg>
+    ),
+  },
+  {
     label: "Аудит",
     to: "/audit" as const,
     icon: (
