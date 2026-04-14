@@ -68,7 +68,15 @@ function NewEntryPage() {
         params: { patientId, entryId: String(entry.id) },
       });
     },
-    onError: () => toast.error("Не удалось сохранить запись"),
+    onError: (err: unknown) => {
+      const axiosErr = err as { response?: { data?: { detail?: string; error?: { message?: string } }; status?: number } };
+      const detail = axiosErr?.response?.data?.detail
+        || axiosErr?.response?.data?.error?.message
+        || String(err);
+      const status = axiosErr?.response?.status;
+      console.error("History create error:", status, axiosErr?.response?.data);
+      toast.error(`Не удалось сохранить запись${status ? ` (${status})` : ""}: ${detail}`);
+    },
   });
 
   if (!method) {

@@ -110,7 +110,7 @@ async def create_history_entry(
     data: MedicalHistoryCreate,
     session: DBSession,
     current_user: CurrentUser,
-    _staff=require_role(UserRole.DOCTOR, UserRole.NURSE, UserRole.CLINIC_ADMIN),
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.NURSE),
 ):
     service = MedicalHistoryService(session)
     entry_data = data.model_dump(exclude_unset=True)
@@ -127,7 +127,7 @@ async def update_history_entry(
     data: MedicalHistoryUpdate,
     session: DBSession,
     current_user: CurrentUser,
-    _staff=require_role(UserRole.DOCTOR, UserRole.NURSE, UserRole.CLINIC_ADMIN),
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.NURSE),
 ):
     service = MedicalHistoryService(session)
     e = await service.update_entry(entry_id, data.model_dump(exclude_unset=True), current_user.clinic_id)
