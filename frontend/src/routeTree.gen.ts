@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalLoginRouteImport } from './routes/portal/login'
 import { Route as PortalPortalRouteImport } from './routes/portal/_portal'
+import { Route as AuthenticatedTelemedicineRouteImport } from './routes/_authenticated/telemedicine'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedPatientsRouteImport } from './routes/_authenticated/patients'
@@ -84,6 +85,12 @@ const PortalPortalRoute = PortalPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTelemedicineRoute =
+  AuthenticatedTelemedicineRouteImport.update({
+    id: '/telemedicine',
+    path: '/telemedicine',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
@@ -347,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/schedule': typeof AuthenticatedScheduleRoute
   '/staff': typeof AuthenticatedStaffRouteWithChildren
+  '/telemedicine': typeof AuthenticatedTelemedicineRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRouteWithChildren
@@ -396,6 +404,7 @@ export interface FileRoutesByTo {
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/schedule': typeof AuthenticatedScheduleRoute
+  '/telemedicine': typeof AuthenticatedTelemedicineRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -447,6 +456,7 @@ export interface FileRoutesById {
   '/_authenticated/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRouteWithChildren
+  '/_authenticated/telemedicine': typeof AuthenticatedTelemedicineRoute
   '/portal/_portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/_authenticated/patients/$patientId': typeof AuthenticatedPatientsPatientIdRouteWithChildren
@@ -500,6 +510,7 @@ export interface FileRouteTypes {
     | '/patients'
     | '/schedule'
     | '/staff'
+    | '/telemedicine'
     | '/portal'
     | '/portal/login'
     | '/patients/$patientId'
@@ -549,6 +560,7 @@ export interface FileRouteTypes {
     | '/medicine-settings'
     | '/notifications'
     | '/schedule'
+    | '/telemedicine'
     | '/portal'
     | '/portal/login'
     | '/patients/new'
@@ -599,6 +611,7 @@ export interface FileRouteTypes {
     | '/_authenticated/patients'
     | '/_authenticated/schedule'
     | '/_authenticated/staff'
+    | '/_authenticated/telemedicine'
     | '/portal/_portal'
     | '/portal/login'
     | '/_authenticated/patients/$patientId'
@@ -684,6 +697,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal'
       preLoaderRoute: typeof PortalPortalRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/telemedicine': {
+      id: '/_authenticated/telemedicine'
+      path: '/telemedicine'
+      fullPath: '/telemedicine'
+      preLoaderRoute: typeof AuthenticatedTelemedicineRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/staff': {
       id: '/_authenticated/staff'
@@ -1120,6 +1140,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPatientsRoute: typeof AuthenticatedPatientsRouteWithChildren
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRouteWithChildren
+  AuthenticatedTelemedicineRoute: typeof AuthenticatedTelemedicineRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -1131,6 +1152,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPatientsRoute: AuthenticatedPatientsRouteWithChildren,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRouteWithChildren,
+  AuthenticatedTelemedicineRoute: AuthenticatedTelemedicineRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

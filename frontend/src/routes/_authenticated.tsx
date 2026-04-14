@@ -140,6 +140,16 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    label: "Телемедицина",
+    to: "/telemedicine" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <polygon points="23 7 16 12 23 17 23 7" />
+        <rect width="15" height="14" x="1" y="5" rx="2" ry="2" />
+      </svg>
+    ),
+  },
 ];
 
 function UserAvatar({ name, role }: { name: string; role: string }) {
