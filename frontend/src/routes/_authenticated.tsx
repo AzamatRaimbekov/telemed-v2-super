@@ -1,6 +1,8 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth-store";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notificationsApi, type Notification } from "@/lib/notifications-api";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context }) => {
@@ -104,6 +106,16 @@ const navItems = [
     ),
   },
   {
+    label: "Уведомления",
+    to: "/notifications" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      </svg>
+    ),
+  },
+  {
     label: "Аудит",
     to: "/audit" as const,
     icon: (
@@ -148,6 +160,170 @@ const roleLabels: Record<string, string> = {
   PATIENT: "Пациент",
   GUARDIAN: "Опекун",
 };
+
+function timeAgo(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "только что";
+  if (diffMins < 60) return `${diffMins} мин назад`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} ч назад`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "вчера";
+  if (diffDays < 7) return `${diffDays} дн назад`;
+  return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+}
+
+const severityColor: Record<string, string> = {
+  INFO: "bg-blue-500",
+  WARNING: "bg-amber-500",
+  CRITICAL: "bg-red-500",
+};
+
+function NotificationBell() {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { data: countData } = useQuery({
+    queryKey: ["notifications-unread-count"],
+    queryFn: notificationsApi.unreadCount,
+    refetchInterval: 30_000,
+  });
+
+  const { data: previewData } = useQuery({
+    queryKey: ["notifications-preview"],
+    queryFn: () => notificationsApi.list(0, 5),
+    enabled: open,
+  });
+
+  const markRead = useMutation({
+    mutationFn: notificationsApi.markRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications-preview"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const markAllRead = useMutation({
+    mutationFn: notificationsApi.markAllRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications-preview"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  const unreadCount = countData?.count ?? 0;
+  const notifications = previewData?.items ?? [];
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="relative p-2 rounded-xl text-[var(--color-text-tertiary)] hover:text-foreground hover:bg-[var(--color-muted)] transition-all duration-200"
+        aria-label="Уведомления"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+        </svg>
+        {unreadCount > 0 && (
+          <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-[3px] bg-destructive rounded-full border-2 border-background flex items-center justify-center text-[9px] font-bold text-white leading-none">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-[360px] bg-[var(--color-surface)] border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground text-sm">Уведомления</span>
+              {unreadCount > 0 && (
+                <span className="px-1.5 py-0.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-full">
+                  {unreadCount} новых
+                </span>
+              )}
+            </div>
+            {unreadCount > 0 && (
+              <button
+                onClick={() => markAllRead.mutate()}
+                className="text-xs text-primary hover:underline font-medium"
+                disabled={markAllRead.isPending}
+              >
+                Прочитать все
+              </button>
+            )}
+          </div>
+
+          {/* List */}
+          <div className="max-h-[380px] overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="py-10 text-center text-sm text-[var(--color-text-tertiary)]">
+                Нет уведомлений
+              </div>
+            ) : (
+              notifications.map((n: Notification) => (
+                <button
+                  key={n.id}
+                  onClick={() => {
+                    if (!n.is_read) markRead.mutate(n.id);
+                  }}
+                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-[var(--color-muted)] transition-colors border-b border-border/50 last:border-0 ${!n.is_read ? "bg-primary/[0.03]" : ""}`}
+                >
+                  {/* Severity dot */}
+                  <span className={`mt-1.5 flex-shrink-0 w-2 h-2 rounded-full ${!n.is_read ? severityColor[n.severity] ?? "bg-blue-500" : "bg-transparent border border-border"}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm leading-snug truncate ${!n.is_read ? "font-semibold text-foreground" : "font-medium text-[var(--color-text-secondary)]"}`}>
+                      {n.title}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5 line-clamp-2 leading-snug">
+                      {n.message}
+                    </p>
+                    <p className="text-[10px] text-[var(--color-text-tertiary)] mt-1">
+                      {timeAgo(n.created_at)}
+                    </p>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-border px-4 py-2.5 flex justify-between items-center">
+            <Link
+              to="/notifications"
+              onClick={() => setOpen(false)}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Показать все
+            </Link>
+            <span className="text-xs text-[var(--color-text-tertiary)]">
+              {previewData?.total ?? 0} всего
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function AuthenticatedLayout() {
   const { user, isAuthenticated, fetchUser, logout } = useAuthStore();
@@ -265,13 +441,7 @@ function AuthenticatedLayout() {
           </div>
           <div className="flex items-center gap-4">
             {/* Notifications bell */}
-            <button className="relative p-2 rounded-xl text-[var(--color-text-tertiary)] hover:text-foreground hover:bg-[var(--color-muted)] transition-all duration-200">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-              </svg>
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-destructive rounded-full border-2 border-background" />
-            </button>
+            <NotificationBell />
             {/* Settings gear */}
             <button className="p-2 rounded-xl text-[var(--color-text-tertiary)] hover:text-foreground hover:bg-[var(--color-muted)] transition-all duration-200">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">

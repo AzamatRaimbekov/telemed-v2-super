@@ -17,6 +17,7 @@ import { Route as PortalPortalRouteImport } from './routes/portal/_portal'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedPatientsRouteImport } from './routes/_authenticated/patients'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMedicineSettingsRouteImport } from './routes/_authenticated/medicine-settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
@@ -96,6 +97,12 @@ const AuthenticatedPatientsRoute = AuthenticatedPatientsRouteImport.update({
   path: '/patients',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedMedicineSettingsRoute =
   AuthenticatedMedicineSettingsRouteImport.update({
     id: '/medicine-settings',
@@ -323,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/schedule': typeof AuthenticatedScheduleRoute
   '/staff': typeof AuthenticatedStaffRouteWithChildren
@@ -371,6 +379,7 @@ export interface FileRoutesByTo {
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
@@ -417,6 +426,7 @@ export interface FileRoutesById {
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRouteWithChildren
@@ -467,6 +477,7 @@ export interface FileRouteTypes {
     | '/audit'
     | '/dashboard'
     | '/medicine-settings'
+    | '/notifications'
     | '/patients'
     | '/schedule'
     | '/staff'
@@ -515,6 +526,7 @@ export interface FileRouteTypes {
     | '/audit'
     | '/dashboard'
     | '/medicine-settings'
+    | '/notifications'
     | '/schedule'
     | '/portal'
     | '/portal/login'
@@ -560,6 +572,7 @@ export interface FileRouteTypes {
     | '/_authenticated/audit'
     | '/_authenticated/dashboard'
     | '/_authenticated/medicine-settings'
+    | '/_authenticated/notifications'
     | '/_authenticated/patients'
     | '/_authenticated/schedule'
     | '/_authenticated/staff'
@@ -667,6 +680,13 @@ declare module '@tanstack/react-router' {
       path: '/patients'
       fullPath: '/patients'
       preLoaderRoute: typeof AuthenticatedPatientsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/medicine-settings': {
@@ -1057,6 +1077,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMedicineSettingsRoute: typeof AuthenticatedMedicineSettingsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPatientsRoute: typeof AuthenticatedPatientsRouteWithChildren
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRouteWithChildren
@@ -1066,6 +1087,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMedicineSettingsRoute: AuthenticatedMedicineSettingsRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPatientsRoute: AuthenticatedPatientsRouteWithChildren,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRouteWithChildren,
