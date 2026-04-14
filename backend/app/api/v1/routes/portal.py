@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Query
@@ -89,7 +90,7 @@ async def get_profile(patient: PortalPatient, session: DBSession):
 @router.patch("/profile")
 async def update_profile(data: PatientProfileUpdate, patient: PortalPatient, session: DBSession):
     service = PortalService(session)
-    p = await service.update_profile(patient.id, data.phone, data.email, data.address)
+    p = await service.update_profile(patient.id, data.phone, data.email, data.address, data.emergency_contact_name, data.emergency_contact_phone)
     return {"status": "updated"}
 
 
@@ -117,8 +118,9 @@ async def get_diagnoses(patient: PortalPatient, session: DBSession):
 
 
 @router.get("/medical-card/documents")
-async def get_documents(patient: PortalPatient):
-    return []  # Placeholder — will be populated when file storage is connected
+async def get_documents(patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_documents(patient.id, patient.clinic_id)
 
 
 # LAB RESULTS (4)
@@ -157,18 +159,53 @@ async def get_treatment(patient: PortalPatient, session: DBSession):
 
 @router.get("/treatment/today")
 async def get_today_treatment(patient: PortalPatient, session: DBSession):
-    from app.models.treatment import TreatmentPlan, TreatmentPlanItem
+    from app.models.treatment import TreatmentPlan, TreatmentPlanItem, TreatmentPlanStatus
     from datetime import date
     today = date.today()
+    # Get all items from ACTIVE plans where: start_date <= today OR start_date is NULL
+    # and plan is within date range
     query = (
         select(TreatmentPlanItem)
         .join(TreatmentPlan)
-        .where(TreatmentPlan.patient_id == patient.id, TreatmentPlanItem.start_date <= today, TreatmentPlanItem.is_deleted == False)
+        .where(
+            TreatmentPlan.patient_id == patient.id,
+            TreatmentPlan.status == TreatmentPlanStatus.ACTIVE,
+            TreatmentPlan.is_deleted == False,
+            TreatmentPlanItem.is_deleted == False,
+            # Include items with no start_date (they apply from plan creation)
+            # or items where start_date <= today
+            (TreatmentPlanItem.start_date <= today) | (TreatmentPlanItem.start_date == None),
+        )
         .order_by(TreatmentPlanItem.sort_order)
     )
     result = await session.execute(query)
     items = result.scalars().all()
-    return [{"id": i.id, "title": i.title, "type": i.item_type.value, "status": i.status.value, "scheduled_at": i.scheduled_at} for i in items]
+    out = []
+    for i in items:
+        cfg = i.configuration or {}
+        out.append({
+            "id": str(i.id),
+            "title": i.title or "",
+            "type": i.item_type.value,
+            "status": i.status.value,
+            "frequency": i.frequency,
+            "scheduled_at": str(i.scheduled_at) if i.scheduled_at else None,
+            "scheduled_time": str(i.scheduled_at).split("T")[1][:5] if i.scheduled_at else None,
+            "description": i.description,
+            # Medication-specific
+            "drug_name": cfg.get("drug_name") or i.title,
+            "dosage": cfg.get("dosage"),
+            "route": cfg.get("route"),
+            "prescription_id": str(i.id),
+            # Exercise-specific
+            "exercise_id": cfg.get("exercise_id"),
+            "exercise_name": cfg.get("exercise_name") or i.title,
+            "sets": cfg.get("sets"),
+            "reps": cfg.get("reps"),
+            # General
+            "configuration": cfg,
+        })
+    return out
 
 
 # BILLING (5)
@@ -360,3 +397,143 @@ async def mark_notification_read(notification_id: uuid.UUID, patient: PortalPati
     user_id = patient.user_id or patient.id
     await service.mark_notification_read(notification_id, user_id)
     return {"status": "read"}
+
+
+# SCHEDULE (2)
+@router.get("/schedule")
+async def get_schedule(
+    patient: PortalPatient,
+    session: DBSession,
+    date: str | None = None,
+    from_date: str | None = Query(None, alias="from"),
+    to_date: str | None = Query(None, alias="to"),
+):
+    service = PortalService(session)
+    return await service.get_schedule(patient.id, patient.clinic_id, single_date=date, from_date=from_date, to_date=to_date)
+
+
+@router.get("/schedule/upcoming")
+async def get_upcoming_events(patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_upcoming_events(patient.id, patient.clinic_id, limit=5)
+
+
+# PRESCRIPTION CONFIRM (1)
+@router.post("/prescriptions/{item_id}/confirm")
+async def confirm_prescription(item_id: uuid.UUID, patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.confirm_prescription(item_id, patient.id)
+
+
+# DASHBOARD (1)
+@router.get("/dashboard")
+async def get_dashboard(patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_dashboard(patient.id, patient.clinic_id, patient)
+
+
+# BILLING CATEGORIES (1)
+@router.get("/billing/categories")
+async def get_billing_categories(patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_billing_categories(patient.id, patient.clinic_id)
+
+
+# VISIT DETAIL (1)
+@router.get("/visits/{visit_id}")
+async def get_visit_detail(visit_id: uuid.UUID, patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_visit_detail(visit_id, patient.id, patient.clinic_id)
+
+
+# DOCUMENTS (1) — replaces placeholder
+@router.get("/documents")
+async def get_documents_list(patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_documents(patient.id, patient.clinic_id)
+
+
+# TREATMENT PLANS FULL (1)
+@router.get("/treatment-plans")
+async def get_treatment_plans_full(patient: PortalPatient, session: DBSession):
+    service = PortalService(session)
+    return await service.get_treatment_plans_full(patient.id, patient.clinic_id)
+
+
+# RECOVERY DYNAMICS (4) — portal-facing, read-only
+@router.get("/recovery/vitals")
+async def portal_recovery_vitals(
+    patient: PortalPatient,
+    session: DBSession,
+    days: int = Query(90, ge=7, le=365),
+):
+    """Patient's own vital signs for recovery dashboard."""
+    service = PortalService(session)
+    vitals = await service.get_vitals(patient.id, days)
+    return [
+        {
+            "recorded_at": v.recorded_at,
+            "systolic_bp": v.systolic_bp,
+            "diastolic_bp": v.diastolic_bp,
+            "pulse": v.pulse,
+            "temperature": float(v.temperature) if v.temperature else None,
+            "weight": float(v.weight) if v.weight else None,
+            "spo2": v.spo2,
+            "respiratory_rate": v.respiratory_rate,
+            "blood_glucose": float(v.blood_glucose) if v.blood_glucose else None,
+        }
+        for v in vitals
+    ]
+
+
+@router.get("/recovery/assessments")
+async def portal_recovery_assessments(patient: PortalPatient, session: DBSession):
+    """Patient's own stroke/rehab assessments for recovery dashboard."""
+    from app.models.stroke import StrokeAssessment
+    query = (
+        select(StrokeAssessment)
+        .where(
+            StrokeAssessment.patient_id == patient.id,
+            StrokeAssessment.is_deleted == False,
+        )
+        .order_by(StrokeAssessment.assessed_at)
+    )
+    result = await session.execute(query)
+    assessments = result.scalars().all()
+    return [
+        {
+            "id": str(a.id),
+            "assessment_type": a.assessment_type.value,
+            "score": float(a.score) if a.score is not None else None,
+            "max_score": float(a.max_score) if a.max_score is not None else None,
+            "assessed_at": a.assessed_at,
+            "interpretation": a.interpretation,
+        }
+        for a in assessments
+    ]
+
+
+@router.get("/recovery/exercise-sessions")
+async def portal_recovery_exercise_sessions(patient: PortalPatient, session: DBSession):
+    """Patient's own exercise sessions for recovery dashboard."""
+    service = PortalService(session)
+    sessions = await service.get_exercise_sessions(patient.id, patient.clinic_id)
+    return [
+        {
+            "id": str(s.id),
+            "started_at": s.started_at,
+            "completed_at": getattr(s, "completed_at", None),
+            "accuracy_score": float(s.accuracy_score) if s.accuracy_score is not None else None,
+            "duration_seconds": s.duration_seconds,
+            "reps_completed": s.reps_completed,
+            "sets_completed": s.sets_completed,
+        }
+        for s in sessions
+    ]
+
+
+@router.get("/recovery/lab-results")
+async def portal_recovery_lab_results(patient: PortalPatient, session: DBSession):
+    """Patient's own lab results for recovery dashboard."""
+    service = PortalService(session)
+    return await service.get_results(patient.id, patient.clinic_id)
