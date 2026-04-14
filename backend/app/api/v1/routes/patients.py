@@ -1,7 +1,8 @@
 from __future__ import annotations
 import uuid
+from datetime import datetime, timezone
 from fastapi import APIRouter, Query, Request
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from app.api.deps import CurrentUser, DBSession, require_role
 from app.models.user import UserRole
 from app.schemas.patient import (
@@ -344,3 +345,192 @@ async def get_diagnoses(patient_id: uuid.UUID, session: DBSession, current_user:
                 "status": "active" if v.status.value == "COMPLETED" else "pending",
             })
     return diagnoses
+
+
+# --- Procedure Orders ---
+@router.get("/{patient_id}/procedure-orders")
+async def list_procedure_orders(
+    patient_id: uuid.UUID, session: DBSession, current_user: CurrentUser,
+    status: str | None = None,
+):
+    from app.models.procedure import ProcedureOrder, ProcedureOrderStatus, Procedure
+    query = (
+        select(ProcedureOrder)
+        .where(
+            ProcedureOrder.patient_id == patient_id,
+            ProcedureOrder.clinic_id == current_user.clinic_id,
+            ProcedureOrder.is_deleted == False,
+        )
+        .order_by(desc(ProcedureOrder.scheduled_at), desc(ProcedureOrder.created_at))
+    )
+    if status:
+        query = query.where(ProcedureOrder.status == ProcedureOrderStatus(status))
+    result = await session.execute(query)
+    orders = list(result.scalars().all())
+    return [_procedure_order_to_dict(o) for o in orders]
+
+
+@router.get("/{patient_id}/procedure-orders/{order_id}")
+async def get_procedure_order(
+    patient_id: uuid.UUID, order_id: uuid.UUID,
+    session: DBSession, current_user: CurrentUser,
+):
+    from app.models.procedure import ProcedureOrder
+    query = select(ProcedureOrder).where(
+        ProcedureOrder.id == order_id,
+        ProcedureOrder.patient_id == patient_id,
+        ProcedureOrder.clinic_id == current_user.clinic_id,
+        ProcedureOrder.is_deleted == False,
+    )
+    result = await session.execute(query)
+    order = result.scalar_one_or_none()
+    if not order:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("ProcedureOrder", str(order_id))
+    return _procedure_order_to_dict(order)
+
+
+@router.post("/{patient_id}/procedure-orders", status_code=201)
+async def create_procedure_order(
+    patient_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+    procedure_id: uuid.UUID = Query(...),
+    scheduled_at: str | None = None,
+    notes: str | None = None,
+):
+    from app.models.procedure import ProcedureOrder, ProcedureOrderStatus, Procedure
+    # Verify procedure exists
+    proc_q = select(Procedure).where(Procedure.id == procedure_id, Procedure.is_deleted == False)
+    proc_result = await session.execute(proc_q)
+    procedure = proc_result.scalar_one_or_none()
+    if not procedure:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Procedure", str(procedure_id))
+
+    order = ProcedureOrder(
+        id=uuid.uuid4(),
+        patient_id=patient_id,
+        procedure_id=procedure_id,
+        ordered_by_id=current_user.id,
+        clinic_id=current_user.clinic_id,
+        status=ProcedureOrderStatus.ORDERED,
+        scheduled_at=datetime.fromisoformat(scheduled_at) if scheduled_at else None,
+        notes=notes,
+    )
+    session.add(order)
+    await session.flush()
+    await session.refresh(order)
+    await session.commit()
+    return _procedure_order_to_dict(order)
+
+
+@router.patch("/{patient_id}/procedure-orders/{order_id}")
+async def update_procedure_order(
+    patient_id: uuid.UUID, order_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.NURSE),
+    status: str | None = None,
+    notes: str | None = None,
+    scheduled_at: str | None = None,
+    performed_by_id: uuid.UUID | None = None,
+    consent_signed: bool | None = None,
+):
+    from app.models.procedure import ProcedureOrder, ProcedureOrderStatus
+    query = select(ProcedureOrder).where(
+        ProcedureOrder.id == order_id,
+        ProcedureOrder.patient_id == patient_id,
+        ProcedureOrder.clinic_id == current_user.clinic_id,
+        ProcedureOrder.is_deleted == False,
+    )
+    result = await session.execute(query)
+    order = result.scalar_one_or_none()
+    if not order:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("ProcedureOrder", str(order_id))
+
+    now = datetime.now(timezone.utc)
+    if status:
+        order.status = ProcedureOrderStatus(status)
+        if status == "IN_PROGRESS" and not order.started_at:
+            order.started_at = now
+        elif status == "COMPLETED" and not order.completed_at:
+            order.completed_at = now
+    if notes is not None:
+        order.notes = notes
+    if scheduled_at is not None:
+        order.scheduled_at = datetime.fromisoformat(scheduled_at) if scheduled_at else None
+    if performed_by_id is not None:
+        order.performed_by_id = performed_by_id
+    if consent_signed is not None:
+        order.consent_signed = consent_signed
+
+    await session.flush()
+    await session.refresh(order)
+    await session.commit()
+    return _procedure_order_to_dict(order)
+
+
+@router.delete("/{patient_id}/procedure-orders/{order_id}", status_code=204)
+async def delete_procedure_order(
+    patient_id: uuid.UUID, order_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    from app.models.procedure import ProcedureOrder
+    query = select(ProcedureOrder).where(
+        ProcedureOrder.id == order_id,
+        ProcedureOrder.patient_id == patient_id,
+        ProcedureOrder.clinic_id == current_user.clinic_id,
+        ProcedureOrder.is_deleted == False,
+    )
+    result = await session.execute(query)
+    order = result.scalar_one_or_none()
+    if not order:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("ProcedureOrder", str(order_id))
+    order.is_deleted = True
+    await session.flush()
+    await session.commit()
+
+
+def _procedure_order_to_dict(o) -> dict:
+    procedure_info = None
+    if o.procedure:
+        procedure_info = {
+            "id": o.procedure.id,
+            "name": o.procedure.name,
+            "code": o.procedure.code,
+            "category": o.procedure.category,
+            "description": o.procedure.description,
+            "duration_minutes": o.procedure.duration_minutes,
+            "price": float(o.procedure.price) if o.procedure.price else None,
+            "requires_consent": o.procedure.requires_consent,
+        }
+    ordered_by_name = ""
+    if o.ordered_by:
+        ordered_by_name = f"{o.ordered_by.last_name} {o.ordered_by.first_name}"
+    performed_by_name = ""
+    if o.performed_by:
+        performed_by_name = f"{o.performed_by.last_name} {o.performed_by.first_name}"
+    return {
+        "id": o.id,
+        "patient_id": o.patient_id,
+        "procedure": procedure_info,
+        "status": o.status.value if hasattr(o.status, "value") else str(o.status),
+        "ordered_by_id": o.ordered_by_id,
+        "ordered_by_name": ordered_by_name,
+        "performed_by_id": o.performed_by_id,
+        "performed_by_name": performed_by_name,
+        "treatment_plan_id": o.treatment_plan_id,
+        "scheduled_at": o.scheduled_at,
+        "started_at": o.started_at,
+        "completed_at": o.completed_at,
+        "notes": o.notes,
+        "consent_signed": o.consent_signed,
+        "created_at": o.created_at,
+        "updated_at": o.updated_at,
+    }

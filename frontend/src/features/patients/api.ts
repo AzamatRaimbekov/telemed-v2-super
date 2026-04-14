@@ -74,6 +74,36 @@ export const patientsApi = {
   getDiagnoses: (patientId: string) =>
     apiClient.get(`/patients/${patientId}/diagnoses`).then((r) => r.data),
 
+  // Procedure Orders
+  getProcedureOrders: (patientId: string, status?: string) => {
+    const q = status ? `?status=${status}` : "";
+    return apiClient.get(`/patients/${patientId}/procedure-orders${q}`).then((r) => r.data);
+  },
+  getProcedureOrder: (patientId: string, orderId: string) =>
+    apiClient.get(`/patients/${patientId}/procedure-orders/${orderId}`).then((r) => r.data),
+  createProcedureOrder: (patientId: string, procedureId: string, scheduledAt?: string, notes?: string) => {
+    const q = new URLSearchParams({ procedure_id: procedureId });
+    if (scheduledAt) q.set("scheduled_at", scheduledAt);
+    if (notes) q.set("notes", notes);
+    return apiClient.post(`/patients/${patientId}/procedure-orders?${q}`).then((r) => r.data);
+  },
+  updateProcedureOrder: (patientId: string, orderId: string, params: Record<string, unknown>) => {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v != null) q.set(k, String(v));
+    }
+    return apiClient.patch(`/patients/${patientId}/procedure-orders/${orderId}?${q}`).then((r) => r.data);
+  },
+  deleteProcedureOrder: (patientId: string, orderId: string) =>
+    apiClient.delete(`/patients/${patientId}/procedure-orders/${orderId}`).then((r) => r.data),
+  // Procedure catalog (for creating orders)
+  getProcedureCatalog: (search?: string, category?: string) => {
+    const q = new URLSearchParams();
+    if (search) q.set("search", search);
+    if (category) q.set("category", category);
+    return apiClient.get(`/treatment/catalogs/procedures?${q}`).then((r) => r.data);
+  },
+
   // Diagnoses CRUD (dedicated table)
   getDiagnosesList: (patientId: string, status?: string) => {
     const q = status ? `?status=${status}` : "";
