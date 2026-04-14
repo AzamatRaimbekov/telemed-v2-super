@@ -454,6 +454,8 @@ export const patientsApi = {
   // AI Assistant
   getAiSummary: (patientId: string) =>
     apiClient.get(`/patients/${patientId}/ai/summary`).then((r) => r.data),
+  sendAiChat: (patientId: string, message: string) =>
+    apiClient.post(`/patients/${patientId}/ai/chat?message=${encodeURIComponent(message)}`).then((r) => r.data),
 
   // ICD-10 catalog
   searchIcd10: (query: string) =>
