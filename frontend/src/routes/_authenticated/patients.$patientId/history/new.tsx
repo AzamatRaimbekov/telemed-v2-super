@@ -725,6 +725,14 @@ function UploadEntryForm({
 
 // ─── Dictate Entry Form ───────────────────────────────────────────────────────
 
+// Check if browser supports Web Speech API
+function getSpeechRecognition(): (new () => SpeechRecognition) | null {
+  const w = window as unknown as Record<string, unknown>;
+  return (w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null) as (new () => SpeechRecognition) | null;
+}
+
+type SttMethod = "browser" | "whisper" | "idle";
+
 function DictateEntryForm({
   onSubmit,
   isPending,
@@ -733,16 +741,27 @@ function DictateEntryForm({
   isPending: boolean;
 }) {
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcription, setTranscription] = useState("");
+  const [interimText, setInterimText] = useState("");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [sttMethod, setSttMethod] = useState<SttMethod>("idle");
+  const [entryType, setEntryType] = useState<EntryType>("daily_note");
 
-  // Cleanup on unmount
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const hasBrowserStt = !!getSpeechRecognition();
+
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      recognitionRef.current?.abort();
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (mediaRecorderRef.current?.state === "recording") {
         mediaRecorderRef.current.stop();
       }
     };
@@ -751,31 +770,135 @@ function DictateEntryForm({
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
+      streamRef.current = stream;
 
-      mediaRecorder.start();
+      // Always record audio for Whisper fallback
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ? "audio/webm;codecs=opus"
+          : "audio/webm",
+      });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      mediaRecorder.start(1000); // chunks every 1s
+
+      // Try browser Speech Recognition for realtime preview
+      const SpeechRec = getSpeechRecognition();
+      if (SpeechRec) {
+        const recognition = new SpeechRec();
+        recognition.lang = "ru-RU";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event) => {
+          let interim = "";
+          let final = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (result.isFinal) {
+              final += result[0].transcript + " ";
+            } else {
+              interim += result[0].transcript;
+            }
+          }
+          if (final) {
+            setTranscription((prev) => prev + final);
+          }
+          setInterimText(interim);
+        };
+
+        recognition.onerror = () => {
+          // Browser STT failed — Whisper will handle it on stop
+          setSttMethod("whisper");
+        };
+
+        recognition.onend = () => {
+          // Restart if still recording (browser STT stops after silence)
+          if (mediaRecorderRef.current?.state === "recording") {
+            try { recognition.start(); } catch { /* ignore */ }
+          }
+        };
+
+        try {
+          recognition.start();
+          recognitionRef.current = recognition;
+          setSttMethod("browser");
+        } catch {
+          setSttMethod("whisper");
+        }
+      } else {
+        setSttMethod("whisper");
+      }
+
       setIsRecording(true);
       setRecordingSeconds(0);
+      setInterimText("");
+      timerRef.current = setInterval(() => setRecordingSeconds((s) => s + 1), 1000);
 
-      timerRef.current = setInterval(() => {
-        setRecordingSeconds((s) => s + 1);
-      }, 1000);
-
-      mediaRecorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-        if (timerRef.current) clearInterval(timerRef.current);
-        setIsRecording(false);
-        // In a real implementation this would send audio to speech-to-text API.
-        // For now we leave the textarea for manual editing.
-      };
     } catch {
       toast.error("Нет доступа к микрофону. Проверьте разрешения браузера.");
     }
   };
 
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
+  const stopRecording = async () => {
+    // Stop browser STT
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setInterimText("");
+
+    // Stop timer
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    // Stop media recorder and get audio blob
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state === "recording") {
+      await new Promise<void>((resolve) => {
+        recorder.onstop = () => resolve();
+        recorder.stop();
+      });
+    }
+
+    // Stop microphone
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+
+    setIsRecording(false);
+
+    // If browser STT got nothing useful, try Whisper
+    const currentText = transcription.trim();
+    if (!currentText || sttMethod === "whisper") {
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      if (audioBlob.size > 100) {
+        await transcribeWithWhisper(audioBlob);
+      }
+    }
+
+    setSttMethod("idle");
+  };
+
+  const transcribeWithWhisper = async (audioBlob: Blob) => {
+    setIsTranscribing(true);
+    try {
+      const result = await patientsApi.transcribeAudio(audioBlob, "ru");
+      if (result.text) {
+        setTranscription((prev) => {
+          const trimmed = prev.trim();
+          return trimmed ? trimmed + "\n\n" + result.text : result.text;
+        });
+        toast.success("Транскрипция готова (Whisper AI)");
+      } else {
+        toast.error("Whisper не смог распознать речь");
+      }
+    } catch {
+      toast.error("Ошибка транскрипции. Отредактируйте текст вручную.");
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
   const formatTime = (s: number) =>
@@ -784,10 +907,11 @@ function DictateEntryForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const now = new Date();
+    const entryLabel = ENTRY_TYPE_OPTIONS.find((o) => o.value === entryType)?.label || entryType;
     onSubmit({
-      entry_type: "daily_note",
-      title: `Дневниковая запись — ${now.toLocaleDateString("ru-RU")}`,
-      content: { complaints: transcription },
+      entry_type: entryType,
+      title: `${entryLabel} — ${now.toLocaleDateString("ru-RU")}`,
+      content: { text: transcription },
       recorded_at: now.toISOString(),
       source_type: "ai_from_audio",
     });
@@ -800,32 +924,45 @@ function DictateEntryForm({
           Голосовая запись
         </h3>
 
+        {/* STT method indicator */}
+        {isRecording && (
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+              sttMethod === "browser"
+                ? "bg-success/10 text-success"
+                : "bg-amber-500/10 text-amber-500"
+            }`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+              {sttMethod === "browser"
+                ? "Распознавание в реальном времени"
+                : "Запись для Whisper AI"}
+            </span>
+          </div>
+        )}
+
         <div className="flex flex-col items-center gap-4 py-6">
           <button
             type="button"
             onClick={isRecording ? stopRecording : startRecording}
+            disabled={isTranscribing}
             className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-lg ${
-              isRecording
+              isTranscribing
+                ? "bg-amber-500/20 text-amber-500 cursor-wait"
+                : isRecording
                 ? "bg-destructive text-white scale-110 shadow-destructive/30 animate-pulse"
                 : "bg-success/10 text-success hover:bg-success/20 hover:scale-105"
             }`}
           >
-            {isRecording ? (
-              <svg
-                className="w-8 h-8"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
+            {isTranscribing ? (
+              <svg className="w-8 h-8 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            ) : isRecording ? (
+              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="6" y="6" width="12" height="12" rx="2" />
               </svg>
             ) : (
-              <svg
-                className="w-8 h-8"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
+              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                 <line x1="12" x2="12" y1="19" y2="22" />
@@ -833,21 +970,44 @@ function DictateEntryForm({
             )}
           </button>
 
+          {isTranscribing && (
+            <p className="text-sm font-medium text-amber-500">
+              Whisper AI расшифровывает запись...
+            </p>
+          )}
           {isRecording && (
             <p className="text-sm font-mono text-destructive font-semibold">
               {formatTime(recordingSeconds)} · Запись...
             </p>
           )}
-          {!isRecording && recordingSeconds > 0 && (
+          {!isRecording && !isTranscribing && recordingSeconds > 0 && (
             <p className="text-sm text-[var(--color-text-secondary)]">
               Запись остановлена · {formatTime(recordingSeconds)}
             </p>
           )}
-          {!isRecording && recordingSeconds === 0 && (
+          {!isRecording && !isTranscribing && recordingSeconds === 0 && (
             <p className="text-sm text-[var(--color-text-secondary)]">
-              Нажмите для начала записи
+              {hasBrowserStt
+                ? "Нажмите — текст появится в реальном времени"
+                : "Нажмите для записи — Whisper AI расшифрует после остановки"}
             </p>
           )}
+        </div>
+
+        {/* Realtime interim text */}
+        {interimText && (
+          <div className="mb-3 px-4 py-2 bg-secondary/5 rounded-xl border border-secondary/20 text-sm text-[var(--color-text-secondary)] italic">
+            {interimText}
+          </div>
+        )}
+
+        <div className="mb-4">
+          <CustomSelect
+            label="Тип записи"
+            value={entryType}
+            onChange={(val) => setEntryType(val as EntryType)}
+            options={ENTRY_TYPE_OPTIONS}
+          />
         </div>
 
         <TextareaField
@@ -855,8 +1015,14 @@ function DictateEntryForm({
           value={transcription}
           onChange={(e) => setTranscription(e.target.value)}
           rows={10}
-          placeholder="Текст появится здесь после транскрипции. Вы также можете вводить или редактировать вручную..."
+          placeholder="Текст появится здесь после начала записи. Можно редактировать вручную..."
         />
+
+        {!hasBrowserStt && (
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-2">
+            Ваш браузер не поддерживает распознавание в реальном времени. Будет использован Whisper AI после остановки записи.
+          </p>
+        )}
       </div>
 
       <div className="flex justify-end gap-3">
@@ -870,7 +1036,7 @@ function DictateEntryForm({
         <Button
           type="submit"
           variant="primary"
-          disabled={isPending || !transcription.trim()}
+          disabled={isPending || isTranscribing || !transcription.trim()}
           loading={isPending}
         >
           {isPending ? "Сохранение..." : "Сохранить запись"}

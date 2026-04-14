@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
 import json
@@ -27,6 +28,9 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:80"]
     SENTRY_DSN: str = ""
+
+    # OpenAI (Whisper STT)
+    OPENAI_API_KEY: str = ""
 
     # SMTP Email
     SMTP_HOST: str = ""
