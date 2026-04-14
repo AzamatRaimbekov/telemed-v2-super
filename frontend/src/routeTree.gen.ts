@@ -18,6 +18,7 @@ import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPatientsRouteImport } from './routes/_authenticated/patients'
 import { Route as AuthenticatedMedicineSettingsRouteImport } from './routes/_authenticated/medicine-settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
 import { Route as PortalPortalTreatmentRouteImport } from './routes/portal/_portal/treatment'
@@ -98,6 +99,11 @@ const AuthenticatedMedicineSettingsRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAuditRoute = AuthenticatedAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedStaffIndexRoute = AuthenticatedStaffIndexRouteImport.update({
@@ -308,6 +314,7 @@ const AuthenticatedPatientsPatientIdHistoryEntryIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
   '/patients': typeof AuthenticatedPatientsRouteWithChildren
@@ -354,6 +361,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
   '/portal': typeof PortalPortalRouteWithChildren
@@ -398,6 +406,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
   '/_authenticated/patients': typeof AuthenticatedPatientsRouteWithChildren
@@ -446,6 +455,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/audit'
     | '/dashboard'
     | '/medicine-settings'
     | '/patients'
@@ -492,6 +502,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/audit'
     | '/dashboard'
     | '/medicine-settings'
     | '/portal'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/audit'
     | '/_authenticated/dashboard'
     | '/_authenticated/medicine-settings'
     | '/_authenticated/patients'
@@ -650,6 +662,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/audit': {
+      id: '/_authenticated/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AuthenticatedAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/staff/': {
@@ -1016,6 +1035,7 @@ const AuthenticatedStaffRouteWithChildren =
   AuthenticatedStaffRoute._addFileChildren(AuthenticatedStaffRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMedicineSettingsRoute: typeof AuthenticatedMedicineSettingsRoute
   AuthenticatedPatientsRoute: typeof AuthenticatedPatientsRouteWithChildren
@@ -1023,6 +1043,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMedicineSettingsRoute: AuthenticatedMedicineSettingsRoute,
   AuthenticatedPatientsRoute: AuthenticatedPatientsRouteWithChildren,
