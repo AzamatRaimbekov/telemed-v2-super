@@ -388,6 +388,15 @@ function CreateDiagnosisForm({
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("active");
   const [notes, setNotes] = useState("");
+  const [icdSearch, setIcdSearch] = useState("");
+  const [showIcdDropdown, setShowIcdDropdown] = useState(false);
+
+  const { data: icdResults } = useQuery({
+    queryKey: ["icd10-search", icdSearch],
+    queryFn: () => patientsApi.searchIcd10(icdSearch),
+    enabled: icdSearch.length >= 1,
+  });
+  const icdItems = (icdResults as { code: string; title: string }[]) || [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -411,12 +420,39 @@ function CreateDiagnosisForm({
         Новый диагноз
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <InputField
-          label="Код МКБ-10"
-          value={icdCode}
-          onChange={(e) => setIcdCode(e.target.value)}
-          placeholder="I63.5"
-        />
+        <div className="relative">
+          <InputField
+            label="Код МКБ-10"
+            value={icdCode}
+            onChange={(e) => {
+              setIcdCode(e.target.value);
+              setIcdSearch(e.target.value);
+              setShowIcdDropdown(true);
+            }}
+            onFocus={() => { if (icdCode) setShowIcdDropdown(true); }}
+            onBlur={() => setTimeout(() => setShowIcdDropdown(false), 200)}
+            placeholder="I63.5"
+          />
+          {showIcdDropdown && icdItems.length > 0 && (
+            <div className="absolute z-20 top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-[var(--color-surface)] shadow-lg divide-y divide-border">
+              {icdItems.map((item) => (
+                <button
+                  key={item.code}
+                  type="button"
+                  onClick={() => {
+                    setIcdCode(item.code);
+                    setTitle(item.title);
+                    setShowIcdDropdown(false);
+                  }}
+                  className="w-full px-3 py-2 text-left hover:bg-[var(--color-muted)] transition-colors"
+                >
+                  <span className="text-xs font-mono font-bold text-secondary">{item.code}</span>
+                  <span className="text-xs text-[var(--color-text-secondary)] ml-2">{item.title}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="sm:col-span-2">
           <InputField
             label="Название диагноза"
