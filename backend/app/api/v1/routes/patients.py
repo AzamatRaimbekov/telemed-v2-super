@@ -497,6 +497,237 @@ async def delete_procedure_order(
     await session.commit()
 
 
+# --- Prescriptions ---
+@router.get("/{patient_id}/prescriptions")
+async def list_prescriptions(
+    patient_id: uuid.UUID, session: DBSession, current_user: CurrentUser,
+    status: str | None = None,
+):
+    from app.models.medication import Prescription, PrescriptionStatus
+    query = (
+        select(Prescription)
+        .where(
+            Prescription.patient_id == patient_id,
+            Prescription.clinic_id == current_user.clinic_id,
+            Prescription.is_deleted == False,
+        )
+        .order_by(desc(Prescription.prescribed_at), desc(Prescription.created_at))
+    )
+    if status:
+        query = query.where(Prescription.status == PrescriptionStatus(status))
+    result = await session.execute(query)
+    prescriptions = list(result.scalars().all())
+    return [_prescription_to_dict(p) for p in prescriptions]
+
+
+@router.get("/{patient_id}/prescriptions/{prescription_id}")
+async def get_prescription(
+    patient_id: uuid.UUID, prescription_id: uuid.UUID,
+    session: DBSession, current_user: CurrentUser,
+):
+    from app.models.medication import Prescription
+    query = select(Prescription).where(
+        Prescription.id == prescription_id,
+        Prescription.patient_id == patient_id,
+        Prescription.clinic_id == current_user.clinic_id,
+        Prescription.is_deleted == False,
+    )
+    result = await session.execute(query)
+    p = result.scalar_one_or_none()
+    if not p:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Prescription", str(prescription_id))
+    return _prescription_to_dict(p)
+
+
+@router.post("/{patient_id}/prescriptions", status_code=201)
+async def create_prescription(
+    patient_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    """Create an empty prescription. Add items via the items endpoint."""
+    from app.models.medication import Prescription, PrescriptionStatus
+    now = datetime.now(timezone.utc)
+    prescription = Prescription(
+        id=uuid.uuid4(),
+        patient_id=patient_id,
+        doctor_id=current_user.id,
+        clinic_id=current_user.clinic_id,
+        status=PrescriptionStatus.ACTIVE,
+        prescribed_at=now,
+    )
+    session.add(prescription)
+    await session.flush()
+    await session.refresh(prescription)
+    await session.commit()
+    return _prescription_to_dict(prescription)
+
+
+@router.post("/{patient_id}/prescriptions/{prescription_id}/items", status_code=201)
+async def add_prescription_item(
+    patient_id: uuid.UUID,
+    prescription_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    drug_id: uuid.UUID = Query(...),
+    dosage: str | None = None,
+    frequency: str | None = None,
+    route: str = "ORAL",
+    duration_days: int | None = None,
+    quantity: int | None = None,
+    is_prn: bool = False,
+    notes: str | None = None,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    from app.models.medication import Prescription, PrescriptionItem, RouteOfAdministration, Drug
+    # Verify prescription exists and belongs to patient
+    query = select(Prescription).where(
+        Prescription.id == prescription_id,
+        Prescription.patient_id == patient_id,
+        Prescription.clinic_id == current_user.clinic_id,
+        Prescription.is_deleted == False,
+    )
+    result = await session.execute(query)
+    prescription = result.scalar_one_or_none()
+    if not prescription:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Prescription", str(prescription_id))
+
+    # Verify drug exists
+    drug_q = select(Drug).where(Drug.id == drug_id, Drug.is_deleted == False)
+    drug_result = await session.execute(drug_q)
+    drug = drug_result.scalar_one_or_none()
+    if not drug:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Drug", str(drug_id))
+
+    try:
+        route_enum = RouteOfAdministration(route)
+    except ValueError:
+        route_enum = RouteOfAdministration.ORAL
+
+    item = PrescriptionItem(
+        id=uuid.uuid4(),
+        prescription_id=prescription_id,
+        drug_id=drug_id,
+        dosage=dosage,
+        frequency=frequency,
+        route=route_enum,
+        duration_days=duration_days,
+        quantity=quantity,
+        is_prn=is_prn,
+        notes=notes,
+        clinic_id=current_user.clinic_id,
+    )
+    session.add(item)
+    await session.flush()
+    await session.refresh(item)
+    await session.commit()
+    return _prescription_item_to_dict(item)
+
+
+@router.patch("/{patient_id}/prescriptions/{prescription_id}")
+async def update_prescription(
+    patient_id: uuid.UUID, prescription_id: uuid.UUID,
+    session: DBSession, current_user: CurrentUser,
+    status: str | None = None,
+    notes: str | None = None,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    from app.models.medication import Prescription, PrescriptionStatus
+    query = select(Prescription).where(
+        Prescription.id == prescription_id,
+        Prescription.patient_id == patient_id,
+        Prescription.clinic_id == current_user.clinic_id,
+        Prescription.is_deleted == False,
+    )
+    result = await session.execute(query)
+    p = result.scalar_one_or_none()
+    if not p:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Prescription", str(prescription_id))
+    if status:
+        p.status = PrescriptionStatus(status)
+    if notes is not None:
+        p.notes = notes
+    await session.flush()
+    await session.refresh(p)
+    await session.commit()
+    return _prescription_to_dict(p)
+
+
+@router.delete("/{patient_id}/prescriptions/{prescription_id}", status_code=204)
+async def delete_prescription(
+    patient_id: uuid.UUID, prescription_id: uuid.UUID,
+    session: DBSession, current_user: CurrentUser,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    from app.models.medication import Prescription
+    query = select(Prescription).where(
+        Prescription.id == prescription_id,
+        Prescription.patient_id == patient_id,
+        Prescription.clinic_id == current_user.clinic_id,
+        Prescription.is_deleted == False,
+    )
+    result = await session.execute(query)
+    p = result.scalar_one_or_none()
+    if not p:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Prescription", str(prescription_id))
+    p.is_deleted = True
+    await session.flush()
+    await session.commit()
+
+
+def _prescription_to_dict(p) -> dict:
+    doctor_name = ""
+    if p.doctor:
+        doctor_name = f"{p.doctor.last_name} {p.doctor.first_name}"
+    items = []
+    if p.items:
+        items = [_prescription_item_to_dict(item) for item in p.items if not item.is_deleted]
+    return {
+        "id": p.id,
+        "patient_id": p.patient_id,
+        "doctor_id": p.doctor_id,
+        "doctor_name": doctor_name,
+        "visit_id": p.visit_id,
+        "treatment_plan_id": p.treatment_plan_id,
+        "status": p.status.value if hasattr(p.status, "value") else str(p.status),
+        "notes": p.notes,
+        "prescribed_at": p.prescribed_at,
+        "items": items,
+        "created_at": p.created_at,
+        "updated_at": p.updated_at,
+    }
+
+
+def _prescription_item_to_dict(item) -> dict:
+    drug_info = None
+    if item.drug:
+        drug_info = {
+            "id": item.drug.id,
+            "name": item.drug.name,
+            "generic_name": item.drug.generic_name,
+            "brand": item.drug.brand,
+            "form": item.drug.form.value if hasattr(item.drug.form, "value") else str(item.drug.form),
+            "category": item.drug.category,
+        }
+    return {
+        "id": item.id,
+        "drug": drug_info,
+        "dosage": item.dosage,
+        "frequency": item.frequency,
+        "route": item.route.value if hasattr(item.route, "value") else str(item.route),
+        "duration_days": item.duration_days,
+        "quantity": item.quantity,
+        "is_prn": item.is_prn,
+        "notes": item.notes,
+    }
+
+
 def _procedure_order_to_dict(o) -> dict:
     procedure_info = None
     if o.procedure:

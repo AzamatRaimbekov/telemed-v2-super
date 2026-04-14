@@ -96,6 +96,38 @@ export const patientsApi = {
   },
   deleteProcedureOrder: (patientId: string, orderId: string) =>
     apiClient.delete(`/patients/${patientId}/procedure-orders/${orderId}`).then((r) => r.data),
+  // Prescriptions
+  getPrescriptions: (patientId: string, status?: string) => {
+    const q = status ? `?status=${status}` : "";
+    return apiClient.get(`/patients/${patientId}/prescriptions${q}`).then((r) => r.data);
+  },
+  getPrescription: (patientId: string, prescriptionId: string) =>
+    apiClient.get(`/patients/${patientId}/prescriptions/${prescriptionId}`).then((r) => r.data),
+  createPrescription: (patientId: string) =>
+    apiClient.post(`/patients/${patientId}/prescriptions`).then((r) => r.data),
+  addPrescriptionItem: (patientId: string, prescriptionId: string, params: Record<string, unknown>) => {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v != null) q.set(k, String(v));
+    }
+    return apiClient.post(`/patients/${patientId}/prescriptions/${prescriptionId}/items?${q}`).then((r) => r.data);
+  },
+  updatePrescription: (patientId: string, prescriptionId: string, params: Record<string, unknown>) => {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v != null) q.set(k, String(v));
+    }
+    return apiClient.patch(`/patients/${patientId}/prescriptions/${prescriptionId}?${q}`).then((r) => r.data);
+  },
+  deletePrescription: (patientId: string, prescriptionId: string) =>
+    apiClient.delete(`/patients/${patientId}/prescriptions/${prescriptionId}`).then((r) => r.data),
+  getDrugCatalog: (search?: string, category?: string) => {
+    const q = new URLSearchParams();
+    if (search) q.set("search", search);
+    if (category) q.set("category", category);
+    return apiClient.get(`/treatment/catalogs/drugs?${q}`).then((r) => r.data);
+  },
+
   // Procedure catalog (for creating orders)
   getProcedureCatalog: (search?: string, category?: string) => {
     const q = new URLSearchParams();
