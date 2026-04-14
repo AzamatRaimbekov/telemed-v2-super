@@ -451,6 +451,10 @@ export const patientsApi = {
   deleteDocument: (patientId: string, documentId: string) =>
     apiClient.delete(`/patients/${patientId}/documents/${documentId}`).then((r) => r.data),
 
+  // AI Assistant
+  getAiSummary: (patientId: string) =>
+    apiClient.get(`/patients/${patientId}/ai/summary`).then((r) => r.data),
+
   // ICD-10 catalog
   searchIcd10: (query: string) =>
     apiClient.get(`/icd10/search?q=${encodeURIComponent(query)}`).then((r) => r.data as { code: string; title: string }[]),
