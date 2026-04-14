@@ -62,6 +62,29 @@ async def analyze_medical_document(
     }
 
 
+@router.post("/upload-audio")
+async def upload_audio(
+    file: UploadFile = File(...),
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.NURSE),
+):
+    """Upload an audio recording and return its URL."""
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+    audio_bytes = await file.read()
+    if len(audio_bytes) > 50 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Audio file too large (max 50MB)")
+
+    ext = os.path.splitext(file.filename or "audio.webm")[1] or ".webm"
+    saved_filename = f"audio-{uuid.uuid4()}{ext}"
+    file_path = os.path.join(UPLOAD_DIR, saved_filename)
+
+    with open(file_path, "wb") as f:
+        f.write(audio_bytes)
+
+    return {"url": f"/uploads/{saved_filename}", "filename": saved_filename, "size": len(audio_bytes)}
+
+
 @router.post("/transcribe")
 async def transcribe_audio(
     file: UploadFile = File(...),

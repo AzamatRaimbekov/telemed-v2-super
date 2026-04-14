@@ -272,22 +272,39 @@ function EntryDetailPage() {
         )}
       </div>
 
-      {/* For AI entries: side-by-side document preview */}
-      {isAI && e.document_url && (
+      {/* Audio recording */}
+      {e.source_document_url && String(e.source_document_url).match(/\.(webm|ogg|mp3|wav|m4a)$/i) && (
+        <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6">
+          <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">
+            Аудиозапись
+          </h3>
+          <audio controls className="w-full" src={String(e.source_document_url)}>
+            <track kind="captions" />
+          </audio>
+          {e.source_type === "ai_from_audio" && (
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-2">
+              Текст записи получен из аудио с помощью ИИ
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Document preview (images, PDFs) */}
+      {e.source_document_url && !String(e.source_document_url).match(/\.(webm|ogg|mp3|wav|m4a)$/i) && (
         <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-6">
           <h3 className="text-sm font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-4">
             Исходный документ
           </h3>
           <div className="rounded-xl overflow-hidden border border-border bg-[var(--color-muted)]">
-            {String(e.document_url).match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+            {String(e.source_document_url).match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
               <img
-                src={String(e.document_url)}
+                src={String(e.source_document_url)}
                 alt="Исходный документ"
                 className="max-w-full h-auto"
               />
             ) : (
               <iframe
-                src={String(e.document_url)}
+                src={String(e.source_document_url)}
                 className="w-full h-[600px]"
                 title="Исходный документ"
               />

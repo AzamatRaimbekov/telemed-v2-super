@@ -750,11 +750,13 @@ function DictateEntryForm({
 }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [transcription, setTranscription] = useState("");
   const [interimText, setInterimText] = useState("");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [sttMethod, setSttMethod] = useState<SttMethod>("idle");
   const [entryType, setEntryType] = useState<EntryType>("daily_note");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -877,11 +879,24 @@ function DictateEntryForm({
 
     setIsRecording(false);
 
-    // If browser STT got nothing useful, try Whisper
-    const currentText = transcription.trim();
-    if (!currentText || sttMethod === "whisper") {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-      if (audioBlob.size > 100) {
+    const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+
+    // Upload audio file for archival
+    if (audioBlob.size > 100) {
+      setIsUploading(true);
+      try {
+        const result = await patientsApi.uploadAudio(audioBlob);
+        setAudioUrl(result.url);
+        toast.success("Аудио сохранено");
+      } catch {
+        toast.error("Не удалось сохранить аудио");
+      } finally {
+        setIsUploading(false);
+      }
+
+      // If browser STT got nothing useful, try Whisper
+      const currentText = transcription.trim();
+      if (!currentText || sttMethod === "whisper") {
         await transcribeWithWhisper(audioBlob);
       }
     }
@@ -922,6 +937,7 @@ function DictateEntryForm({
       content: { text: transcription },
       recorded_at: now.toISOString(),
       source_type: "ai_from_audio",
+      source_document_url: audioUrl,
     });
   };
 
@@ -1006,6 +1022,30 @@ function DictateEntryForm({
         {interimText && (
           <div className="mb-3 px-4 py-2 bg-secondary/5 rounded-xl border border-secondary/20 text-sm text-[var(--color-text-secondary)] italic">
             {interimText}
+          </div>
+        )}
+
+        {/* Audio saved indicator + player */}
+        {audioUrl && (
+          <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-xl">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-4 h-4 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <span className="text-xs font-medium text-success">Аудио сохранено</span>
+            </div>
+            <audio controls className="w-full h-8" src={audioUrl}>
+              <track kind="captions" />
+            </audio>
+          </div>
+        )}
+
+        {isUploading && (
+          <div className="mb-4 flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
+            <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            Загрузка аудио на сервер...
           </div>
         )}
 

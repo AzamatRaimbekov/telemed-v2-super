@@ -132,6 +132,17 @@ export const patientsApi = {
       .then((r) => r.data);
   },
 
+  // AI Audio upload
+  uploadAudio: (audioBlob: Blob) => {
+    const formData = new FormData();
+    formData.append("file", audioBlob, "recording.webm");
+    return apiClient
+      .post("/ai/upload-audio", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data as { url: string; filename: string; size: number });
+  },
+
   // AI Speech-to-Text (Whisper)
   transcribeAudio: (audioBlob: Blob, language: string = "ru") => {
     const formData = new FormData();
