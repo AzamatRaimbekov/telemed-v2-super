@@ -74,6 +74,20 @@ export const patientsApi = {
   getDiagnoses: (patientId: string) =>
     apiClient.get(`/patients/${patientId}/diagnoses`).then((r) => r.data),
 
+  // Diagnoses CRUD (dedicated table)
+  getDiagnosesList: (patientId: string, status?: string) => {
+    const q = status ? `?status=${status}` : "";
+    return apiClient.get(`/patients/${patientId}/diagnoses-list${q}`).then((r) => r.data);
+  },
+  getDiagnosisDetail: (patientId: string, diagnosisId: string) =>
+    apiClient.get(`/patients/${patientId}/diagnoses-list/${diagnosisId}`).then((r) => r.data),
+  createDiagnosis: (patientId: string, data: Record<string, unknown>) =>
+    apiClient.post(`/patients/${patientId}/diagnoses-list`, data).then((r) => r.data),
+  updateDiagnosis: (patientId: string, diagnosisId: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/patients/${patientId}/diagnoses-list/${diagnosisId}`, data).then((r) => r.data),
+  deleteDiagnosis: (patientId: string, diagnosisId: string) =>
+    apiClient.delete(`/patients/${patientId}/diagnoses-list/${diagnosisId}`).then((r) => r.data),
+
   // Medical History
   getHistory: (
     patientId: string,
