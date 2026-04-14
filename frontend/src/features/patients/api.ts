@@ -70,6 +70,10 @@ export const patientsApi = {
   getVisits: (patientId: string) =>
     apiClient.get(`/patients/${patientId}/visits`).then((r) => r.data),
 
+  // Diagnoses
+  getDiagnoses: (patientId: string) =>
+    apiClient.get(`/patients/${patientId}/diagnoses`).then((r) => r.data),
+
   // Medical History
   getHistory: (
     patientId: string,

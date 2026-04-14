@@ -1,5 +1,6 @@
+from __future__ import annotations
 import uuid
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from sqlalchemy import select
 from app.api.deps import CurrentUser, DBSession, require_role
 from app.models.user import UserRole
@@ -7,6 +8,7 @@ from app.schemas.patient import (
     PatientCreate, PatientUpdate, PatientOut, PatientListOut,
     MedicalCardOut, VitalSignCreate, VitalSignOut,
     LabResultApproval, TreatmentPlanCreate, TreatmentPlanItemCreate,
+    PortalPasswordReset,
 )
 from app.services.patient import PatientService
 
@@ -40,11 +42,17 @@ async def list_patients(
 
 @router.post("", status_code=201)
 async def create_patient(
-    data: PatientCreate, session: DBSession, current_user: CurrentUser,
+    data: PatientCreate, request: Request, session: DBSession, current_user: CurrentUser,
     _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST),
 ):
     service = PatientService(session)
-    patient = await service.create_patient(data.model_dump(), current_user.clinic_id)
+    patient = await service.create_patient(
+        data.model_dump(),
+        current_user.clinic_id,
+        changed_by_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
     card = await service.get_medical_card(patient.id)
 
     # Get doctor/nurse names if assigned
@@ -92,26 +100,84 @@ async def get_patient(patient_id: uuid.UUID, session: DBSession, current_user: C
         "photo_url": p.photo_url, "registration_source": p.registration_source.value,
         "status": p.status.value, "created_at": p.created_at, "updated_at": p.updated_at,
         "medical_card": {"id": card.id, "card_number": card.card_number, "opened_at": card.opened_at} if card else None,
+        "has_portal_password": p.portal_password_hash is not None,
+        "last_portal_login": p.last_portal_login,
     }
 
 
 @router.patch("/{patient_id}")
 async def update_patient(
-    patient_id: uuid.UUID, data: PatientUpdate, session: DBSession, current_user: CurrentUser,
+    patient_id: uuid.UUID, data: PatientUpdate, request: Request, session: DBSession, current_user: CurrentUser,
     _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.RECEPTIONIST),
 ):
     service = PatientService(session)
-    p = await service.update_patient(patient_id, data.model_dump(exclude_unset=True), current_user.clinic_id)
+    p = await service.update_patient(
+        patient_id,
+        data.model_dump(exclude_unset=True),
+        current_user.clinic_id,
+        changed_by_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
     return {"id": p.id, "status": "updated"}
 
 
 @router.delete("/{patient_id}", status_code=204)
 async def delete_patient(
-    patient_id: uuid.UUID, session: DBSession, current_user: CurrentUser,
+    patient_id: uuid.UUID, request: Request, session: DBSession, current_user: CurrentUser,
     _admin=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN),
 ):
     service = PatientService(session)
-    await service.delete_patient(patient_id, current_user.clinic_id)
+    await service.delete_patient(
+        patient_id,
+        current_user.clinic_id,
+        changed_by_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
+
+
+@router.post("/{patient_id}/reset-portal-password")
+async def reset_portal_password(
+    patient_id: uuid.UUID,
+    data: PortalPasswordReset,
+    request: Request,
+    session: DBSession,
+    current_user: CurrentUser,
+    _admin=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    service = PatientService(session)
+    await service.reset_portal_password(
+        patient_id=patient_id,
+        new_password=data.new_password,
+        clinic_id=current_user.clinic_id,
+        changed_by_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
+    return {"status": "ok", "message": "Portal password updated"}
+
+
+@router.get("/{patient_id}/audit-logs")
+async def get_patient_audit_logs(
+    patient_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    action: str | None = None,
+    _admin=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN),
+):
+    service = PatientService(session)
+    # Verify patient exists and belongs to this clinic
+    await service.get_patient(patient_id, current_user.clinic_id)
+    items, total = await service.get_patient_audit_logs(patient_id, skip, limit, action)
+    return {
+        "items": items,
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+    }
 
 
 # --- Vitals ---
@@ -154,11 +220,18 @@ async def get_lab_results(patient_id: uuid.UUID, session: DBSession, current_use
 
 @router.patch("/results/{result_id}/approve")
 async def approve_lab_result(
-    result_id: uuid.UUID, data: LabResultApproval, session: DBSession, current_user: CurrentUser,
+    result_id: uuid.UUID, data: LabResultApproval, request: Request, session: DBSession, current_user: CurrentUser,
     _doctor=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
 ):
     service = PatientService(session)
-    r = await service.approve_lab_result(result_id, current_user.id, data.visible_to_patient)
+    r = await service.approve_lab_result(
+        result_id,
+        current_user.id,
+        data.visible_to_patient,
+        clinic_id=current_user.clinic_id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
     return {"id": r.id, "visible_to_patient": r.visible_to_patient, "approved_at": r.approved_at}
 
 
@@ -225,3 +298,49 @@ async def get_visits(patient_id: uuid.UUID, session: DBSession, current_user: Cu
         {"id": v.id, "visit_type": v.visit_type.value, "status": v.status.value, "chief_complaint": v.chief_complaint, "diagnosis_codes": v.diagnosis_codes, "diagnosis_text": v.diagnosis_text, "started_at": v.started_at, "ended_at": v.ended_at}
         for v in visits
     ]
+
+
+# --- Diagnoses (extracted from visits) ---
+@router.get("/{patient_id}/diagnoses")
+async def get_diagnoses(patient_id: uuid.UUID, session: DBSession, current_user: CurrentUser):
+    from app.models.medical import Visit, VisitStatus
+    from sqlalchemy import select, desc
+    service = PatientService(session)
+    # Verify patient access
+    await service.get_patient(patient_id, current_user.clinic_id)
+
+    query = (
+        select(Visit)
+        .where(
+            Visit.patient_id == patient_id,
+            Visit.clinic_id == current_user.clinic_id,
+            Visit.is_deleted == False,
+            Visit.diagnosis_codes != None,
+        )
+        .order_by(desc(Visit.started_at))
+    )
+    result = await session.execute(query)
+    visits = list(result.scalars().all())
+
+    diagnoses = []
+    for v in visits:
+        if not v.diagnosis_codes:
+            continue
+        codes = v.diagnosis_codes if isinstance(v.diagnosis_codes, list) else [v.diagnosis_codes]
+        for code in codes:
+            doctor_name = ""
+            if v.doctor:
+                doctor_name = f"{v.doctor.last_name} {v.doctor.first_name}"
+            diagnoses.append({
+                "id": str(v.id),
+                "code": code if isinstance(code, str) else str(code),
+                "text": v.diagnosis_text,
+                "visit_type": v.visit_type.value if hasattr(v.visit_type, "value") else str(v.visit_type),
+                "visit_status": v.status.value if hasattr(v.status, "value") else str(v.status),
+                "chief_complaint": v.chief_complaint,
+                "doctor_id": str(v.doctor_id),
+                "doctor_name": doctor_name,
+                "date": v.started_at,
+                "status": "active" if v.status.value == "COMPLETED" else "pending",
+            })
+    return diagnoses
