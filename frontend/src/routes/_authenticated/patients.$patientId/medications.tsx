@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { CustomSelect } from "@/components/ui/select-custom";
+import { PrintLayout } from "@/components/ui/print-layout";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -115,6 +116,7 @@ function MedicationsPage() {
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [printRx, setPrintRx] = useState<PrescriptionData | null>(null);
 
   const { data: rawPrescriptions, isLoading } = useQuery({
     queryKey: ["patient-prescriptions", patientId],
@@ -465,6 +467,9 @@ function MedicationsPage() {
                               </Button>
                             </>
                           )}
+                          <Button size="sm" variant="secondary" onClick={() => setPrintRx(rx)}>
+                            Печать
+                          </Button>
                           <div className="flex-1" />
                           <button
                             type="button"
@@ -484,6 +489,12 @@ function MedicationsPage() {
             );
           })}
         </div>
+      )}
+
+      {printRx && (
+        <PrintLayout title={`Рецепт — ${printRx.doctor_name}`} onClose={() => setPrintRx(null)}>
+          <PrescriptionPrintContent rx={printRx} />
+        </PrintLayout>
       )}
     </div>
   );
@@ -763,6 +774,79 @@ function CreatePrescriptionForm({
           </Button>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Prescription Print Content ────────────────────────────────────────────────
+
+function PrescriptionPrintContent({ rx }: { rx: PrescriptionData }) {
+  return (
+    <div>
+      <div className="header">
+        <h1>Рецепт</h1>
+        <div className="subtitle">MedCore KG · {rx.prescribed_at ? new Date(rx.prescribed_at).toLocaleDateString("ru-RU") : ""}</div>
+      </div>
+
+      <div className="section">
+        <div className="section-title">Информация о назначении</div>
+        <div className="row"><span className="label">Врач:</span><span className="value">{rx.doctor_name}</span></div>
+        <div className="row"><span className="label">Дата назначения:</span><span className="value">{rx.prescribed_at ? new Date(rx.prescribed_at).toLocaleDateString("ru-RU") : "—"}</span></div>
+        <div className="row"><span className="label">Статус:</span><span className="value"><span className={`badge ${rx.status === "ACTIVE" ? "badge-active" : ""}`}>{STATUS_META[rx.status]?.label || rx.status}</span></span></div>
+      </div>
+
+      <div className="section">
+        <div className="section-title">Препараты</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Препарат</th>
+              <th>Дозировка</th>
+              <th>Частота</th>
+              <th>Путь</th>
+              <th>Длительность</th>
+              <th>Кол-во</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rx.items.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <strong>{item.drug?.name || "—"}</strong>
+                  {item.drug?.generic_name && <div style={{ fontSize: "10px", color: "#666" }}>{item.drug.generic_name}</div>}
+                  {item.is_prn && <span className="badge" style={{ marginLeft: "4px" }}>PRN</span>}
+                </td>
+                <td>{item.dosage || "—"}</td>
+                <td>{item.frequency || "—"}</td>
+                <td>{ROUTE_LABELS[item.route] || item.route}</td>
+                <td>{item.duration_days ? `${item.duration_days} дн.` : "—"}</td>
+                <td>{item.quantity || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {rx.notes && (
+        <div className="section">
+          <div className="section-title">Заметки</div>
+          <p>{rx.notes}</p>
+        </div>
+      )}
+
+      <div className="signature-line">
+        <div className="signature-block">
+          <div className="line">Подпись врача</div>
+        </div>
+        <div className="signature-block">
+          <div className="line">Печать</div>
+        </div>
+      </div>
+
+      <div className="footer">
+        <span>Дата печати: {new Date().toLocaleDateString("ru-RU")}</span>
+        <span>MedCore KG</span>
+      </div>
     </div>
   );
 }

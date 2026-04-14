@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { CustomSelect } from "@/components/ui/select-custom";
+import { PrintLayout } from "@/components/ui/print-layout";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -73,6 +74,7 @@ function DiagnosesPage() {
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showPrint, setShowPrint] = useState(false);
 
   const { data: rawList, isLoading } = useQuery({
     queryKey: ["patient-diagnoses-list", patientId],
@@ -150,9 +152,12 @@ function DiagnosesPage() {
             </span>
           )}
         </div>
-        <Button variant="primary" size="sm" onClick={() => setShowCreate(!showCreate)}>
-          {showCreate ? "Отмена" : "+ Добавить диагноз"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={() => setShowPrint(true)}>Печать</Button>
+          <Button variant="primary" size="sm" onClick={() => setShowCreate(!showCreate)}>
+            {showCreate ? "Отмена" : "+ Добавить диагноз"}
+          </Button>
+        </div>
       </div>
 
       {/* Create form */}
@@ -370,6 +375,12 @@ function DiagnosesPage() {
           })}
         </div>
       )}
+
+      {showPrint && (
+        <PrintLayout title="Диагнозы пациента" onClose={() => setShowPrint(false)}>
+          <DiagnosesPrintContent diagnoses={diagnoses} />
+        </PrintLayout>
+      )}
     </div>
   );
 }
@@ -489,5 +500,53 @@ function CreateDiagnosisForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+// ─── Diagnoses Print Content ───────────────────────────────────────────────────
+
+function DiagnosesPrintContent({ diagnoses }: { diagnoses: DiagnosisItem[] }) {
+  return (
+    <div>
+      <div className="header">
+        <h1>Лист диагнозов</h1>
+        <div className="subtitle">MedCore KG · {new Date().toLocaleDateString("ru-RU")}</div>
+      </div>
+      <div className="section">
+        <table>
+          <thead>
+            <tr>
+              <th>Код МКБ-10</th>
+              <th>Диагноз</th>
+              <th>Статус</th>
+              <th>Врач</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+            {diagnoses.map((d) => {
+              const statusLabel = STATUS_BADGES[d.status]?.label || d.status;
+              return (
+                <tr key={d.id}>
+                  <td><strong>{d.icd_code}</strong></td>
+                  <td>{d.title}{d.description ? <div style={{ fontSize: "10px", color: "#666" }}>{d.description}</div> : null}</td>
+                  <td><span className={`badge ${d.status === "active" ? "badge-active" : d.status === "resolved" ? "badge-completed" : ""}`}>{statusLabel}</span></td>
+                  <td>{d.diagnosed_by_name || "—"}</td>
+                  <td>{d.diagnosed_at ? new Date(d.diagnosed_at).toLocaleDateString("ru-RU") : "—"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="signature-line">
+        <div className="signature-block"><div className="line">Подпись врача</div></div>
+        <div className="signature-block"><div className="line">Печать</div></div>
+      </div>
+      <div className="footer">
+        <span>Дата печати: {new Date().toLocaleDateString("ru-RU")}</span>
+        <span>MedCore KG</span>
+      </div>
+    </div>
   );
 }
