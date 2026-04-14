@@ -24,6 +24,7 @@ from app.models.medical_history import MedicalHistoryEntry
 from app.models.room_assignment import RoomAssignment
 from app.models.recovery import RecoveryGoal, RecoveryDomainWeight
 from app.models.diagnosis import Diagnosis
+from app.models.document import Document
 
 __all__ = [
     "Base", "Clinic",
@@ -48,4 +49,5 @@ __all__ = [
     "RoomAssignment",
     "RecoveryGoal", "RecoveryDomainWeight",
     "Diagnosis",
+    "Document",
 ]

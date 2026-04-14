@@ -433,6 +433,24 @@ export const patientsApi = {
       })
       .then((r) => r.data),
 
+  // Documents
+  getDocuments: (patientId: string, category?: string) => {
+    const q = category ? `?category=${category}` : "";
+    return apiClient.get(`/patients/${patientId}/documents${q}`).then((r) => r.data);
+  },
+  uploadDocument: (patientId: string, file: File, title: string, category: string, description?: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append("category", category);
+    if (description) formData.append("description", description);
+    return apiClient.post(`/patients/${patientId}/documents`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+  },
+  deleteDocument: (patientId: string, documentId: string) =>
+    apiClient.delete(`/patients/${patientId}/documents/${documentId}`).then((r) => r.data),
+
   // Audit logs
   getAuditLogs: (
     patientId: string,

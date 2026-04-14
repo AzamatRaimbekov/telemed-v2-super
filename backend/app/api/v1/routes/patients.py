@@ -1,7 +1,7 @@
 from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query, Request, File, UploadFile, Form
 from sqlalchemy import select, desc
 from app.api.deps import CurrentUser, DBSession, require_role
 from app.models.user import UserRole
@@ -764,4 +764,112 @@ def _procedure_order_to_dict(o) -> dict:
         "consent_signed": o.consent_signed,
         "created_at": o.created_at,
         "updated_at": o.updated_at,
+    }
+
+
+# --- Documents ---
+@router.get("/{patient_id}/documents")
+async def list_documents(
+    patient_id: uuid.UUID, session: DBSession, current_user: CurrentUser,
+    category: str | None = None,
+):
+    from app.models.document import Document, DocumentCategory
+    query = (
+        select(Document)
+        .where(Document.patient_id == patient_id, Document.clinic_id == current_user.clinic_id, Document.is_deleted == False)
+        .order_by(desc(Document.uploaded_at), desc(Document.created_at))
+    )
+    if category:
+        query = query.where(Document.category == DocumentCategory(category))
+    result = await session.execute(query)
+    return [_document_to_dict(d) for d in result.scalars().all()]
+
+
+@router.post("/{patient_id}/documents", status_code=201)
+async def upload_document(
+    patient_id: uuid.UUID,
+    session: DBSession,
+    current_user: CurrentUser,
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    category: str = Form("other"),
+    description: str = Form(""),
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.NURSE),
+):
+    import os
+    from app.models.document import Document, DocumentCategory
+
+    UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "uploads")
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+    content = await file.read()
+    if len(content) > 50 * 1024 * 1024:
+        from fastapi import HTTPException
+        raise HTTPException(400, "File too large (max 50MB)")
+
+    ext = os.path.splitext(file.filename or "file")[1] or ".bin"
+    saved_name = f"doc-{uuid.uuid4()}{ext}"
+    with open(os.path.join(UPLOAD_DIR, saved_name), "wb") as f:
+        f.write(content)
+
+    now = datetime.now(timezone.utc)
+    doc = Document(
+        id=uuid.uuid4(),
+        patient_id=patient_id,
+        clinic_id=current_user.clinic_id,
+        title=title,
+        category=DocumentCategory(category),
+        file_url=f"/uploads/{saved_name}",
+        file_name=file.filename or saved_name,
+        file_size=len(content),
+        mime_type=file.content_type,
+        description=description or None,
+        uploaded_by_id=current_user.id,
+        uploaded_at=now,
+    )
+    session.add(doc)
+    await session.flush()
+    await session.refresh(doc)
+    await session.commit()
+    return _document_to_dict(doc)
+
+
+@router.delete("/{patient_id}/documents/{document_id}", status_code=204)
+async def delete_document(
+    patient_id: uuid.UUID, document_id: uuid.UUID,
+    session: DBSession, current_user: CurrentUser,
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR),
+):
+    from app.models.document import Document
+    query = select(Document).where(
+        Document.id == document_id, Document.patient_id == patient_id,
+        Document.clinic_id == current_user.clinic_id, Document.is_deleted == False,
+    )
+    result = await session.execute(query)
+    doc = result.scalar_one_or_none()
+    if not doc:
+        from app.core.exceptions import NotFoundError
+        raise NotFoundError("Document", str(document_id))
+    doc.is_deleted = True
+    await session.flush()
+    await session.commit()
+
+
+def _document_to_dict(d) -> dict:
+    uploader = ""
+    if d.uploaded_by:
+        uploader = f"{d.uploaded_by.last_name} {d.uploaded_by.first_name}"
+    return {
+        "id": d.id,
+        "patient_id": d.patient_id,
+        "title": d.title,
+        "category": d.category.value if hasattr(d.category, "value") else str(d.category),
+        "file_url": d.file_url,
+        "file_name": d.file_name,
+        "file_size": d.file_size,
+        "mime_type": d.mime_type,
+        "description": d.description,
+        "uploaded_by_name": uploader,
+        "uploaded_at": d.uploaded_at,
+        "created_at": d.created_at,
     }
