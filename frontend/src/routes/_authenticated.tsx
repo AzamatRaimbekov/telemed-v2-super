@@ -38,7 +38,7 @@ const navItems = [
   },
   {
     label: "Расписание",
-    to: "/appointments" as const,
+    to: "/schedule" as const,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
         <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />

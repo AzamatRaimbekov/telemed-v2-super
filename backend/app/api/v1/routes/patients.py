@@ -873,3 +873,45 @@ def _document_to_dict(d) -> dict:
         "uploaded_at": d.uploaded_at,
         "created_at": d.created_at,
     }
+
+
+# --- Appointments ---
+@router.get("/{patient_id}/appointments")
+async def list_patient_appointments(
+    patient_id: uuid.UUID, session: DBSession, current_user: CurrentUser,
+):
+    from app.models.appointment import Appointment
+    query = (
+        select(Appointment)
+        .where(Appointment.patient_id == patient_id, Appointment.clinic_id == current_user.clinic_id, Appointment.is_deleted == False)
+        .order_by(desc(Appointment.scheduled_start))
+    )
+    result = await session.execute(query)
+    return [_appointment_to_dict(a) for a in result.scalars().all()]
+
+
+def _appointment_to_dict(a) -> dict:
+    patient_name = ""
+    if a.patient:
+        patient_name = f"{a.patient.last_name} {a.patient.first_name}"
+    doctor_name = ""
+    if a.doctor:
+        doctor_name = f"{a.doctor.last_name} {a.doctor.first_name}"
+    return {
+        "id": a.id,
+        "patient_id": a.patient_id,
+        "patient_name": patient_name,
+        "doctor_id": a.doctor_id,
+        "doctor_name": doctor_name,
+        "appointment_type": a.appointment_type.value if hasattr(a.appointment_type, "value") else str(a.appointment_type),
+        "status": a.status.value if hasattr(a.status, "value") else str(a.status),
+        "scheduled_start": a.scheduled_start,
+        "scheduled_end": a.scheduled_end,
+        "actual_start": a.actual_start,
+        "actual_end": a.actual_end,
+        "reason": a.reason,
+        "notes": a.notes,
+        "is_walk_in": a.is_walk_in,
+        "queue_number": a.queue_number,
+        "created_at": a.created_at,
+    }
