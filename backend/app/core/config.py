@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     MINIO_USE_SSL: bool = False
     CELERY_BROKER_URL: str = "redis://localhost:6379/2"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:80"]
+    CORS_ORIGINS: str = '["http://localhost:5173", "http://localhost:80"]'
     SENTRY_DSN: str = ""
 
     # OpenAI (Whisper STT)
@@ -41,17 +41,18 @@ class Settings(BaseSettings):
     SMTP_FROM_NAME: str = "MedCore KG"
     SMTP_USE_TLS: bool = True
 
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
-        if isinstance(v, str):
-            if v.strip() == "*":
-                return ["*"]
-            try:
-                return json.loads(v)
-            except (json.JSONDecodeError, ValueError):
-                return [s.strip() for s in v.split(",") if s.strip()]
-        return v
+    @property
+    def cors_origins_list(self) -> list[str]:
+        v = self.CORS_ORIGINS
+        if v.strip() == "*":
+            return ["*"]
+        try:
+            parsed = json.loads(v)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, ValueError):
+            pass
+        return [s.strip() for s in v.split(",") if s.strip()]
 
     @property
     def database_url(self) -> str:

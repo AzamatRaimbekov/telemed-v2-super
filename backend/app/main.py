@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
     stop_simulator()
 
 app = FastAPI(title=settings.APP_NAME, version="1.0.0", docs_url="/docs", openapi_url="/openapi.json", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins_list, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(RequestLoggingMiddleware)
 app.add_exception_handler(APIError, api_error_handler)
 app.include_router(api_router)
