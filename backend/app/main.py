@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.core.exceptions import APIError, api_error_handler
 from app.core.logging_config import setup_logging
 from app.core.middleware import RequestLoggingMiddleware
+from app.services.monitoring_simulator import start_simulator, stop_simulator
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,7 +28,9 @@ async def lifespan(app: FastAPI):
             print(f"Migrations OK")
         else:
             print(f"Migration warning: {result.stderr[:500]}")
+    start_simulator()
     yield
+    stop_simulator()
 
 app = FastAPI(title=settings.APP_NAME, version="1.0.0", docs_url="/docs", openapi_url="/openapi.json", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
