@@ -25,6 +25,7 @@ from app.models.room_assignment import RoomAssignment
 from app.models.recovery import RecoveryGoal, RecoveryDomainWeight
 from app.models.diagnosis import Diagnosis
 from app.models.document import Document
+from app.models.monitoring import RoomCamera, SensorDevice, SensorReading, MonitoringAlert, NurseCall
 
 __all__ = [
     "Base", "Clinic",
@@ -50,4 +51,5 @@ __all__ = [
     "RecoveryGoal", "RecoveryDomainWeight",
     "Diagnosis",
     "Document",
+    "RoomCamera", "SensorDevice", "SensorReading", "MonitoringAlert", "NurseCall",
 ]
