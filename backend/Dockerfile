@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/
-RUN ls -la /app/app/api/v1/routes/monitoring.py && python -c "print('FILES OK')"
+RUN cat /app/app/api/v1/routes/health.py | head -15 && python -c "from app.api.v1.routes.health import router; print('HEALTH ROUTES:', [r.path for r in router.routes])"
 ENV PYTHONPATH=/app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
