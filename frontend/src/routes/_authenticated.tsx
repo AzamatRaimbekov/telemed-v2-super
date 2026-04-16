@@ -97,7 +97,7 @@ const navItems = [
   },
   {
     label: "Финансы",
-    to: "/billing" as const,
+    to: "/finance" as const,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
         <line x1="12" x2="12" y1="2" y2="22" />

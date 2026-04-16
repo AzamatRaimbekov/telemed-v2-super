@@ -1,0 +1,218 @@
+<h2>Несколько камер в палате — варианты</h2>
+<p class="subtitle">Палата 204 — 3 камеры: общий вид, у кровати, вход</p>
+
+<div class="cards">
+  <!-- Option A: Grid -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="font-size: 11px; color: #ccc;">
+        <!-- Sensor row top -->
+        <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #f87171;">
+            <div style="font-size: 7px; color: #888;">Пульс</div>
+            <div style="font-size: 14px; font-weight: 700; color: #f87171;">142</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #10b981;">
+            <div style="font-size: 7px; color: #888;">SpO2</div>
+            <div style="font-size: 14px; font-weight: 700; color: #10b981;">97%</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #f59e0b;">
+            <div style="font-size: 7px; color: #888;">Темп.</div>
+            <div style="font-size: 14px; font-weight: 700; color: #f59e0b;">37.8</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #60a5fa;">
+            <div style="font-size: 7px; color: #888;">АД</div>
+            <div style="font-size: 14px; font-weight: 700; color: #60a5fa;">135/85</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #10b981;">
+            <div style="font-size: 7px; color: #888;">Падение</div>
+            <div style="font-size: 10px; font-weight: 700; color: #10b981;">Норма</div>
+          </div>
+        </div>
+        <!-- Camera grid 1 big + 2 small -->
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: 80px 80px; gap: 6px;">
+          <div style="grid-row: 1/3; background: #0d0d1a; border-radius: 8px; padding: 6px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: #10b981; font-size: 8px;">● LIVE</span>
+              <span style="font-size: 8px; color: #666;">Общий вид</span>
+            </div>
+            <div style="flex:1; background: #16162a; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+              <div style="text-align:center; color: #444;">
+                <div style="font-size: 28px;">📹</div>
+                <div style="font-size: 8px;">Основная камера</div>
+              </div>
+            </div>
+          </div>
+          <div style="background: #0d0d1a; border-radius: 8px; padding: 6px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+              <span style="color: #10b981; font-size: 7px;">● LIVE</span>
+              <span style="font-size: 7px; color: #666;">У кровати</span>
+            </div>
+            <div style="flex:1; background: #16162a; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 18px;">📹</div>
+          </div>
+          <div style="background: #0d0d1a; border-radius: 8px; padding: 6px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+              <span style="color: #10b981; font-size: 7px;">● LIVE</span>
+              <span style="font-size: 7px; color: #666;">Вход</span>
+            </div>
+            <div style="flex:1; background: #16162a; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 18px;">📹</div>
+          </div>
+        </div>
+        <!-- Room sensors bottom -->
+        <div style="display: flex; gap: 5px; margin-top: 8px;">
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Палата 22.4°C</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Влажн. 54%</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Дверь: закрыта</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Сетка — главная камера большая + остальные мельче</h3>
+      <p>Одна камера (общий вид) занимает 60%, остальные стопкой рядом. Клик на маленькую — она становится главной. Датчики пациента сверху, палата снизу.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Tabs -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="font-size: 11px; color: #ccc;">
+        <!-- Sensor row -->
+        <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #f87171;">
+            <div style="font-size: 7px; color: #888;">Пульс</div>
+            <div style="font-size: 14px; font-weight: 700; color: #f87171;">142</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #10b981;">
+            <div style="font-size: 7px; color: #888;">SpO2</div>
+            <div style="font-size: 14px; font-weight: 700; color: #10b981;">97%</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #f59e0b;">
+            <div style="font-size: 7px; color: #888;">Темп.</div>
+            <div style="font-size: 14px; font-weight: 700; color: #f59e0b;">37.8</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #60a5fa;">
+            <div style="font-size: 7px; color: #888;">АД</div>
+            <div style="font-size: 14px; font-weight: 700; color: #60a5fa;">135/85</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #10b981;">
+            <div style="font-size: 7px; color: #888;">Падение</div>
+            <div style="font-size: 10px; font-weight: 700; color: #10b981;">Норма</div>
+          </div>
+        </div>
+        <!-- Camera tabs -->
+        <div style="display: flex; gap: 3px; margin-bottom: 6px;">
+          <div style="padding: 4px 10px; background: #2563eb; border-radius: 6px; font-size: 8px; color: white; font-weight: 600;">Общий вид</div>
+          <div style="padding: 4px 10px; background: #16162a; border-radius: 6px; font-size: 8px; color: #888;">У кровати</div>
+          <div style="padding: 4px 10px; background: #16162a; border-radius: 6px; font-size: 8px; color: #888;">Вход</div>
+        </div>
+        <!-- Single camera full width -->
+        <div style="background: #0d0d1a; border-radius: 8px; padding: 8px; height: 130px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span style="color: #10b981; font-size: 8px;">● LIVE</span>
+            <span style="font-size: 8px; color: #666;">Палата 204 — Общий вид</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #444;">
+            <div style="text-align:center;">
+              <div style="font-size: 32px;">📹</div>
+              <div style="font-size: 8px; margin-top: 2px;">Камера на всю ширину</div>
+            </div>
+          </div>
+        </div>
+        <!-- Room sensors bottom -->
+        <div style="display: flex; gap: 5px; margin-top: 8px;">
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Палата 22.4°C</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Влажн. 54%</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Дверь: закрыта</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Переключатель камер — одна большая на всю ширину</h3>
+      <p>Табы-кнопки для выбора камеры. Активная камера показывается большой на всю ширину. Фокус на одном потоке — меньше нагрузки, крупнее картинка.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Hybrid -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="font-size: 11px; color: #ccc;">
+        <!-- Sensor row -->
+        <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #f87171;">
+            <div style="font-size: 7px; color: #888;">Пульс</div>
+            <div style="font-size: 14px; font-weight: 700; color: #f87171;">142</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #10b981;">
+            <div style="font-size: 7px; color: #888;">SpO2</div>
+            <div style="font-size: 14px; font-weight: 700; color: #10b981;">97%</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #f59e0b;">
+            <div style="font-size: 7px; color: #888;">Темп.</div>
+            <div style="font-size: 14px; font-weight: 700; color: #f59e0b;">37.8</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #60a5fa;">
+            <div style="font-size: 7px; color: #888;">АД</div>
+            <div style="font-size: 14px; font-weight: 700; color: #60a5fa;">135/85</div>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 6px; padding: 5px 4px; text-align: center; border-left: 2px solid #10b981;">
+            <div style="font-size: 7px; color: #888;">Падение</div>
+            <div style="font-size: 10px; font-weight: 700; color: #10b981;">Норма</div>
+          </div>
+        </div>
+        <!-- Main camera -->
+        <div style="background: #0d0d1a; border-radius: 8px; padding: 6px; height: 100px; display: flex; flex-direction: column; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+            <span style="color: #10b981; font-size: 8px;">● LIVE</span>
+            <span style="font-size: 8px; color: #666;">Общий вид</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #444;">
+            <div style="font-size: 24px;">📹</div>
+          </div>
+        </div>
+        <!-- Thumbnail strip -->
+        <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+          <div style="flex:1; background: #0d0d1a; border-radius: 6px; padding: 4px; border: 2px solid #2563eb;">
+            <div style="background: #16162a; border-radius: 3px; height: 36px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 14px;">📹</div>
+            <div style="font-size: 7px; color: #2563eb; text-align: center; margin-top: 2px; font-weight: 600;">Общий вид</div>
+          </div>
+          <div style="flex:1; background: #0d0d1a; border-radius: 6px; padding: 4px; border: 2px solid transparent;">
+            <div style="background: #16162a; border-radius: 3px; height: 36px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 14px;">📹</div>
+            <div style="font-size: 7px; color: #888; text-align: center; margin-top: 2px;">У кровати</div>
+          </div>
+          <div style="flex:1; background: #0d0d1a; border-radius: 6px; padding: 4px; border: 2px solid transparent;">
+            <div style="background: #16162a; border-radius: 3px; height: 36px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 14px;">📹</div>
+            <div style="font-size: 7px; color: #888; text-align: center; margin-top: 2px;">Вход</div>
+          </div>
+        </div>
+        <!-- Room sensors -->
+        <div style="display: flex; gap: 5px;">
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Палата 22.4°C</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Влажн. 54%</span>
+          </div>
+          <div style="flex:1; background: #16162a; border-radius: 5px; padding: 4px; text-align: center;">
+            <span style="font-size: 7px; color: #888;">Дверь: закрыта</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Главная камера + превью-полоска</h3>
+      <p>Основная камера большая сверху. Под ней — полоска миниатюр всех камер с живым превью. Клик на миниатюру — она становится главной. Совмещает обзор всех камер и крупную картинку.</p>
+    </div>
+  </div>
+</div>

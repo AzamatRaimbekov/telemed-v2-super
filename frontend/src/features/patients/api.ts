@@ -491,7 +491,7 @@ export const patientsApi = {
 
   // Billing
   getInvoices: (patientId: string) =>
-    apiClient.get(`/billing/invoices?patient_id=${patientId}`).then((r) => r.data),
+    apiClient.get(`/billing/invoices?patient_id=${patientId}`).then((r) => r.data?.items ?? r.data),
   getInvoice: (invoiceId: string) =>
     apiClient.get(`/billing/invoices/${invoiceId}`).then((r) => r.data),
   createInvoice: (data: Record<string, unknown>) =>
@@ -503,7 +503,7 @@ export const patientsApi = {
   recordPayment: (data: Record<string, unknown>) =>
     apiClient.post("/billing/payments", data).then((r) => r.data),
   getPayments: (patientId: string) =>
-    apiClient.get(`/billing/payments?patient_id=${patientId}`).then((r) => r.data),
+    apiClient.get(`/billing/payments?patient_id=${patientId}`).then((r) => r.data?.items ?? r.data),
   getBillingStats: () =>
     apiClient.get("/billing/stats").then((r) => r.data),
 
