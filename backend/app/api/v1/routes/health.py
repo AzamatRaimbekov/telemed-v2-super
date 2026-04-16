@@ -10,7 +10,15 @@ router = APIRouter(prefix="/health", tags=["Health"])
 
 @router.get("")
 async def health_check():
-    return {"status": "ok"}
+    import os
+    stamp = ""
+    try:
+        with open("/app/.build_stamp") as f:
+            stamp = f.read().strip()
+    except Exception:
+        stamp = "no stamp"
+    monitoring_exists = os.path.exists("/app/app/api/v1/routes/monitoring.py")
+    return {"status": "ok", "build": stamp, "monitoring_file": monitoring_exists, "deploy": "v2"}
 
 @router.get("/db")
 async def health_db(session: AsyncSession = Depends(get_session)):
