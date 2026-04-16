@@ -1,3 +1,4 @@
+from typing import Optional
 import enum
 import uuid
 from datetime import date, datetime
@@ -31,12 +32,12 @@ class TreatmentPlan(TenantMixin, Base):
     __tablename__ = "treatment_plans"
     patient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
     doctor_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    visit_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("visits.id"), nullable=True)
+    visit_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("visits.id"), nullable=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text)
+    description: Mapped[Optional[str]] = mapped_column(Text)
     status: Mapped[TreatmentPlanStatus] = mapped_column(Enum(TreatmentPlanStatus), default=TreatmentPlanStatus.DRAFT)
-    start_date: Mapped[date | None] = mapped_column(Date)
-    end_date: Mapped[date | None] = mapped_column(Date)
+    start_date: Mapped[Optional[date]] = mapped_column(Date)
+    end_date: Mapped[Optional[date]] = mapped_column(Date)
     patient = relationship("Patient", foreign_keys=[patient_id], lazy="selectin")
     doctor = relationship("User", foreign_keys=[doctor_id], lazy="selectin")
     visit = relationship("Visit", foreign_keys=[visit_id], lazy="selectin")
@@ -47,14 +48,14 @@ class TreatmentPlanItem(TenantMixin, Base):
     treatment_plan_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("treatment_plans.id"), nullable=False)
     item_type: Mapped[TreatmentItemType] = mapped_column(Enum(TreatmentItemType), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text)
-    configuration: Mapped[dict | None] = mapped_column(JSON)
-    assigned_to_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
-    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    frequency: Mapped[str | None] = mapped_column(String(100))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    configuration: Mapped[Optional[dict]] = mapped_column(JSON)
+    assigned_to_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    scheduled_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    frequency: Mapped[Optional[str]] = mapped_column(String(100))
     status: Mapped[TreatmentItemStatus] = mapped_column(Enum(TreatmentItemStatus), default=TreatmentItemStatus.PENDING)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
-    start_date: Mapped[date | None] = mapped_column(Date)
-    end_date: Mapped[date | None] = mapped_column(Date)
+    start_date: Mapped[Optional[date]] = mapped_column(Date)
+    end_date: Mapped[Optional[date]] = mapped_column(Date)
     treatment_plan = relationship("TreatmentPlan", back_populates="items")
     assigned_to = relationship("User", foreign_keys=[assigned_to_id], lazy="selectin")

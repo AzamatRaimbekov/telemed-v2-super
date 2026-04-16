@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { usePortalAuthStore } from "@/stores/portal-auth-store";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ function PortalLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const login = usePortalAuthStore((s) => s.login);
   const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +26,7 @@ function PortalLoginPage() {
     try {
       await login(phone, password);
       toast.success("Добро пожаловать!");
+      await router.invalidate();
       navigate({ to: "/portal/dashboard" });
     } catch {
       toast.error("Неверный телефон или пароль");

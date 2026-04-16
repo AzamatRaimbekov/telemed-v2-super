@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
@@ -66,15 +67,24 @@ class PortalService:
             raise NotFoundError("Patient")
         return patient
 
-    async def update_profile(self, patient_id: uuid.UUID, phone: str | None = None, email: str | None = None, address: str | None = None) -> Patient:
+    async def update_profile(self, patient_id: uuid.UUID, phone: str | None = None, email: str | None = None, address: str | None = None, emergency_contact_name: str | None = None, emergency_contact_phone: str | None = None) -> Patient:
         patient = await self.get_profile(patient_id)
         if phone is not None:
             patient.phone = phone
-        if email is not None:
-            # store in a field or user if linked
-            pass
         if address is not None:
             patient.address = address
+        if emergency_contact_name is not None:
+            patient.emergency_contact_name = emergency_contact_name
+        if emergency_contact_phone is not None:
+            patient.emergency_contact_phone = emergency_contact_phone
+        await self.session.flush()
+        await self.session.refresh(patient)
+        return patient
+
+    async def update_notification_preferences(self, patient_id: uuid.UUID, preferences: dict) -> Patient:
+        """Save notification preferences (JSON) to the patient record."""
+        patient = await self.get_profile(patient_id)
+        patient.notification_preferences = preferences
         await self.session.flush()
         await self.session.refresh(patient)
         return patient
@@ -427,3 +437,497 @@ class PortalService:
             notif.is_read = True
             notif.read_at = datetime.now(timezone.utc)
             await self.session.flush()
+
+    # --- Schedule ---
+    async def get_schedule(
+        self, patient_id: uuid.UUID, clinic_id: uuid.UUID,
+        single_date: str | None = None,
+        from_date: str | None = None, to_date: str | None = None,
+    ) -> list[dict]:
+        from datetime import date as date_type
+        from app.models.treatment import TreatmentPlan, TreatmentPlanItem, TreatmentItemType, TreatmentItemStatus
+
+        now = datetime.now(timezone.utc)
+
+        # Determine date range
+        def parse_date(s: str) -> date_type:
+            """Parse date from ISO string, handling both '2026-04-10' and '2026-04-10T00:00:00Z' formats."""
+            return date_type.fromisoformat(s.split("T")[0])
+
+        if single_date:
+            d = parse_date(single_date)
+            range_start = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+            range_end = range_start + timedelta(days=1)
+        elif from_date and to_date:
+            d1 = parse_date(from_date)
+            d2 = parse_date(to_date)
+            range_start = datetime(d1.year, d1.month, d1.day, tzinfo=timezone.utc)
+            range_end = datetime(d2.year, d2.month, d2.day, 23, 59, 59, tzinfo=timezone.utc)
+        else:
+            # Default: today
+            today = now.date()
+            range_start = datetime(today.year, today.month, today.day, tzinfo=timezone.utc)
+            range_end = range_start + timedelta(days=1)
+
+        events: list[dict] = []
+
+        # Treatment plan items (medications, procedures, exercises, etc.)
+        items_q = (
+            select(TreatmentPlanItem, TreatmentPlan)
+            .join(TreatmentPlan, TreatmentPlanItem.treatment_plan_id == TreatmentPlan.id)
+            .where(
+                TreatmentPlan.patient_id == patient_id,
+                TreatmentPlan.clinic_id == clinic_id,
+                TreatmentPlan.is_deleted == False,
+                TreatmentPlanItem.is_deleted == False,
+                TreatmentPlanItem.scheduled_at >= range_start,
+                TreatmentPlanItem.scheduled_at < range_end,
+            )
+            .order_by(TreatmentPlanItem.scheduled_at)
+        )
+        items_result = await self.session.execute(items_q)
+        type_map = {
+            TreatmentItemType.MEDICATION: "medication",
+            TreatmentItemType.PROCEDURE: "procedure",
+            TreatmentItemType.LAB_TEST: "lab",
+            TreatmentItemType.EXERCISE: "exercise",
+            TreatmentItemType.THERAPY: "procedure",
+            TreatmentItemType.DIET: "medication",
+            TreatmentItemType.MONITORING: "procedure",
+        }
+        status_map = {
+            TreatmentItemStatus.PENDING: "scheduled",
+            TreatmentItemStatus.IN_PROGRESS: "scheduled",
+            TreatmentItemStatus.COMPLETED: "completed",
+            TreatmentItemStatus.CANCELLED: "cancelled",
+        }
+        for item, plan in items_result.all():
+            doctor_name = None
+            if plan.doctor:
+                doctor_name = f"{plan.doctor.last_name} {plan.doctor.first_name}"
+            events.append({
+                "id": item.id,
+                "type": type_map.get(item.item_type, "procedure"),
+                "title": item.title,
+                "scheduled_at": item.scheduled_at,
+                "duration_minutes": 30,
+                "location": None,
+                "doctor_name": doctor_name,
+                "status": status_map.get(item.status, "scheduled"),
+                "notes": item.description,
+            })
+
+        # Appointments
+        appts_q = (
+            select(Appointment)
+            .where(
+                Appointment.patient_id == patient_id,
+                Appointment.clinic_id == clinic_id,
+                Appointment.is_deleted == False,
+                Appointment.scheduled_start >= range_start,
+                Appointment.scheduled_start < range_end,
+            )
+            .order_by(Appointment.scheduled_start)
+        )
+        appts_result = await self.session.execute(appts_q)
+        appt_type_map = {"CONSULTATION": "consultation", "FOLLOW_UP": "consultation", "PROCEDURE": "procedure", "TELEMEDICINE": "telemedicine"}
+        appt_status_map = {"SCHEDULED": "scheduled", "CONFIRMED": "scheduled", "CHECKED_IN": "scheduled", "IN_PROGRESS": "scheduled", "COMPLETED": "completed", "CANCELLED": "cancelled", "NO_SHOW": "skipped"}
+        for a in appts_result.scalars().all():
+            doctor_name = None
+            if a.doctor:
+                doctor_name = f"{a.doctor.last_name} {a.doctor.first_name}"
+            duration = 60
+            if a.scheduled_start and a.scheduled_end:
+                duration = int((a.scheduled_end - a.scheduled_start).total_seconds() / 60)
+            events.append({
+                "id": a.id,
+                "type": appt_type_map.get(a.appointment_type.value if hasattr(a.appointment_type, 'value') else str(a.appointment_type), "consultation"),
+                "title": a.reason or f"Прием: {a.appointment_type.value if hasattr(a.appointment_type, 'value') else str(a.appointment_type)}",
+                "scheduled_at": a.scheduled_start,
+                "duration_minutes": duration,
+                "location": None,
+                "doctor_name": doctor_name,
+                "status": appt_status_map.get(a.status.value if hasattr(a.status, 'value') else str(a.status), "scheduled"),
+                "notes": a.notes,
+            })
+
+        # Lab orders (scheduled)
+        lab_q = (
+            select(LabOrder, LabTestCatalog)
+            .join(LabTestCatalog, LabOrder.test_id == LabTestCatalog.id)
+            .where(
+                LabOrder.patient_id == patient_id,
+                LabOrder.clinic_id == clinic_id,
+                LabOrder.is_deleted == False,
+                LabOrder.expected_at >= range_start,
+                LabOrder.expected_at < range_end,
+            )
+            .order_by(LabOrder.expected_at)
+        )
+        lab_result = await self.session.execute(lab_q)
+        lab_status_map = {"ORDERED": "scheduled", "SAMPLE_COLLECTED": "scheduled", "IN_PROGRESS": "scheduled", "COMPLETED": "completed", "CANCELLED": "cancelled"}
+        for lo, test in lab_result.all():
+            events.append({
+                "id": lo.id,
+                "type": "lab",
+                "title": f"Анализ: {test.name}",
+                "scheduled_at": lo.expected_at,
+                "duration_minutes": 15,
+                "location": None,
+                "doctor_name": None,
+                "status": lab_status_map.get(lo.status.value if hasattr(lo.status, 'value') else str(lo.status), "scheduled"),
+                "notes": lo.notes,
+            })
+
+        # Sort all events by scheduled_at
+        events.sort(key=lambda e: e["scheduled_at"] or now)
+        return events
+
+    async def get_upcoming_events(self, patient_id: uuid.UUID, clinic_id: uuid.UUID, limit: int = 5) -> list[dict]:
+        """Returns next N upcoming events from the schedule."""
+        now = datetime.now(timezone.utc)
+        # Get events for the next 30 days and pick the first `limit`
+        future = now + timedelta(days=30)
+        all_events = await self.get_schedule(
+            patient_id, clinic_id,
+            from_date=now.strftime("%Y-%m-%d"),
+            to_date=future.strftime("%Y-%m-%d"),
+        )
+        # Filter only future, non-completed events
+        upcoming = [e for e in all_events if e["scheduled_at"] and e["scheduled_at"] >= now and e["status"] == "scheduled"]
+        return upcoming[:limit]
+
+    # --- Prescription confirm ---
+    async def confirm_prescription(self, item_id: uuid.UUID, patient_id: uuid.UUID) -> dict:
+        from app.models.treatment import TreatmentPlan, TreatmentPlanItem, TreatmentItemStatus
+
+        query = (
+            select(TreatmentPlanItem)
+            .join(TreatmentPlan, TreatmentPlanItem.treatment_plan_id == TreatmentPlan.id)
+            .where(
+                TreatmentPlanItem.id == item_id,
+                TreatmentPlan.patient_id == patient_id,
+                TreatmentPlanItem.is_deleted == False,
+            )
+        )
+        result = await self.session.execute(query)
+        item = result.scalar_one_or_none()
+        if not item:
+            raise NotFoundError("Prescription item")
+
+        now = datetime.now(timezone.utc)
+        item.status = TreatmentItemStatus.COMPLETED
+        item.updated_at = now
+        await self.session.flush()
+
+        return {"id": item.id, "status": "confirmed", "confirmed_at": now}
+
+    # --- Dashboard ---
+    async def get_dashboard(self, patient_id: uuid.UUID, clinic_id: uuid.UUID, patient: "Patient") -> dict:
+        from app.models.treatment import TreatmentPlan, TreatmentPlanItem, TreatmentPlanStatus, TreatmentItemStatus
+        from app.models.vital_signs import VitalSign
+
+        now = datetime.now(timezone.utc)
+
+        # Basic patient info
+        patient_info = {
+            "id": patient.id,
+            "first_name": patient.first_name,
+            "last_name": patient.last_name,
+            "middle_name": patient.middle_name,
+            "photo_url": patient.photo_url,
+            "status": patient.status.value if patient.status else None,
+        }
+
+        # Next appointment
+        next_appt_q = (
+            select(Appointment)
+            .where(
+                Appointment.patient_id == patient_id,
+                Appointment.clinic_id == clinic_id,
+                Appointment.is_deleted == False,
+                Appointment.scheduled_start >= now,
+                Appointment.status.in_(["SCHEDULED", "CONFIRMED"]),
+            )
+            .order_by(Appointment.scheduled_start.asc())
+            .limit(1)
+        )
+        next_appt_r = await self.session.execute(next_appt_q)
+        next_appt = next_appt_r.scalar_one_or_none()
+        next_appointment = None
+        if next_appt:
+            doctor_name = None
+            if next_appt.doctor:
+                doctor_name = f"{next_appt.doctor.last_name} {next_appt.doctor.first_name}"
+            next_appointment = {
+                "id": next_appt.id,
+                "appointment_type": next_appt.appointment_type.value if hasattr(next_appt.appointment_type, 'value') else str(next_appt.appointment_type),
+                "scheduled_start": next_appt.scheduled_start,
+                "scheduled_end": next_appt.scheduled_end,
+                "doctor_name": doctor_name,
+                "reason": next_appt.reason,
+            }
+
+        # Today events count
+        today_start = datetime(now.year, now.month, now.day, tzinfo=timezone.utc)
+        today_end = today_start + timedelta(days=1)
+        today_events = await self.get_schedule(patient_id, clinic_id, single_date=now.strftime("%Y-%m-%d"))
+        today_events_count = len(today_events)
+
+        # Unread notifications
+        user_id = patient.user_id or patient.id
+        unread_q = select(func.count()).select_from(Notification).where(
+            Notification.user_id == user_id,
+            Notification.is_read == False,
+            Notification.is_deleted == False,
+        )
+        unread_r = await self.session.execute(unread_q)
+        unread_notifications = unread_r.scalar_one()
+
+        # Treatment progress (across active plans)
+        plans_q = (
+            select(TreatmentPlan)
+            .where(
+                TreatmentPlan.patient_id == patient_id,
+                TreatmentPlan.clinic_id == clinic_id,
+                TreatmentPlan.is_deleted == False,
+                TreatmentPlan.status == TreatmentPlanStatus.ACTIVE,
+            )
+        )
+        plans_r = await self.session.execute(plans_q)
+        plans = plans_r.scalars().all()
+        total_items = 0
+        completed_items = 0
+        for p in plans:
+            if p.items:
+                for item in p.items:
+                    if not item.is_deleted:
+                        total_items += 1
+                        if item.status == TreatmentItemStatus.COMPLETED:
+                            completed_items += 1
+        progress_percent = round((completed_items / total_items * 100) if total_items > 0 else 0, 1)
+
+        # Latest vitals
+        vitals_q = (
+            select(VitalSign)
+            .where(VitalSign.patient_id == patient_id, VitalSign.is_deleted == False)
+            .order_by(VitalSign.recorded_at.desc())
+            .limit(1)
+        )
+        vitals_r = await self.session.execute(vitals_q)
+        latest_vital = vitals_r.scalar_one_or_none()
+        latest_vitals = None
+        if latest_vital:
+            latest_vitals = {
+                "recorded_at": latest_vital.recorded_at,
+                "systolic_bp": latest_vital.systolic_bp,
+                "diastolic_bp": latest_vital.diastolic_bp,
+                "pulse": latest_vital.pulse,
+                "temperature": float(latest_vital.temperature) if latest_vital.temperature else None,
+                "weight": float(latest_vital.weight) if latest_vital.weight else None,
+                "spo2": latest_vital.spo2,
+            }
+
+        # Exercise stats
+        exercise_progress = await self.get_exercise_progress(patient_id, clinic_id)
+
+        return {
+            "patient": patient_info,
+            "next_appointment": next_appointment,
+            "today_events_count": today_events_count,
+            "unread_notifications": unread_notifications,
+            "treatment_progress": {
+                "total_items": total_items,
+                "completed_items": completed_items,
+                "progress_percent": progress_percent,
+            },
+            "latest_vitals": latest_vitals,
+            "exercise_stats": {
+                "this_week_sessions": exercise_progress["this_week_sessions"],
+                "avg_accuracy": exercise_progress["avg_accuracy"],
+                "total_reps": exercise_progress["total_reps"],
+            },
+        }
+
+    # --- Billing categories ---
+    async def get_billing_categories(self, patient_id: uuid.UUID, clinic_id: uuid.UUID) -> list[dict]:
+        query = (
+            select(
+                InvoiceItem.item_type,
+                func.sum(InvoiceItem.total_price).label("total"),
+            )
+            .join(Invoice, InvoiceItem.invoice_id == Invoice.id)
+            .where(
+                Invoice.patient_id == patient_id,
+                Invoice.clinic_id == clinic_id,
+                Invoice.is_deleted == False,
+                InvoiceItem.is_deleted == False,
+            )
+            .group_by(InvoiceItem.item_type)
+        )
+        result = await self.session.execute(query)
+        rows = result.all()
+
+        label_map = {
+            "CONSULTATION": "Консультации",
+            "PROCEDURE": "Процедуры",
+            "LAB_TEST": "Лабораторные анализы",
+            "MEDICATION": "Лекарства",
+            "ROOM": "Палата",
+            "OTHER": "Прочее",
+        }
+        return [
+            {
+                "category": (row.item_type.value if hasattr(row.item_type, 'value') else str(row.item_type)).lower(),
+                "label": label_map.get(row.item_type.value if hasattr(row.item_type, 'value') else str(row.item_type), "Прочее"),
+                "total": float(row.total or 0),
+            }
+            for row in rows
+        ]
+
+    # --- Visit detail ---
+    async def get_visit_detail(self, visit_id: uuid.UUID, patient_id: uuid.UUID, clinic_id: uuid.UUID) -> dict:
+        from app.models.treatment import TreatmentPlan, TreatmentPlanItem
+
+        query = select(Visit).where(
+            Visit.id == visit_id,
+            Visit.patient_id == patient_id,
+            Visit.is_deleted == False,
+        )
+        result = await self.session.execute(query)
+        visit = result.scalar_one_or_none()
+        if not visit:
+            raise NotFoundError("Visit")
+
+        doctor_name = None
+        if visit.doctor:
+            doctor_name = f"{visit.doctor.last_name} {visit.doctor.first_name}"
+
+        # Linked prescriptions (treatment plan items from plans linked to this visit)
+        prescriptions: list[dict] = []
+        plans_q = (
+            select(TreatmentPlan)
+            .where(
+                TreatmentPlan.visit_id == visit_id,
+                TreatmentPlan.patient_id == patient_id,
+                TreatmentPlan.is_deleted == False,
+            )
+        )
+        plans_r = await self.session.execute(plans_q)
+        for plan in plans_r.scalars().all():
+            if plan.items:
+                for item in plan.items:
+                    if not item.is_deleted:
+                        prescriptions.append({
+                            "id": item.id,
+                            "item_type": item.item_type.value,
+                            "title": item.title,
+                            "description": item.description,
+                            "status": item.status.value,
+                            "frequency": item.frequency,
+                        })
+
+        return {
+            "id": visit.id,
+            "visit_type": visit.visit_type.value if hasattr(visit.visit_type, 'value') else str(visit.visit_type),
+            "status": visit.status.value if hasattr(visit.status, 'value') else str(visit.status),
+            "chief_complaint": visit.chief_complaint,
+            "examination_notes": visit.examination_notes,
+            "diagnosis_codes": visit.diagnosis_codes,
+            "diagnosis_text": visit.diagnosis_text,
+            "doctor_name": doctor_name,
+            "started_at": visit.started_at,
+            "ended_at": visit.ended_at,
+            "prescriptions": prescriptions,
+        }
+
+    # --- Documents ---
+    async def get_documents(self, patient_id: uuid.UUID, clinic_id: uuid.UUID) -> list[dict]:
+        from app.models.medical_history import MedicalHistoryEntry
+
+        query = (
+            select(MedicalHistoryEntry)
+            .where(
+                MedicalHistoryEntry.patient_id == patient_id,
+                MedicalHistoryEntry.clinic_id == clinic_id,
+                MedicalHistoryEntry.is_deleted == False,
+                MedicalHistoryEntry.source_document_url != None,
+            )
+            .order_by(MedicalHistoryEntry.recorded_at.desc())
+        )
+        result = await self.session.execute(query)
+        entries = result.scalars().all()
+
+        docs = []
+        for e in entries:
+            author_name = None
+            if e.author:
+                author_name = f"{e.author.last_name} {e.author.first_name}"
+            docs.append({
+                "id": e.id,
+                "title": e.title,
+                "entry_type": e.entry_type.value if hasattr(e.entry_type, 'value') else str(e.entry_type),
+                "recorded_at": e.recorded_at,
+                "source_document_url": e.source_document_url,
+                "author_name": author_name,
+            })
+        return docs
+
+    # --- Treatment plans with items ---
+    async def get_treatment_plans_full(self, patient_id: uuid.UUID, clinic_id: uuid.UUID) -> list[dict]:
+        from app.models.treatment import TreatmentPlan, TreatmentPlanItem, TreatmentItemStatus
+
+        query = (
+            select(TreatmentPlan)
+            .where(
+                TreatmentPlan.patient_id == patient_id,
+                TreatmentPlan.clinic_id == clinic_id,
+                TreatmentPlan.is_deleted == False,
+            )
+            .order_by(TreatmentPlan.created_at.desc())
+        )
+        result = await self.session.execute(query)
+        plans = result.scalars().all()
+
+        output = []
+        for plan in plans:
+            doctor_name = None
+            if plan.doctor:
+                doctor_name = f"{plan.doctor.last_name} {plan.doctor.first_name}"
+
+            items = []
+            total = 0
+            completed = 0
+            if plan.items:
+                for item in plan.items:
+                    if item.is_deleted:
+                        continue
+                    total += 1
+                    if item.status == TreatmentItemStatus.COMPLETED:
+                        completed += 1
+                    items.append({
+                        "id": item.id,
+                        "item_type": item.item_type.value,
+                        "title": item.title,
+                        "description": item.description,
+                        "status": item.status.value,
+                        "frequency": item.frequency,
+                        "scheduled_at": item.scheduled_at,
+                        "configuration": item.configuration,
+                    })
+
+            progress = round((completed / total * 100) if total > 0 else 0, 1)
+            output.append({
+                "id": plan.id,
+                "title": plan.title,
+                "description": plan.description,
+                "doctor_name": doctor_name,
+                "status": plan.status.value,
+                "start_date": plan.start_date,
+                "end_date": plan.end_date,
+                "items": items,
+                "total_items": total,
+                "completed_items": completed,
+                "progress_percent": progress,
+            })
+        return output

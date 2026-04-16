@@ -1,3 +1,4 @@
+from typing import Optional
 import enum
 import uuid
 from datetime import date, datetime
@@ -34,27 +35,27 @@ class StrokeAssessment(TenantMixin, Base):
     patient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
     assessed_by_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     assessment_type: Mapped[AssessmentType] = mapped_column(Enum(AssessmentType), nullable=False)
-    score: Mapped[float | None] = mapped_column(Numeric(6, 2))
-    max_score: Mapped[float | None] = mapped_column(Numeric(6, 2))
-    responses: Mapped[dict | None] = mapped_column(JSON)
-    interpretation: Mapped[str | None] = mapped_column(Text)
-    assessed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    notes: Mapped[str | None] = mapped_column(Text)
+    score: Mapped[Optional[float]] = mapped_column(Numeric(6, 2))
+    max_score: Mapped[Optional[float]] = mapped_column(Numeric(6, 2))
+    responses: Mapped[Optional[dict]] = mapped_column(JSON)
+    interpretation: Mapped[Optional[str]] = mapped_column(Text)
+    assessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    notes: Mapped[Optional[str]] = mapped_column(Text)
     patient = relationship("Patient", foreign_keys=[patient_id], lazy="selectin")
     assessed_by = relationship("User", foreign_keys=[assessed_by_id], lazy="selectin")
 
 class RehabGoal(TenantMixin, Base):
     __tablename__ = "rehab_goals"
     patient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
-    treatment_plan_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("treatment_plans.id"), nullable=True)
+    treatment_plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("treatment_plans.id"), nullable=True)
     domain: Mapped[RehabDomain] = mapped_column(Enum(RehabDomain), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    target_date: Mapped[date | None] = mapped_column(Date)
-    baseline_value: Mapped[str | None] = mapped_column(String(255))
-    target_value: Mapped[str | None] = mapped_column(String(255))
-    current_value: Mapped[str | None] = mapped_column(String(255))
+    target_date: Mapped[Optional[date]] = mapped_column(Date)
+    baseline_value: Mapped[Optional[str]] = mapped_column(String(255))
+    target_value: Mapped[Optional[str]] = mapped_column(String(255))
+    current_value: Mapped[Optional[str]] = mapped_column(String(255))
     status: Mapped[RehabGoalStatus] = mapped_column(Enum(RehabGoalStatus), default=RehabGoalStatus.ACTIVE)
-    set_by_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    set_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     patient = relationship("Patient", foreign_keys=[patient_id], lazy="selectin")
     set_by = relationship("User", foreign_keys=[set_by_id], lazy="selectin")
     progress_records = relationship("RehabProgress", back_populates="goal", lazy="selectin")
@@ -63,8 +64,8 @@ class RehabProgress(TenantMixin, Base):
     __tablename__ = "rehab_progress"
     goal_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("rehab_goals.id"), nullable=False)
     recorded_by_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    value: Mapped[str | None] = mapped_column(String(255))
-    notes: Mapped[str | None] = mapped_column(Text)
-    recorded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    value: Mapped[Optional[str]] = mapped_column(String(255))
+    notes: Mapped[Optional[str]] = mapped_column(Text)
+    recorded_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     goal = relationship("RehabGoal", back_populates="progress_records")
     recorded_by = relationship("User", foreign_keys=[recorded_by_id], lazy="selectin")

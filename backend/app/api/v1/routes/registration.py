@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Query, UploadFile, File
@@ -257,10 +258,28 @@ async def list_rooms(department_id: uuid.UUID, session: DBSession, current_user:
         Room.is_active == True, Room.is_deleted == False,
     )
     result = await session.execute(query)
-    return [
-        {"id": str(r.id), "name": r.name, "room_number": r.room_number, "room_type": r.room_type.value, "capacity": r.capacity, "floor": r.floor}
-        for r in result.scalars().all()
-    ]
+    rooms = result.scalars().all()
+
+    items = []
+    for r in rooms:
+        available_q = select(func.count()).select_from(Bed).where(
+            Bed.room_id == r.id,
+            Bed.status == BedStatus.AVAILABLE,
+            Bed.is_deleted == False,
+        )
+        available_r = await session.execute(available_q)
+        available_beds = available_r.scalar_one()
+
+        items.append({
+            "id": str(r.id),
+            "name": r.name,
+            "room_number": r.room_number,
+            "room_type": r.room_type.value,
+            "capacity": r.capacity,
+            "floor": r.floor,
+            "available_beds": available_beds,
+        })
+    return items
 
 
 @router.get("/beds")
@@ -282,10 +301,14 @@ async def list_beds(room_id: uuid.UUID, session: DBSession, current_user: Curren
 async def emergency_registration(
     session: DBSession, current_user: CurrentUser,
     first_name: str = "Неизвестный",
+    last_name: str = "Экстренный",
+    phone: str | None = None,
+    gender: str = "OTHER",
+    initial_diagnosis: str | None = None,
     date_of_birth: str | None = None,
     doctor_id: uuid.UUID | None = None,
     bed_id: uuid.UUID | None = None,
-    _staff=require_role(UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST, UserRole.CLINIC_ADMIN),
+    _staff=require_role(UserRole.SUPER_ADMIN, UserRole.CLINIC_ADMIN, UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST),
 ):
     """Minimal emergency patient registration."""
     from app.models.medical import MedicalCard
@@ -298,9 +321,10 @@ async def emergency_registration(
     patient = Patient(
         id=patient_id,
         first_name=first_name,
-        last_name="Экстренный",
+        last_name=last_name,
         date_of_birth=dob,
-        gender="OTHER",
+        gender=gender,
+        phone=phone,
         registration_source="EMERGENCY",
         status="ACTIVE",
         assigned_doctor_id=doctor_id,

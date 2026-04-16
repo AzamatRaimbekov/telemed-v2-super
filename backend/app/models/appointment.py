@@ -1,3 +1,4 @@
+from typing import Optional
 import enum
 import uuid
 from datetime import datetime
@@ -27,13 +28,13 @@ class Appointment(TenantMixin, Base):
     doctor_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     appointment_type: Mapped[AppointmentType] = mapped_column(Enum(AppointmentType), nullable=False)
     status: Mapped[AppointmentStatus] = mapped_column(Enum(AppointmentStatus), default=AppointmentStatus.SCHEDULED)
-    scheduled_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    scheduled_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    actual_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    actual_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    reason: Mapped[str | None] = mapped_column(Text)
-    notes: Mapped[str | None] = mapped_column(Text)
+    scheduled_start: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    scheduled_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    actual_start: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    actual_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    reason: Mapped[Optional[str]] = mapped_column(Text)
+    notes: Mapped[Optional[str]] = mapped_column(Text)
     is_walk_in: Mapped[bool] = mapped_column(Boolean, default=False)
-    queue_number: Mapped[int | None] = mapped_column(Integer)
+    queue_number: Mapped[Optional[int]] = mapped_column(Integer)
     patient = relationship("Patient", foreign_keys=[patient_id], lazy="selectin")
     doctor = relationship("User", foreign_keys=[doctor_id], lazy="selectin")

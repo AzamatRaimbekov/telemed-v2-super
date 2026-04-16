@@ -6,6 +6,8 @@ export const portalApi = {
   getFullProfile: () => portalClient.get("/portal/profile").then(r => r.data),
   updateProfile: (data: Record<string, unknown>) =>
     portalClient.patch("/portal/profile", data).then(r => r.data),
+  updatePreferences: (data: { notification_preferences: Record<string, boolean> }) =>
+    portalClient.patch("/portal/profile/preferences", data).then(r => r.data),
 
   // Medical card
   getMedicalCard: () => portalClient.get("/portal/medical-card").then(r => r.data),
@@ -82,6 +84,8 @@ export const portalApi = {
     portalClient.post("/portal/messages", data).then(r => r.data),
   getConversation: (userId: string) =>
     portalClient.get(`/portal/messages/${userId}`).then(r => r.data),
+  markMessageRead: (messageId: string) =>
+    portalClient.patch(`/portal/messages/${messageId}/read`, {}).then(r => r.data),
 
   // Notifications
   getNotifications: () => portalClient.get("/portal/notifications").then(r => r.data),

@@ -1,0 +1,5 @@
+node_modules
+.tanstack
+dist
+tsconfig.app.tsbuildinfo
+tsconfig.node.tsbuildinfo

@@ -1,3 +1,4 @@
+from typing import Optional
 import enum
 import uuid
 from datetime import datetime
@@ -16,6 +17,10 @@ class NotificationType(str, enum.Enum):
     ABNORMAL_RESULT = "ABNORMAL_RESULT"
     ALLERGY_ALERT = "ALLERGY_ALERT"
     SYSTEM = "SYSTEM"
+    EXPIRING_BATCH = "EXPIRING_BATCH"
+    EXPIRED_BATCH = "EXPIRED_BATCH"
+    NEW_PRESCRIPTION = "NEW_PRESCRIPTION"
+    ORDER_RECEIVED = "ORDER_RECEIVED"
 
 class NotificationSeverity(str, enum.Enum):
     INFO = "INFO"
@@ -30,8 +35,8 @@ class Notification(TenantMixin, Base):
     message: Mapped[str] = mapped_column(Text, nullable=False)
     severity: Mapped[NotificationSeverity] = mapped_column(Enum(NotificationSeverity), default=NotificationSeverity.INFO)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
-    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    reference_type: Mapped[str | None] = mapped_column(String(100))
-    reference_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
-    data: Mapped[dict | None] = mapped_column(JSON)
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    reference_type: Mapped[Optional[str]] = mapped_column(String(100))
+    reference_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), nullable=True)
+    data: Mapped[Optional[dict]] = mapped_column(JSON)
     user = relationship("User", foreign_keys=[user_id], lazy="selectin")

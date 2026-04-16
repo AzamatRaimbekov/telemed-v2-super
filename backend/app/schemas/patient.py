@@ -1,6 +1,7 @@
+from __future__ import annotations
 import uuid
 from datetime import date, datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class PatientCreate(BaseModel):
@@ -153,3 +154,26 @@ class TreatmentPlanItemCreate(BaseModel):
     start_date: date
     end_date: date | None = None
     sort_order: int = 0
+
+
+class PortalPasswordReset(BaseModel):
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError("Password must be at least 6 characters long")
+        return v
+
+
+class AuditLogOut(BaseModel):
+    id: uuid.UUID
+    action: str
+    user_name: str | None = None
+    user_role: str | None = None
+    old_values: dict | None = None
+    new_values: dict | None = None
+    ip_address: str | None = None
+    user_agent: str | None = None
+    created_at: datetime

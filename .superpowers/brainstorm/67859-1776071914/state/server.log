@@ -1,0 +1,4 @@
+{"type":"server-started","port":59368,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:59368","screen_dir":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/67859-1776071914/content","state_dir":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/67859-1776071914/state"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/67859-1776071914/content/dashboard-layout.html"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/67859-1776071914/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

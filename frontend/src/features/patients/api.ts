@@ -282,6 +282,34 @@ export const patientsApi = {
     apiClient
       .get(`/beds?room_id=${roomId}&status=AVAILABLE`)
       .then((r) => r.data),
+  getAllBeds: (roomId: string) =>
+    apiClient
+      .get(`/beds?room_id=${roomId}`)
+      .then((r) => r.data),
+
+  // Department management
+  createDepartment: (data: { name: string; description?: string }) =>
+    apiClient.post("/departments", data).then((r) => r.data),
+  updateDepartment: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/departments/${id}`, data).then((r) => r.data),
+  deleteDepartment: (id: string) =>
+    apiClient.delete(`/departments/${id}`).then((r) => r.data),
+
+  // Room management
+  createRoom: (data: { department_id: string; name: string; room_number: string; room_type: string; capacity: number; floor?: number }) =>
+    apiClient.post("/rooms", data).then((r) => r.data),
+  updateRoom: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/rooms/${id}`, data).then((r) => r.data),
+  deleteRoom: (id: string) =>
+    apiClient.delete(`/rooms/${id}`).then((r) => r.data),
+
+  // Bed management
+  createBed: (roomId: string, data: { bed_number: string }) =>
+    apiClient.post(`/rooms/${roomId}/beds`, data).then((r) => r.data),
+  updateBed: (id: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/beds/${id}`, data).then((r) => r.data),
+  deleteBed: (id: string) =>
+    apiClient.delete(`/beds/${id}`).then((r) => r.data),
   emergencyRegistration: (data: Record<string, unknown>) =>
     apiClient
       .post("/patients/emergency", null, { params: data })

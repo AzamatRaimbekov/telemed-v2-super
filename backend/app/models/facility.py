@@ -1,3 +1,4 @@
+from typing import Optional
 import enum
 import uuid
 from datetime import datetime
@@ -25,9 +26,9 @@ class BedStatus(str, enum.Enum):
 class Department(TenantMixin, Base):
     __tablename__ = "departments"
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    code: Mapped[str | None] = mapped_column(String(50))
-    description: Mapped[str | None] = mapped_column(Text)
-    head_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", use_alter=True), nullable=True)
+    code: Mapped[Optional[str]] = mapped_column(String(50))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    head_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", use_alter=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     head = relationship("User", foreign_keys=[head_id], lazy="selectin")
     rooms = relationship("Room", back_populates="department", lazy="selectin")
@@ -36,9 +37,9 @@ class Room(TenantMixin, Base):
     __tablename__ = "rooms"
     department_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("departments.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    room_number: Mapped[str | None] = mapped_column(String(50))
+    room_number: Mapped[Optional[str]] = mapped_column(String(50))
     room_type: Mapped[RoomType] = mapped_column(Enum(RoomType), nullable=False)
-    capacity: Mapped[int | None] = mapped_column(Integer)
+    capacity: Mapped[Optional[int]] = mapped_column(Integer)
     floor: Mapped[int] = mapped_column(Integer, default=1)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     department = relationship("Department", back_populates="rooms")
@@ -56,8 +57,8 @@ class BedAssignment(TenantMixin, Base):
     __tablename__ = "bed_assignments"
     bed_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("beds.id"), nullable=False)
     patient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
-    assigned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    discharged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    notes: Mapped[str | None] = mapped_column(Text)
+    assigned_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    discharged_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    notes: Mapped[Optional[str]] = mapped_column(Text)
     bed = relationship("Bed", back_populates="assignments")
     patient = relationship("Patient", foreign_keys=[patient_id], lazy="selectin")

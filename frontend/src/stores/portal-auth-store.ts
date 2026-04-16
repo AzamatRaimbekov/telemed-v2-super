@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import apiClient from "@/lib/api-client";
+import portalClient from "@/lib/portal-api-client";
 
 interface PortalUser {
   id: string;
@@ -30,7 +30,7 @@ export const usePortalAuthStore = create<PortalAuthState>((set, get) => ({
   isLoading: false,
 
   login: async (phone: string, password: string) => {
-    const { data } = await apiClient.post("/portal/auth/login", { phone, password });
+    const { data } = await portalClient.post("/portal/auth/login", { phone, password });
     localStorage.setItem("portal_access_token", data.access_token);
     localStorage.setItem("portal_refresh_token", data.refresh_token);
     set({ isAuthenticated: true });
@@ -39,7 +39,10 @@ export const usePortalAuthStore = create<PortalAuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      await apiClient.post("/portal/auth/logout");
+      const token = localStorage.getItem("portal_access_token");
+      if (token) {
+        await portalClient.post("/portal/auth/logout", {});
+      }
     } catch { /* ignore */ }
     localStorage.removeItem("portal_access_token");
     localStorage.removeItem("portal_refresh_token");
@@ -49,10 +52,7 @@ export const usePortalAuthStore = create<PortalAuthState>((set, get) => ({
   fetchProfile: async () => {
     try {
       set({ isLoading: true });
-      const token = localStorage.getItem("portal_access_token");
-      const { data } = await apiClient.get("/portal/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await portalClient.get("/portal/profile");
       set({ patient: data, isAuthenticated: true });
     } catch {
       set({ patient: null, isAuthenticated: false });

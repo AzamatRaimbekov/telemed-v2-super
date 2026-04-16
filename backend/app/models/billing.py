@@ -1,3 +1,4 @@
+from typing import Optional
 import enum
 import uuid
 from datetime import date, datetime
@@ -38,20 +39,20 @@ class PaymentMethod(str, enum.Enum):
 class Invoice(TenantMixin, Base):
     __tablename__ = "invoices"
     patient_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("patients.id"), nullable=False)
-    visit_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("visits.id"), nullable=True)
-    treatment_plan_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("treatment_plans.id"), nullable=True)
+    visit_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("visits.id"), nullable=True)
+    treatment_plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("treatment_plans.id"), nullable=True)
     invoice_number: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     status: Mapped[InvoiceStatus] = mapped_column(Enum(InvoiceStatus), default=InvoiceStatus.DRAFT)
     subtotal: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
     discount: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
     tax: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
     total: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
-    insurance_claim_amount: Mapped[float | None] = mapped_column(Numeric(12, 2))
+    insurance_claim_amount: Mapped[Optional[float]] = mapped_column(Numeric(12, 2))
     insurance_claim_status: Mapped[InsuranceClaimStatus] = mapped_column(Enum(InsuranceClaimStatus), default=InsuranceClaimStatus.NONE)
-    foms_claim_number: Mapped[str | None] = mapped_column(String(100))
-    due_date: Mapped[date | None] = mapped_column(Date)
-    notes: Mapped[str | None] = mapped_column(Text)
-    issued_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    foms_claim_number: Mapped[Optional[str]] = mapped_column(String(100))
+    due_date: Mapped[Optional[date]] = mapped_column(Date)
+    notes: Mapped[Optional[str]] = mapped_column(Text)
+    issued_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     patient = relationship("Patient", foreign_keys=[patient_id], lazy="selectin")
     items = relationship("InvoiceItem", back_populates="invoice", lazy="selectin")
     payments = relationship("Payment", back_populates="invoice", lazy="selectin")
@@ -64,7 +65,7 @@ class InvoiceItem(TenantMixin, Base):
     quantity: Mapped[float] = mapped_column(Numeric(10, 2), default=1)
     unit_price: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     total_price: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
-    reference_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    reference_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), nullable=True)
     invoice = relationship("Invoice", back_populates="items")
 
 class Payment(TenantMixin, Base):
@@ -72,8 +73,8 @@ class Payment(TenantMixin, Base):
     invoice_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("invoices.id"), nullable=False)
     amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     payment_method: Mapped[PaymentMethod] = mapped_column(Enum(PaymentMethod), nullable=False)
-    reference_number: Mapped[str | None] = mapped_column(String(255))
-    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    received_by_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    reference_number: Mapped[Optional[str]] = mapped_column(String(255))
+    paid_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    received_by_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     invoice = relationship("Invoice", back_populates="payments")
     received_by = relationship("User", foreign_keys=[received_by_id], lazy="selectin")

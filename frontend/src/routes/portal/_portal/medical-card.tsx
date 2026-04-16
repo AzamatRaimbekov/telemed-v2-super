@@ -195,14 +195,81 @@ function DiagnosesTab({ diagnoses }: { diagnoses: any }) {
   );
 }
 
+const ENTRY_TYPE_LABELS: Record<string, { label: string; color: string }> = {
+  initial_exam: { label: "Осмотр", color: "bg-blue-500/10 text-blue-600" },
+  daily_note: { label: "Дневник", color: "bg-slate-500/10 text-slate-600" },
+  specialist_consult: { label: "Консультация", color: "bg-violet-500/10 text-violet-600" },
+  procedure_note: { label: "Процедура", color: "bg-teal-500/10 text-teal-600" },
+  discharge_summary: { label: "Выписка", color: "bg-emerald-500/10 text-emerald-600" },
+  anamnesis: { label: "Анамнез", color: "bg-amber-500/10 text-amber-600" },
+  surgery_note: { label: "Операция", color: "bg-red-500/10 text-red-600" },
+  lab_interpretation: { label: "Анализ", color: "bg-cyan-500/10 text-cyan-600" },
+  imaging_description: { label: "Снимок", color: "bg-indigo-500/10 text-indigo-600" },
+  ai_generated: { label: "AI-заключение", color: "bg-yellow-500/10 text-yellow-600" },
+  manual: { label: "Заключение", color: "bg-gray-500/10 text-gray-600" },
+};
+
 function DocumentsTab() {
+  const { data: documents, isLoading } = useQuery({
+    queryKey: ["portal-documents"],
+    queryFn: portalApi.getDocuments,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="p-4 flex items-center gap-4 animate-pulse">
+            <div className="w-24 h-6 bg-[var(--color-muted)] rounded-lg" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-[var(--color-muted)] rounded w-3/4" />
+              <div className="h-3 bg-[var(--color-muted)] rounded w-1/3" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (!documents || (documents as any[]).length === 0) {
+    return (
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">
+        <svg className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+        </svg>
+        <p className="text-[var(--color-text-secondary)]">Документы не найдены</p>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Здесь будут отображаться снимки, результаты и другие файлы</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl border border-border p-8 text-center">
-      <svg className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>
-      </svg>
-      <p className="text-[var(--color-text-secondary)]">Документы пока не загружены</p>
-      <p className="text-xs text-[var(--color-text-tertiary)] mt-1">Здесь будут отображаться снимки, результаты и другие файлы</p>
+    <div className="bg-[var(--color-surface)] rounded-2xl border border-border divide-y divide-border">
+      {(documents as Array<Record<string, any>>).map((doc) => {
+        const typeInfo = ENTRY_TYPE_LABELS[doc.entry_type] || { label: doc.entry_type, color: "bg-gray-500/10 text-gray-600" };
+        return (
+          <div key={doc.id} className="p-4 flex items-center gap-4">
+            <span className={`px-2.5 py-1 text-xs font-medium rounded-lg flex-shrink-0 ${typeInfo.color}`}>
+              {typeInfo.label}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{doc.title}</p>
+              <p className="text-xs text-[var(--color-text-tertiary)]">
+                {doc.recorded_at ? new Date(doc.recorded_at).toLocaleDateString("ru-RU") : ""}
+                {doc.author_name ? ` · ${doc.author_name}` : ""}
+              </p>
+            </div>
+            {doc.source_document_url && (
+              <a href={doc.source_document_url} target="_blank" rel="noreferrer" aria-label="Открыть документ"
+                className="p-2 rounded-lg hover:bg-[var(--color-muted)] transition-colors text-[var(--color-text-tertiary)] hover:text-foreground">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

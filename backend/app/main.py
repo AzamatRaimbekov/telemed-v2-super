@@ -13,6 +13,20 @@ from app.core.middleware import RequestLoggingMiddleware
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+    # Auto-run migrations on startup in production
+    if settings.APP_ENV == "production":
+        import subprocess
+        # Ensure DB exists
+        db_result = subprocess.run(["python", "create_db.py"], capture_output=True, text=True)
+        print(f"DB: {db_result.stdout.strip()}")
+        if db_result.returncode != 0:
+            print(f"DB error: {db_result.stderr[:300]}")
+        # Run migrations
+        result = subprocess.run(["python", "-m", "alembic", "upgrade", "head"], capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"Migrations OK")
+        else:
+            print(f"Migration warning: {result.stderr[:500]}")
     yield
 
 app = FastAPI(title=settings.APP_NAME, version="1.0.0", docs_url="/docs", openapi_url="/openapi.json", lifespan=lifespan)

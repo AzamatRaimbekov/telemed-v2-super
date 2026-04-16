@@ -1,3 +1,4 @@
+from __future__ import annotations
 from fastapi import APIRouter, Request
 from app.api.deps import CurrentUser, DBSession, RedisClient
 from app.core.security import decode_token

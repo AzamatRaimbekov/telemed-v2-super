@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
@@ -44,6 +45,8 @@ class PatientProfileUpdate(BaseModel):
     phone: str | None = None
     email: str | None = None
     address: str | None = None
+    emergency_contact_name: str | None = None
+    emergency_contact_phone: str | None = None
 
 
 # Medical Card
@@ -262,3 +265,104 @@ class NotificationOut(BaseModel):
     is_read: bool = False
     created_at: datetime
     model_config = {"from_attributes": True}
+
+
+# Schedule
+class ScheduleEvent(BaseModel):
+    id: uuid.UUID
+    type: str  # medication | procedure | lab | exercise | consultation | telemedicine
+    title: str
+    scheduled_at: datetime
+    duration_minutes: int = 30
+    location: str | None = None
+    doctor_name: str | None = None
+    status: str  # scheduled | completed | skipped | cancelled
+    notes: str | None = None
+
+
+# Prescription confirm
+class PrescriptionConfirmOut(BaseModel):
+    id: uuid.UUID
+    status: str = "confirmed"
+    confirmed_at: datetime
+
+
+# Dashboard
+class TreatmentProgressOut(BaseModel):
+    total_items: int = 0
+    completed_items: int = 0
+    progress_percent: float = 0.0
+
+
+class ExerciseStatsOut(BaseModel):
+    this_week_sessions: int = 0
+    avg_accuracy: float = 0.0
+    total_reps: int = 0
+
+
+class DashboardOut(BaseModel):
+    patient: dict
+    next_appointment: dict | None = None
+    today_events_count: int = 0
+    unread_notifications: int = 0
+    treatment_progress: TreatmentProgressOut = TreatmentProgressOut()
+    latest_vitals: dict | None = None
+    exercise_stats: ExerciseStatsOut = ExerciseStatsOut()
+
+
+# Billing categories
+class BillingCategoryOut(BaseModel):
+    category: str
+    label: str
+    total: float = 0.0
+
+
+# Visit detail
+class VisitDetailOut(BaseModel):
+    id: uuid.UUID
+    visit_type: str
+    status: str
+    chief_complaint: str | None = None
+    examination_notes: str | None = None
+    diagnosis_codes: list | None = None
+    diagnosis_text: str | None = None
+    doctor_name: str | None = None
+    started_at: datetime | None = None
+    ended_at: datetime | None = None
+    prescriptions: list[dict] = []
+
+
+# Documents
+class DocumentOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    entry_type: str
+    recorded_at: datetime
+    source_document_url: str | None = None
+    author_name: str | None = None
+
+
+# Treatment plans with items
+class TreatmentPlanItemOut(BaseModel):
+    id: uuid.UUID
+    item_type: str
+    title: str
+    description: str | None = None
+    status: str
+    frequency: str | None = None
+    scheduled_at: datetime | None = None
+    configuration: dict | None = None
+
+
+class TreatmentPlanFullOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    description: str | None = None
+    doctor_name: str | None = None
+    status: str
+    start_date: date | None = None
+    end_date: date | None = None
+    items: list[TreatmentPlanItemOut] = []
+    total_items: int = 0
+    completed_items: int = 0
+    progress_percent: float = 0.0

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from fastapi import APIRouter, Query
 from app.api.deps import CurrentUser, DBSession, require_role

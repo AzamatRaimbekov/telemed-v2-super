@@ -1,0 +1,209 @@
+<h2>Компоновка дашборда динамики восстановления</h2>
+<p class="subtitle">Как расположить графики на вкладке "Обзор" пациента?</p>
+
+<div class="cards">
+  <!-- Option A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px; color: #8888aa;">
+        <!-- Recovery Index top -->
+        <div style="background: linear-gradient(135deg, #1e3a5f, #2a1a4e); border-radius: 8px; padding: 12px; text-align: center;">
+          <div style="font-size: 10px; color: #888; margin-bottom: 4px;">ОБЩИЙ ИНДЕКС ВОССТАНОВЛЕНИЯ</div>
+          <div style="font-size: 28px; font-weight: bold; color: #4ade80;">78%</div>
+          <div style="font-size: 9px; color: #4ade80;">▲ +5% за неделю</div>
+          <div style="margin-top: 6px; height: 30px; background: rgba(74,222,128,0.1); border-radius: 4px; display: flex; align-items: end; justify-content: center; gap: 2px; padding-bottom: 2px;">
+            <div style="width: 3px; height: 10px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 3px; height: 14px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 3px; height: 12px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 3px; height: 18px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 3px; height: 16px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 3px; height: 22px; background: #4ade80; border-radius: 1px;"></div>
+            <div style="width: 3px; height: 24px; background: #4ade80; border-radius: 1px;"></div>
+          </div>
+        </div>
+        <!-- Grid 2x3 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="font-size: 9px; color: #666;">Витальные</div>
+            <div style="height: 24px; display: flex; align-items: end; gap: 1px;">
+              <div style="flex:1; height: 60%; background: #3b82f6; border-radius: 1px;"></div>
+              <div style="flex:1; height: 80%; background: #3b82f6; border-radius: 1px;"></div>
+              <div style="flex:1; height: 50%; background: #3b82f6; border-radius: 1px;"></div>
+              <div style="flex:1; height: 70%; background: #3b82f6; border-radius: 1px;"></div>
+              <div style="flex:1; height: 90%; background: #3b82f6; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="font-size: 9px; color: #666;">Анализы</div>
+            <div style="height: 24px; display: flex; align-items: end; gap: 1px;">
+              <div style="flex:1; height: 40%; background: #f59e0b; border-radius: 1px;"></div>
+              <div style="flex:1; height: 55%; background: #f59e0b; border-radius: 1px;"></div>
+              <div style="flex:1; height: 70%; background: #4ade80; border-radius: 1px;"></div>
+              <div style="flex:1; height: 65%; background: #4ade80; border-radius: 1px;"></div>
+              <div style="flex:1; height: 80%; background: #4ade80; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="font-size: 9px; color: #666;">План лечения</div>
+            <div style="height: 24px; display: flex; align-items: center; justify-content: center;">
+              <div style="width: 80%; height: 6px; background: #333; border-radius: 3px; overflow: hidden;">
+                <div style="width: 65%; height: 100%; background: #8b5cf6; border-radius: 3px;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="font-size: 9px; color: #666;">Шкалы</div>
+            <div style="height: 24px; display: flex; align-items: end; gap: 1px;">
+              <div style="flex:1; height: 90%; background: #ef4444; border-radius: 1px;"></div>
+              <div style="flex:1; height: 70%; background: #f59e0b; border-radius: 1px;"></div>
+              <div style="flex:1; height: 50%; background: #f59e0b; border-radius: 1px;"></div>
+              <div style="flex:1; height: 30%; background: #4ade80; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="font-size: 9px; color: #666;">Упражнения</div>
+            <div style="height: 24px; display: flex; align-items: end; gap: 1px;">
+              <div style="flex:1; height: 30%; background: #06b6d4; border-radius: 1px;"></div>
+              <div style="flex:1; height: 45%; background: #06b6d4; border-radius: 1px;"></div>
+              <div style="flex:1; height: 55%; background: #06b6d4; border-radius: 1px;"></div>
+              <div style="flex:1; height: 70%; background: #06b6d4; border-radius: 1px;"></div>
+              <div style="flex:1; height: 85%; background: #06b6d4; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="font-size: 9px; color: #666;">Домены</div>
+            <div style="height: 24px; display: flex; align-items: center; gap: 2px;">
+              <div style="flex:1; height: 12px; background: #4ade80; border-radius: 2px; opacity: 0.9;"></div>
+              <div style="flex:1; height: 12px; background: #f59e0b; border-radius: 2px; opacity: 0.7;"></div>
+              <div style="flex:1; height: 12px; background: #4ade80; border-radius: 2px; opacity: 0.8;"></div>
+              <div style="flex:1; height: 12px; background: #ef4444; border-radius: 2px; opacity: 0.5;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>А) Индекс сверху + сетка виджетов</h3>
+      <p>Большой индекс восстановления наверху, под ним сетка 2×3 из мини-графиков по каждому домену. Компактно, всё видно сразу. Клик по виджету раскрывает подробный график.</p>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: #8888aa;">
+        <!-- Combined top row -->
+        <div style="display: flex; gap: 6px;">
+          <div style="flex: 1; background: linear-gradient(135deg, #1e3a5f, #2a1a4e); border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #4ade80;">78%</div>
+            <div style="font-size: 8px; color: #4ade80;">▲ +5%</div>
+          </div>
+          <div style="flex: 2; background: #16213e; border-radius: 8px; padding: 10px;">
+            <div style="font-size: 9px; color: #666; margin-bottom: 4px;">Домены восстановления</div>
+            <div style="display: flex; gap: 3px;">
+              <div style="flex:1; text-align: center;">
+                <div style="height: 20px; width: 20px; margin: 0 auto; border-radius: 50%; border: 2px solid #4ade80; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #4ade80;">85</div>
+                <div style="font-size: 7px; margin-top: 2px;">Витал</div>
+              </div>
+              <div style="flex:1; text-align: center;">
+                <div style="height: 20px; width: 20px; margin: 0 auto; border-radius: 50%; border: 2px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #f59e0b;">62</div>
+                <div style="font-size: 7px; margin-top: 2px;">Анал</div>
+              </div>
+              <div style="flex:1; text-align: center;">
+                <div style="height: 20px; width: 20px; margin: 0 auto; border-radius: 50%; border: 2px solid #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #8b5cf6;">70</div>
+                <div style="font-size: 7px; margin-top: 2px;">План</div>
+              </div>
+              <div style="flex:1; text-align: center;">
+                <div style="height: 20px; width: 20px; margin: 0 auto; border-radius: 50%; border: 2px solid #06b6d4; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #06b6d4;">90</div>
+                <div style="font-size: 7px; margin-top: 2px;">Упр</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Scrollable cards -->
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 9px; color: #3b82f6;">● Витальные показатели</span>
+              <span style="font-size: 8px; color: #666;">7д | 30д | 3м</span>
+            </div>
+            <div style="height: 28px; background: rgba(59,130,246,0.1); border-radius: 4px;"></div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 9px; color: #f59e0b;">● Лабораторные анализы</span>
+              <span style="font-size: 8px; color: #666;">7д | 30д | 3м</span>
+            </div>
+            <div style="height: 28px; background: rgba(245,158,11,0.1); border-radius: 4px;"></div>
+          </div>
+          <div style="background: #16213e; border-radius: 6px; padding: 8px; opacity: 0.6;">
+            <div style="font-size: 9px; color: #8b5cf6;">● План лечения...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Б) Сводка сверху + вертикальный скролл</h3>
+      <p>Компактная сводка (индекс + кольца доменов) наверху, ниже — полноразмерные графики один под другим с прокруткой. Каждый график самостоятельный, с фильтрами периода.</p>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #1a1a2e;">
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: #8888aa;">
+        <!-- Tabs -->
+        <div style="display: flex; gap: 2px; background: #0d1117; border-radius: 6px; padding: 3px;">
+          <div style="flex: 1; text-align: center; padding: 4px; background: #1e3a5f; border-radius: 4px; font-size: 8px; color: #fff;">Сводка</div>
+          <div style="flex: 1; text-align: center; padding: 4px; font-size: 8px; color: #666;">Витальные</div>
+          <div style="flex: 1; text-align: center; padding: 4px; font-size: 8px; color: #666;">Анализы</div>
+          <div style="flex: 1; text-align: center; padding: 4px; font-size: 8px; color: #666;">Шкалы</div>
+        </div>
+        <!-- Summary content -->
+        <div style="display: flex; gap: 6px;">
+          <div style="flex: 1; background: linear-gradient(135deg, #1e3a5f, #2a1a4e); border-radius: 8px; padding: 10px;">
+            <div style="font-size: 9px; color: #888; margin-bottom: 2px;">Индекс</div>
+            <div style="font-size: 22px; font-weight: bold; color: #4ade80;">78%</div>
+            <div style="height: 30px; margin-top: 4px; display: flex; align-items: end; gap: 2px;">
+              <div style="flex:1; height: 40%; background: #4ade80; border-radius: 1px;"></div>
+              <div style="flex:1; height: 55%; background: #4ade80; border-radius: 1px;"></div>
+              <div style="flex:1; height: 50%; background: #4ade80; border-radius: 1px;"></div>
+              <div style="flex:1; height: 65%; background: #4ade80; border-radius: 1px;"></div>
+              <div style="flex:1; height: 75%; background: #4ade80; border-radius: 1px;"></div>
+            </div>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <div style="background: #16213e; border-radius: 4px; padding: 6px; display: flex; justify-content: space-between;">
+              <span style="font-size: 8px;">Витальные</span>
+              <span style="font-size: 8px; color: #4ade80;">85%</span>
+            </div>
+            <div style="background: #16213e; border-radius: 4px; padding: 6px; display: flex; justify-content: space-between;">
+              <span style="font-size: 8px;">Анализы</span>
+              <span style="font-size: 8px; color: #f59e0b;">62%</span>
+            </div>
+            <div style="background: #16213e; border-radius: 4px; padding: 6px; display: flex; justify-content: space-between;">
+              <span style="font-size: 8px;">План</span>
+              <span style="font-size: 8px; color: #8b5cf6;">70%</span>
+            </div>
+            <div style="background: #16213e; border-radius: 4px; padding: 6px; display: flex; justify-content: space-between;">
+              <span style="font-size: 8px;">Упражнения</span>
+              <span style="font-size: 8px; color: #06b6d4;">90%</span>
+            </div>
+          </div>
+        </div>
+        <!-- Radar chart mock -->
+        <div style="background: #16213e; border-radius: 6px; padding: 10px; text-align: center;">
+          <div style="font-size: 9px; color: #666; margin-bottom: 4px;">Радарная диаграмма доменов</div>
+          <div style="width: 50px; height: 50px; margin: 0 auto; border: 1px solid #333; border-radius: 50%; position: relative;">
+            <div style="position: absolute; inset: 8px; border: 1px solid #444; border-radius: 50;"></div>
+            <div style="position: absolute; inset: 15px; background: rgba(74,222,128,0.2); border: 1px solid #4ade80; border-radius: 50%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>В) Под-табы внутри обзора</h3>
+      <p>Внутри обзора — мини-табы: "Сводка", "Витальные", "Анализы", "Шкалы", "Упражнения". На сводке — индекс + радарная диаграмма. На каждом табе — подробные графики домена.</p>
+    </div>
+  </div>
+</div>

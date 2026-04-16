@@ -2,6 +2,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
@@ -71,7 +72,7 @@ async def portal_logout(patient: PortalPatient, redis: RedisClient):
     return {"message": "Logged out"}
 
 
-# PROFILE (2)
+# PROFILE (3)
 @router.get("/profile")
 async def get_profile(patient: PortalPatient, session: DBSession):
     service = PortalService(session)
@@ -84,6 +85,15 @@ async def get_profile(patient: PortalPatient, session: DBSession):
         "chronic_conditions": p.chronic_conditions, "photo_url": p.photo_url,
         "status": p.status.value if p.status else None, "insurance_provider": p.insurance_provider,
         "insurance_number": p.insurance_number, "created_at": p.created_at,
+        "emergency_contact_name": p.emergency_contact_name,
+        "emergency_contact_phone": p.emergency_contact_phone,
+        "notification_preferences": p.notification_preferences,
+        "assigned_doctor": {
+            "id": str(p.assigned_doctor.id),
+            "first_name": p.assigned_doctor.first_name,
+            "last_name": p.assigned_doctor.last_name,
+            "specialization": p.assigned_doctor.specialization,
+        } if p.assigned_doctor else None,
     }
 
 
@@ -91,6 +101,18 @@ async def get_profile(patient: PortalPatient, session: DBSession):
 async def update_profile(data: PatientProfileUpdate, patient: PortalPatient, session: DBSession):
     service = PortalService(session)
     p = await service.update_profile(patient.id, data.phone, data.email, data.address, data.emergency_contact_name, data.emergency_contact_phone)
+    return {"status": "updated"}
+
+
+class NotificationPreferencesPayload(BaseModel):
+    notification_preferences: dict
+
+
+@router.patch("/profile/preferences")
+async def update_preferences(data: NotificationPreferencesPayload, patient: PortalPatient, session: DBSession):
+    """Save notification preferences to patient record."""
+    service = PortalService(session)
+    await service.update_notification_preferences(patient.id, data.notification_preferences)
     return {"status": "updated"}
 
 
