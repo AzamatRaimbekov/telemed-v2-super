@@ -38,6 +38,11 @@ app.add_middleware(RequestLoggingMiddleware)
 app.add_exception_handler(APIError, api_error_handler)
 app.include_router(api_router)
 
+# Log registered routes for debugging
+_route_count = len([r for r in app.routes if hasattr(r, 'path')])
+_monitor_routes = [r.path for r in app.routes if hasattr(r, 'path') and 'monitor' in r.path]
+print(f"APP ROUTES: {_route_count} total, monitoring: {_monitor_routes}")
+
 # Serve uploaded files (audio, documents)
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
