@@ -17,6 +17,7 @@ const TABS = [
   { path: "medications", label: "Препараты",         icon: PillIcon },
   { path: "stroke",      label: "Инсульт",           icon: BrainIcon },
   { path: "rooms",       label: "Палаты",            icon: BedIcon },
+  { path: "monitoring",  label: "Мониторинг",        icon: MonitorIcon },
   { path: "documents",   label: "Документы",         icon: FileIcon },
   { path: "billing",     label: "Биллинг",           icon: DollarIcon },
   { path: "ai",          label: "ИИ Ассистент",     icon: SparklesIcon },
@@ -280,6 +281,16 @@ function BrainIcon({ className }: { className?: string }) {
       <path d="M19.938 10.5a4 4 0 0 1 .585.396" />
       <path d="M6 18a4 4 0 0 1-1.967-.516" />
       <path d="M19.967 17.484A4 4 0 0 1 18 18" />
+    </svg>
+  );
+}
+
+function MonitorIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
     </svg>
   );
 }
