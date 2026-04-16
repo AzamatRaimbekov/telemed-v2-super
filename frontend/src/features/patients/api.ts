@@ -489,6 +489,24 @@ export const patientsApi = {
   searchIcd10: (query: string) =>
     apiClient.get(`/icd10/search?q=${encodeURIComponent(query)}`).then((r) => r.data as { code: string; title: string }[]),
 
+  // Billing
+  getInvoices: (patientId: string) =>
+    apiClient.get(`/billing/invoices?patient_id=${patientId}`).then((r) => r.data),
+  getInvoice: (invoiceId: string) =>
+    apiClient.get(`/billing/invoices/${invoiceId}`).then((r) => r.data),
+  createInvoice: (data: Record<string, unknown>) =>
+    apiClient.post("/billing/invoices", data).then((r) => r.data),
+  updateInvoice: (invoiceId: string, data: Record<string, unknown>) =>
+    apiClient.patch(`/billing/invoices/${invoiceId}`, data).then((r) => r.data),
+  deleteInvoice: (invoiceId: string) =>
+    apiClient.delete(`/billing/invoices/${invoiceId}`).then((r) => r.data),
+  recordPayment: (data: Record<string, unknown>) =>
+    apiClient.post("/billing/payments", data).then((r) => r.data),
+  getPayments: (patientId: string) =>
+    apiClient.get(`/billing/payments?patient_id=${patientId}`).then((r) => r.data),
+  getBillingStats: () =>
+    apiClient.get("/billing/stats").then((r) => r.data),
+
   // Audit logs
   getAuditLogs: (
     patientId: string,
