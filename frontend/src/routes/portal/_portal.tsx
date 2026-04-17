@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState, useNavigate } from "@tanstack/react-router";
 import { usePortalAuthStore } from "@/stores/portal-auth-store";
 import { useEffect } from "react";
+import { VoiceAssistantProvider } from "@/features/voice-assistant";
 
 export const Route = createFileRoute("/portal/_portal")({
   beforeLoad: () => {
@@ -151,6 +152,7 @@ function PortalLayout() {
   if (!isAuthenticated) return null;
 
   return (
+    <VoiceAssistantProvider>
     <div className="min-h-screen bg-background">
       {/* Top header */}
       <header className="sticky top-0 z-50 h-14 bg-[var(--color-surface)]/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-4 lg:px-8">
@@ -224,5 +226,6 @@ function PortalLayout() {
         </div>
       </nav>
     </div>
+    </VoiceAssistantProvider>
   );
 }
