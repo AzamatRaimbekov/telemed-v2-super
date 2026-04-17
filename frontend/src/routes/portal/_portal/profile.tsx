@@ -4,6 +4,8 @@ import { portalApi } from "@/features/portal/api";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { usePortalAuthStore } from "@/stores/portal-auth-store";
+import { useVoiceAssistant } from "@/features/voice-assistant";
+import { Mic } from "lucide-react";
 
 export const Route = createFileRoute("/portal/_portal/profile")({
   component: ProfilePage,
@@ -79,13 +81,14 @@ function initials(first: string, last: string): string {
 
 // ---------- toggle switch ----------
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
   return (
     <button
       role="switch"
       aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${checked ? "bg-secondary" : "bg-[var(--color-muted)]"}`}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${disabled ? "opacity-40 cursor-not-allowed" : ""} ${checked ? "bg-secondary" : "bg-[var(--color-muted)]"}`}
     >
       <span
         className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-6" : "translate-x-1"}`}
@@ -234,6 +237,8 @@ function ProfilePage() {
     // Sync to backend
     prefsMutation.mutate({ notification_preferences: updated });
   }
+
+  const { settings: voiceSettings, updateSettings: updateVoiceSettings } = useVoiceAssistant();
 
   const displayProfile = profile || (patientFromStore as unknown as FullProfile | null);
   const birthDate = displayProfile?.date_of_birth || displayProfile?.birth_date;
@@ -449,6 +454,125 @@ function ProfilePage() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Voice assistant settings */}
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-border overflow-hidden animate-float-up" style={{ animationDelay: "300ms" }}>
+        <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+          <Mic className="w-5 h-5 text-secondary" />
+          <h3 className="text-base font-semibold text-foreground">Голосовой ассистент</h3>
+        </div>
+        <div className="p-6 space-y-4">
+          {/* Voice enabled */}
+          <div className="flex items-center justify-between gap-3">
+            <label
+              className="text-sm text-[var(--color-text-secondary)] cursor-pointer flex-1"
+              onClick={() => updateVoiceSettings({ voice_enabled: !voiceSettings.voice_enabled })}
+            >
+              Голосовое управление
+            </label>
+            <Toggle
+              checked={voiceSettings.voice_enabled}
+              onChange={(v) => updateVoiceSettings({ voice_enabled: v })}
+            />
+          </div>
+
+          {/* Wake word */}
+          <div className="flex items-center justify-between gap-3">
+            <label
+              className={`text-sm flex-1 ${voiceSettings.voice_enabled ? "text-[var(--color-text-secondary)] cursor-pointer" : "text-[var(--color-text-tertiary)] cursor-not-allowed"}`}
+              onClick={() => voiceSettings.voice_enabled && updateVoiceSettings({ wake_word_enabled: !voiceSettings.wake_word_enabled })}
+            >
+              Активация голосом (&laquo;Эй, Медкор&raquo;)
+            </label>
+            <Toggle
+              checked={voiceSettings.wake_word_enabled}
+              onChange={(v) => updateVoiceSettings({ wake_word_enabled: v })}
+              disabled={!voiceSettings.voice_enabled}
+            />
+          </div>
+
+          {/* TTS enabled */}
+          <div className="flex items-center justify-between gap-3">
+            <label
+              className={`text-sm flex-1 ${voiceSettings.voice_enabled ? "text-[var(--color-text-secondary)] cursor-pointer" : "text-[var(--color-text-tertiary)] cursor-not-allowed"}`}
+              onClick={() => voiceSettings.voice_enabled && updateVoiceSettings({ tts_enabled: !voiceSettings.tts_enabled })}
+            >
+              Озвучка ответов
+            </label>
+            <Toggle
+              checked={voiceSettings.tts_enabled}
+              onChange={(v) => updateVoiceSettings({ tts_enabled: v })}
+              disabled={!voiceSettings.voice_enabled}
+            />
+          </div>
+
+          {/* Language select */}
+          <div>
+            <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-1">
+              Язык распознавания
+            </label>
+            <select
+              value={voiceSettings.language}
+              onChange={(e) => updateVoiceSettings({ language: e.target.value as "ru" | "ky" | "en" })}
+              className="w-full px-3 py-2 rounded-xl border border-border bg-[var(--color-muted)]/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-secondary/40 focus:border-secondary transition-colors"
+            >
+              <option value="ru">Русский</option>
+              <option value="ky">Кыргызча</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          {/* TTS speed — shown only if TTS on */}
+          {voiceSettings.tts_enabled && (
+            <div>
+              <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-1">
+                Скорость озвучки — {voiceSettings.tts_speed.toFixed(1)}x
+              </label>
+              <input
+                type="range"
+                min={0.5}
+                max={2.0}
+                step={0.1}
+                value={voiceSettings.tts_speed}
+                onChange={(e) => updateVoiceSettings({ tts_speed: parseFloat(e.target.value) })}
+                className="w-full accent-secondary"
+              />
+              <div className="flex justify-between text-xs text-[var(--color-text-tertiary)] mt-0.5">
+                <span>0.5x</span>
+                <span>2.0x</span>
+              </div>
+            </div>
+          )}
+
+          {/* Hint size — shown only if voice on */}
+          {voiceSettings.voice_enabled && (
+            <div>
+              <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
+                Размер подсказок
+              </label>
+              <div className="flex gap-2">
+                {([
+                  { value: "sm" as const, label: "S" },
+                  { value: "md" as const, label: "M" },
+                  { value: "lg" as const, label: "L" },
+                ]).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateVoiceSettings({ hint_size: opt.value })}
+                    className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${
+                      voiceSettings.hint_size === opt.value
+                        ? "bg-secondary text-white"
+                        : "bg-[var(--color-muted)] text-[var(--color-text-secondary)] hover:bg-[var(--color-muted)]/80"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
