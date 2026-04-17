@@ -43,6 +43,12 @@ CAMERA_NAMES = [
 
 async def seed() -> None:
     async with async_session_factory() as session:
+        # Check if already seeded
+        existing_sensors = await session.execute(select(SensorDevice).limit(1))
+        if existing_sensors.scalar_one_or_none():
+            print("Monitoring already seeded. Skipping.")
+            return
+
         # Find active room assignments (patients currently in rooms)
         query = (
             select(RoomAssignment)
