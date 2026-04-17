@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import uuid
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 logger = structlog.get_logger()
 
@@ -24,7 +26,7 @@ def store_pending_action(
     }
 
 
-def get_pending_action(action_id: str) -> dict | None:
+def get_pending_action(action_id: str) -> Optional[dict]:
     """Pop and return a pending action by its ID, or None if not found."""
     return _pending_actions.pop(action_id, None)
 
