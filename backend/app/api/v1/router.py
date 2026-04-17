@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.routes import auth, clinics, health, users, portal, patients, registration, staff, medical_history, rooms, ai, treatment, stroke, settings, recovery, diagnoses, icd10, audit, schedule, notifications, analytics, telemedicine, patient_ai, pharmacy, billing, laboratory, monitoring, infrastructure
+from app.api.v1.routes import auth, clinics, health, users, portal, portal_voice, patients, registration, staff, medical_history, rooms, ai, treatment, stroke, settings, recovery, diagnoses, icd10, audit, schedule, notifications, analytics, telemedicine, patient_ai, pharmacy, billing, laboratory, monitoring, infrastructure
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health.router)
@@ -7,6 +7,7 @@ api_router.include_router(auth.router)
 api_router.include_router(users.router)
 api_router.include_router(clinics.router)
 api_router.include_router(portal.router)
+api_router.include_router(portal_voice.router)
 api_router.include_router(patients.router)
 api_router.include_router(registration.router)
 api_router.include_router(staff.router)
