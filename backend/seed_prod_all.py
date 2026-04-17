@@ -114,6 +114,149 @@ async def is_already_seeded(conn: asyncpg.Connection) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# 0. Base data — clinic, admin, main doctor, main patient
+# ---------------------------------------------------------------------------
+async def seed_base_data(conn: asyncpg.Connection):
+    """Create fundamental records that all other seeds depend on."""
+    print("0. Seeding base data (clinic, admin, doctor, patient) ...")
+    from app.core.security import hash_password
+    pw_hash_admin = hash_password("Admin123!")
+    pw_hash_staff = hash_password("Staff123!")
+
+    # --- Clinic ---
+    clinic_exists = await conn.fetchval(
+        "SELECT 1 FROM clinics WHERE id = $1", uuid.UUID(CLINIC_ID)
+    )
+    if not clinic_exists:
+        await conn.execute(
+            """
+            INSERT INTO clinics
+                (id, clinic_id, name, slug, address, phone, email,
+                 working_hours, subscription_plan, is_active,
+                 is_deleted, created_at, updated_at)
+            VALUES
+                ($1, $1, $2, $3, $4, $5, $6,
+                 $7::jsonb, $8::subscriptionplan, true,
+                 false, $9, $9)
+            ON CONFLICT (id) DO NOTHING
+            """,
+            uuid.UUID(CLINIC_ID), "Бишкек Мед Центр", "bishkek-med",
+            "ул. Токтогула 123, Бишкек, Кыргызстан",
+            "+996 312 123456", "info@bishkek-med.kg",
+            json.dumps({"mon": ["08:00", "18:00"], "tue": ["08:00", "18:00"],
+                        "wed": ["08:00", "18:00"], "thu": ["08:00", "18:00"],
+                        "fri": ["08:00", "18:00"], "sat": ["09:00", "14:00"],
+                        "sun": None}),
+            "PRO", now,
+        )
+        print("   -> clinic created")
+    else:
+        print("   -> clinic exists")
+
+    # --- Departments ---
+    departments = [
+        ("d0000001-0000-4000-a000-000000000001", "Терапия", "THER"),
+        ("d0000001-0000-4000-a000-000000000002", "Неврология", "NEUR"),
+        ("d0000001-0000-4000-a000-000000000003", "Скорая помощь", "EMER"),
+        ("d0000001-0000-4000-a000-000000000004", "Аптека", "PHAR"),
+        ("d0000001-0000-4000-a000-000000000005", "Лаборатория", "LAB"),
+    ]
+    dept_added = 0
+    for dept_id, dept_name, dept_code in departments:
+        exists = await conn.fetchval(
+            "SELECT 1 FROM departments WHERE id = $1", uuid.UUID(dept_id)
+        )
+        if not exists:
+            await conn.execute(
+                """
+                INSERT INTO departments (id, clinic_id, name, code, is_deleted, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, false, $5, $5)
+                ON CONFLICT (id) DO NOTHING
+                """,
+                uuid.UUID(dept_id), uuid.UUID(CLINIC_ID), dept_name, dept_code, now,
+            )
+            dept_added += 1
+    print(f"   -> {dept_added} departments added")
+
+    # --- Admin user ---
+    admin_exists = await conn.fetchval(
+        "SELECT 1 FROM users WHERE id = $1", uuid.UUID(ADMIN_ID)
+    )
+    if not admin_exists:
+        await conn.execute(
+            """
+            INSERT INTO users
+                (id, clinic_id, email, hashed_password, first_name, last_name,
+                 role, is_active, is_deleted, created_at, updated_at)
+            VALUES
+                ($1, $2, $3, $4, $5, $6,
+                 $7::userrole, true, false, $8, $8)
+            ON CONFLICT (id) DO NOTHING
+            """,
+            uuid.UUID(ADMIN_ID), uuid.UUID(CLINIC_ID),
+            "admin@medcore.kg", pw_hash_admin,
+            "System", "Admin", "SUPER_ADMIN", now,
+        )
+        print("   -> admin created")
+    else:
+        print("   -> admin exists")
+
+    # --- Main doctor (Бакыт Исаков) ---
+    doctor_exists = await conn.fetchval(
+        "SELECT 1 FROM users WHERE id = $1", uuid.UUID(DOCTOR_ID)
+    )
+    if not doctor_exists:
+        await conn.execute(
+            """
+            INSERT INTO users
+                (id, clinic_id, email, hashed_password, first_name, last_name,
+                 role, specialization, is_active, is_deleted, created_at, updated_at)
+            VALUES
+                ($1, $2, $3, $4, $5, $6,
+                 $7::userrole, $8, true, false, $9, $9)
+            ON CONFLICT (id) DO NOTHING
+            """,
+            uuid.UUID(DOCTOR_ID), uuid.UUID(CLINIC_ID),
+            "doctor.therapist@medcore.kg", pw_hash_staff,
+            "Бакыт", "Исаков", "DOCTOR", "Терапевт", now,
+        )
+        print("   -> doctor created")
+    else:
+        print("   -> doctor exists")
+
+    # --- Main patient (Уметов Асан Бакирович) ---
+    patient_exists = await conn.fetchval(
+        "SELECT 1 FROM patients WHERE id = $1", uuid.UUID(PATIENT_ID)
+    )
+    if not patient_exists:
+        await conn.execute(
+            """
+            INSERT INTO patients
+                (id, clinic_id, first_name, last_name, middle_name,
+                 date_of_birth, gender, passport_number, inn,
+                 address, phone, blood_type,
+                 assigned_doctor_id, registration_source, status,
+                 is_deleted, created_at, updated_at)
+            VALUES
+                ($1, $2, $3, $4, $5,
+                 $6, $7::gender, $8, $9,
+                 $10, $11, $12::bloodtype,
+                 $13, $14::registrationsource, $15::patientstatus,
+                 false, $16, $16)
+            ON CONFLICT (id) DO NOTHING
+            """,
+            uuid.UUID(PATIENT_ID), uuid.UUID(CLINIC_ID),
+            "Асан", "Уметов", "Бакирович",
+            date(1985, 3, 15), "MALE", "AN1234567", "12345678901234",
+            "г. Бишкек, ул. Манаса 55", "+996 555 100000", "A_POS",
+            uuid.UUID(DOCTOR_ID), "WALK_IN", "ACTIVE", now,
+        )
+        print("   -> patient Уметов Асан created")
+    else:
+        print("   -> patient Уметов Асан exists")
+
+
+# ---------------------------------------------------------------------------
 # 1. Additional Users (doctors, nurse, receptionist)
 # ---------------------------------------------------------------------------
 async def seed_users(conn: asyncpg.Connection):
@@ -1330,6 +1473,7 @@ async def main():
         print(f"   Found enums: {[r['typname'] for r in enum_types]}")
         print()
 
+        await seed_base_data(conn)
         await seed_users(conn)
         await seed_patients(conn)
         await seed_medical_cards(conn)

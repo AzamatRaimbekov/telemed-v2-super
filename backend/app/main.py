@@ -29,6 +29,20 @@ async def lifespan(app: FastAPI):
             print(f"Migrations OK")
         else:
             print(f"Migration warning: {result.stderr[:500]}")
+        # Auto-seed mock data (idempotent)
+        seed_scripts = [
+            ("seed_prod_all.py", "Production mock data"),
+            ("seed_catalogs.py", "Catalogs"),
+            ("seed_exercises.py", "Exercises"),
+        ]
+        for script, label in seed_scripts:
+            seed_result = subprocess.run(
+                ["python", script], capture_output=True, text=True, timeout=120
+            )
+            if seed_result.returncode == 0:
+                print(f"Seed [{label}] OK")
+            else:
+                print(f"Seed [{label}] warning: {seed_result.stderr[:300]}")
     start_simulator()
     start_bms_simulator()
     yield

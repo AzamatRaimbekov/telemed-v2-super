@@ -2,6 +2,7 @@
 from __future__ import annotations
 import asyncio
 import uuid
+from sqlalchemy import select
 from app.core.database import async_session_factory
 from app.models.medication import Drug, DrugForm
 from app.models.procedure import Procedure
@@ -58,6 +59,11 @@ LAB_TESTS = [
 
 async def seed():
     async with async_session_factory() as session:
+        # Check if already seeded
+        existing = await session.execute(select(Drug).limit(1))
+        if existing.scalar_one_or_none():
+            print("Catalogs already seeded. Skipping.")
+            return
         # Drugs
         for d in DRUGS:
             session.add(Drug(
