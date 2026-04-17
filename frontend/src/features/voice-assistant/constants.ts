@@ -11,7 +11,7 @@ export const CONFIDENCE_THRESHOLD = 0.6;
 export const MIC_BUTTON_SIZE = 56;
 
 export const DEFAULT_VOICE_SETTINGS: VoiceSettings = {
-  voice_enabled: false,
+  voice_enabled: true,
   wake_word_enabled: false,
   tts_enabled: false,
   language: "ru",

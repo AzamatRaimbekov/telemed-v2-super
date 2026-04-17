@@ -5,7 +5,7 @@ import { useWakeWord } from "../hooks/useWakeWord";
 import { useIntentRouter } from "../hooks/useIntentRouter";
 import { useAIAssistant } from "../hooks/useAIAssistant";
 import { useTextToSpeech } from "../hooks/useTextToSpeech";
-import { getHintsForPage } from "../intents/hints";
+import { getHintsForPage, getIdleHints } from "../intents/hints";
 import { DEFAULT_VOICE_SETTINGS } from "../constants";
 import { getVoiceSettings, updateVoiceSettings } from "../api";
 import { FloatingMic } from "./FloatingMic";
@@ -149,6 +149,22 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
     [currentPage, settings.language],
   );
 
+  const idleHints = useMemo(
+    () => getIdleHints(currentPage, settings.language),
+    [currentPage, settings.language],
+  );
+
+  const [showIdleHints, setShowIdleHints] = useState(false);
+
+  useEffect(() => {
+    if (status !== "idle") {
+      setShowIdleHints(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowIdleHints(true), 2000);
+    return () => clearTimeout(timer);
+  }, [status, currentPage]);
+
   const contextValue = useMemo<VoiceContextValue>(
     () => ({
       status,
@@ -171,10 +187,11 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
       {settings.voice_enabled && (
         <>
           <HintChips
-            hints={hints}
-            visible={status === "listening"}
+            hints={status === "listening" ? hints : idleHints}
+            visible={status === "listening" || showIdleHints}
             size={settings.hint_size}
             onHintClick={handleHintClick}
+            idle={status !== "listening"}
           />
           <SpeechBubble
             transcript={transcript}

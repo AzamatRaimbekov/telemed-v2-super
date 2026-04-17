@@ -1,5 +1,50 @@
 import type { VoiceLanguage } from "../types";
 
+const NAV_HINTS: Record<VoiceLanguage, string[]> = {
+  ru: [
+    "Открой главную",
+    "Перейди в лечение",
+    "Покажи расписание",
+    "Мед. карта",
+    "Мои анализы",
+    "Счета и оплата",
+    "Упражнения",
+    "Записи к врачу",
+    "История визитов",
+    "Сообщения",
+    "Динамика",
+    "Профиль",
+  ],
+  ky: [
+    "Башкы бетти ач",
+    "Дарылоого өт",
+    "Расписание көрсөт",
+    "Мед. карта",
+    "Анализдар",
+    "Эсептер",
+    "Көнүгүүлөр",
+    "Врачка жазылуу",
+    "Визиттер тарыхы",
+    "Билдирүүлөр",
+    "Динамика",
+    "Профиль",
+  ],
+  en: [
+    "Open dashboard",
+    "Go to treatment",
+    "Show schedule",
+    "Medical card",
+    "My results",
+    "Billing",
+    "Exercises",
+    "Appointments",
+    "Visit history",
+    "Messages",
+    "Recovery",
+    "Profile",
+  ],
+};
+
 const PAGE_HINTS: Record<string, Record<VoiceLanguage, string[]>> = {
   dashboard: {
     ru: ["Расписание", "Мои анализы", "Ближайший приём"],
@@ -67,4 +112,19 @@ export function getHintsForPage(page: string, language: VoiceLanguage): string[]
   const pageKey = page.includes("/") ? page.split("/").pop() || "dashboard" : page;
   const hints = PAGE_HINTS[pageKey] || PAGE_HINTS.dashboard;
   return hints[language] || hints.ru;
+}
+
+export function getNavHints(language: VoiceLanguage): string[] {
+  return NAV_HINTS[language] || NAV_HINTS.ru;
+}
+
+export function getIdleHints(page: string, language: VoiceLanguage): string[] {
+  const pageHints = getHintsForPage(page, language);
+  const navList = NAV_HINTS[language] || NAV_HINTS.ru;
+  const pageKey = page.includes("/") ? page.split("/").pop() || "" : page;
+  const filteredNav = navList.filter(
+    (h) => !h.toLowerCase().includes(pageKey.toLowerCase()),
+  );
+  const randomNav = filteredNav.sort(() => Math.random() - 0.5).slice(0, 2);
+  return [...pageHints.slice(0, 2), ...randomNav];
 }
