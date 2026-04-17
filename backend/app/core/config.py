@@ -32,6 +32,13 @@ class Settings(BaseSettings):
     # OpenAI (Whisper STT)
     OPENAI_API_KEY: str = ""
 
+    # Voice Assistant AI providers
+    GEMINI_API_KEY: str = ""
+    DEEPSEEK_API_KEY: str = ""
+    WHISPER_MODEL_SIZE: str = "base"  # tiny, base, small, medium, large
+    VOICE_AI_TIMEOUT: int = 5  # seconds
+    VOICE_RATE_LIMIT: int = 30  # requests per minute per patient
+
     # SMTP Email
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587
