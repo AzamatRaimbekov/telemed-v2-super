@@ -10,6 +10,7 @@ from app.core.exceptions import APIError, api_error_handler
 from app.core.logging_config import setup_logging
 from app.core.middleware import RequestLoggingMiddleware
 from app.services.monitoring_simulator import start_simulator, stop_simulator
+from app.services.bms_simulator import start_bms_simulator, stop_bms_simulator
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,7 +30,9 @@ async def lifespan(app: FastAPI):
         else:
             print(f"Migration warning: {result.stderr[:500]}")
     start_simulator()
+    start_bms_simulator()
     yield
+    stop_bms_simulator()
     stop_simulator()
 
 app = FastAPI(title=settings.APP_NAME, version="1.0.0", docs_url="/docs", openapi_url="/openapi.json", lifespan=lifespan)
