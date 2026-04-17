@@ -62,6 +62,7 @@ class Patient(TenantMixin, Base):
     portal_password_hash: Mapped[Optional[str]] = mapped_column(String(255))
     last_portal_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     notification_preferences: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
+    voice_settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True, default=None)
     user = relationship("User", foreign_keys=[user_id], lazy="selectin")
     assigned_doctor = relationship("User", foreign_keys=[assigned_doctor_id], lazy="selectin")
     assigned_nurse = relationship("User", foreign_keys=[assigned_nurse_id], lazy="selectin")
