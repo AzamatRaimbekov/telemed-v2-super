@@ -1,1 +1,3 @@
-# Voice assistant service module
+from .service import VoiceAssistantService
+
+__all__ = ["VoiceAssistantService"]
