@@ -34,6 +34,11 @@ async def lifespan(app: FastAPI):
             ("seed_prod_all.py", "Production mock data"),
             ("seed_catalogs.py", "Catalogs"),
             ("seed_exercises.py", "Exercises"),
+            ("seed_rooms.py", "Rooms & beds"),
+            ("seed_rbac.py", "RBAC permissions"),
+            ("seed_monitoring.py", "Monitoring sensors & data"),
+            ("seed_pharmacy.py", "Pharmacy"),
+            ("seed_bms.py", "BMS building management"),
         ]
         for script, label in seed_scripts:
             seed_result = subprocess.run(
