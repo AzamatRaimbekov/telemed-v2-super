@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import structlog
-from fastapi import APIRouter, Depends, UploadFile, File
+from collections import defaultdict
+from time import time
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
+from app.core.config import settings
 from app.core.database import get_session
 from app.api.v1.routes.portal import get_portal_patient
 from app.models.patient import Patient
@@ -27,6 +30,19 @@ router = APIRouter(prefix="/portal/voice", tags=["portal-voice"])
 PortalPatient = Annotated[Patient, Depends(get_portal_patient)]
 DBSession = Annotated[AsyncSession, Depends(get_session)]
 
+# Simple in-memory rate limiter (single-worker only)
+_rate_limits: dict[str, list[float]] = defaultdict(list)
+
+
+def check_rate_limit(patient_id: str, limit: int) -> bool:
+    now = time()
+    window = [t for t in _rate_limits[patient_id] if now - t < 60]
+    _rate_limits[patient_id] = window
+    if len(window) >= limit:
+        return False
+    _rate_limits[patient_id].append(now)
+    return True
+
 
 @router.post("/process", response_model=VoiceProcessResponse)
 async def process_voice(
@@ -35,6 +51,8 @@ async def process_voice(
     session: DBSession,
 ):
     """Process voice text and return AI response."""
+    if not check_rate_limit(str(patient.id), settings.VOICE_RATE_LIMIT):
+        raise HTTPException(status_code=429, detail="Слишком много запросов, попробуйте позже")
     service = VoiceAssistantService()
     return await service.process(data, patient.id, session)
 
@@ -95,5 +113,5 @@ async def update_voice_settings(
     """Update patient's voice assistant settings."""
     patient.voice_settings = data.model_dump()
     session.add(patient)
-    await session.flush()
+    await session.commit()
     return data

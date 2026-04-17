@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 import json
 import structlog
@@ -82,6 +83,17 @@ AVAILABLE_FUNCTIONS = [
                 "text": {"type": "string", "description": "Текст сообщения"},
             },
             "required": ["doctor_id", "text"],
+        },
+    },
+    {
+        "name": "pay_bill",
+        "description": "Инициировать оплату счёта",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "bill_id": {"type": "string", "description": "UUID счёта"},
+            },
+            "required": ["bill_id"],
         },
     },
 ]
@@ -228,6 +240,7 @@ class VoiceAssistantService:
             "book_appointment": f"Записать к врачу на {args.get('date', '')}",
             "cancel_appointment": "Отменить запись к врачу",
             "send_message": "Отправить сообщение врачу",
+            "pay_bill": "Оплатить счёт",
         }
 
         store_pending_action(action_id, name, args, patient_id)
