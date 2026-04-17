@@ -22,12 +22,14 @@ import { Route as AuthenticatedPatientsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMedicineSettingsRouteImport } from './routes/_authenticated/medicine-settings'
 import { Route as AuthenticatedLaboratoryRouteImport } from './routes/_authenticated/laboratory'
+import { Route as AuthenticatedInfrastructureRouteImport } from './routes/_authenticated/infrastructure'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
+import { Route as AuthenticatedInfrastructureIndexRouteImport } from './routes/_authenticated/infrastructure/index'
 import { Route as PortalPortalTreatmentRouteImport } from './routes/portal/_portal/treatment'
 import { Route as PortalPortalScheduleRouteImport } from './routes/portal/_portal/schedule'
 import { Route as PortalPortalResultsRouteImport } from './routes/portal/_portal/results'
@@ -46,6 +48,8 @@ import { Route as AuthenticatedStaffNewRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedStaffStaffIdRouteImport } from './routes/_authenticated/staff.$staffId'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients.new'
 import { Route as AuthenticatedPatientsPatientIdRouteImport } from './routes/_authenticated/patients.$patientId'
+import { Route as AuthenticatedInfrastructureMapRouteImport } from './routes/_authenticated/infrastructure/map'
+import { Route as AuthenticatedInfrastructureDashboardRouteImport } from './routes/_authenticated/infrastructure/dashboard'
 import { Route as AuthenticatedPatientsPatientIdIndexRouteImport } from './routes/_authenticated/patients.$patientId/index'
 import { Route as AuthenticatedPatientsPatientIdTreatmentRouteImport } from './routes/_authenticated/patients.$patientId/treatment'
 import { Route as AuthenticatedPatientsPatientIdStrokeRouteImport } from './routes/_authenticated/patients.$patientId/stroke'
@@ -132,6 +136,12 @@ const AuthenticatedLaboratoryRoute = AuthenticatedLaboratoryRouteImport.update({
   path: '/laboratory',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedInfrastructureRoute =
+  AuthenticatedInfrastructureRouteImport.update({
+    id: '/infrastructure',
+    path: '/infrastructure',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -162,6 +172,12 @@ const AuthenticatedPatientsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedPatientsRoute,
+  } as any)
+const AuthenticatedInfrastructureIndexRoute =
+  AuthenticatedInfrastructureIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedInfrastructureRoute,
   } as any)
 const PortalPortalTreatmentRoute = PortalPortalTreatmentRouteImport.update({
   id: '/treatment',
@@ -258,6 +274,18 @@ const AuthenticatedPatientsPatientIdRoute =
     id: '/$patientId',
     path: '/$patientId',
     getParentRoute: () => AuthenticatedPatientsRoute,
+  } as any)
+const AuthenticatedInfrastructureMapRoute =
+  AuthenticatedInfrastructureMapRouteImport.update({
+    id: '/map',
+    path: '/map',
+    getParentRoute: () => AuthenticatedInfrastructureRoute,
+  } as any)
+const AuthenticatedInfrastructureDashboardRoute =
+  AuthenticatedInfrastructureDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedInfrastructureRoute,
   } as any)
 const AuthenticatedPatientsPatientIdIndexRoute =
   AuthenticatedPatientsPatientIdIndexRouteImport.update({
@@ -375,6 +403,7 @@ export interface FileRoutesByFullPath {
   '/audit': typeof AuthenticatedAuditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/infrastructure': typeof AuthenticatedInfrastructureRouteWithChildren
   '/laboratory': typeof AuthenticatedLaboratoryRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -385,6 +414,8 @@ export interface FileRoutesByFullPath {
   '/telemedicine': typeof AuthenticatedTelemedicineRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
+  '/infrastructure/dashboard': typeof AuthenticatedInfrastructureDashboardRoute
+  '/infrastructure/map': typeof AuthenticatedInfrastructureMapRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRouteWithChildren
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/staff/$staffId': typeof AuthenticatedStaffStaffIdRoute
@@ -403,6 +434,7 @@ export interface FileRoutesByFullPath {
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
+  '/infrastructure/': typeof AuthenticatedInfrastructureIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/staff/': typeof AuthenticatedStaffIndexRoute
   '/patients/$patientId/ai': typeof AuthenticatedPatientsPatientIdAiRoute
@@ -439,6 +471,8 @@ export interface FileRoutesByTo {
   '/telemedicine': typeof AuthenticatedTelemedicineRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
+  '/infrastructure/dashboard': typeof AuthenticatedInfrastructureDashboardRoute
+  '/infrastructure/map': typeof AuthenticatedInfrastructureMapRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/staff/$staffId': typeof AuthenticatedStaffStaffIdRoute
   '/staff/new': typeof AuthenticatedStaffNewRoute
@@ -456,6 +490,7 @@ export interface FileRoutesByTo {
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
+  '/infrastructure': typeof AuthenticatedInfrastructureIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/staff': typeof AuthenticatedStaffIndexRoute
   '/patients/$patientId/ai': typeof AuthenticatedPatientsPatientIdAiRoute
@@ -485,6 +520,7 @@ export interface FileRoutesById {
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/infrastructure': typeof AuthenticatedInfrastructureRouteWithChildren
   '/_authenticated/laboratory': typeof AuthenticatedLaboratoryRoute
   '/_authenticated/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -495,6 +531,8 @@ export interface FileRoutesById {
   '/_authenticated/telemedicine': typeof AuthenticatedTelemedicineRoute
   '/portal/_portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
+  '/_authenticated/infrastructure/dashboard': typeof AuthenticatedInfrastructureDashboardRoute
+  '/_authenticated/infrastructure/map': typeof AuthenticatedInfrastructureMapRoute
   '/_authenticated/patients/$patientId': typeof AuthenticatedPatientsPatientIdRouteWithChildren
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
   '/_authenticated/staff/$staffId': typeof AuthenticatedStaffStaffIdRoute
@@ -513,6 +551,7 @@ export interface FileRoutesById {
   '/portal/_portal/results': typeof PortalPortalResultsRoute
   '/portal/_portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/_portal/treatment': typeof PortalPortalTreatmentRoute
+  '/_authenticated/infrastructure/': typeof AuthenticatedInfrastructureIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/staff/': typeof AuthenticatedStaffIndexRoute
   '/_authenticated/patients/$patientId/ai': typeof AuthenticatedPatientsPatientIdAiRoute
@@ -543,6 +582,7 @@ export interface FileRouteTypes {
     | '/audit'
     | '/dashboard'
     | '/finance'
+    | '/infrastructure'
     | '/laboratory'
     | '/medicine-settings'
     | '/notifications'
@@ -553,6 +593,8 @@ export interface FileRouteTypes {
     | '/telemedicine'
     | '/portal'
     | '/portal/login'
+    | '/infrastructure/dashboard'
+    | '/infrastructure/map'
     | '/patients/$patientId'
     | '/patients/new'
     | '/staff/$staffId'
@@ -571,6 +613,7 @@ export interface FileRouteTypes {
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
+    | '/infrastructure/'
     | '/patients/'
     | '/staff/'
     | '/patients/$patientId/ai'
@@ -607,6 +650,8 @@ export interface FileRouteTypes {
     | '/telemedicine'
     | '/portal'
     | '/portal/login'
+    | '/infrastructure/dashboard'
+    | '/infrastructure/map'
     | '/patients/new'
     | '/staff/$staffId'
     | '/staff/new'
@@ -624,6 +669,7 @@ export interface FileRouteTypes {
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
+    | '/infrastructure'
     | '/patients'
     | '/staff'
     | '/patients/$patientId/ai'
@@ -652,6 +698,7 @@ export interface FileRouteTypes {
     | '/_authenticated/audit'
     | '/_authenticated/dashboard'
     | '/_authenticated/finance'
+    | '/_authenticated/infrastructure'
     | '/_authenticated/laboratory'
     | '/_authenticated/medicine-settings'
     | '/_authenticated/notifications'
@@ -662,6 +709,8 @@ export interface FileRouteTypes {
     | '/_authenticated/telemedicine'
     | '/portal/_portal'
     | '/portal/login'
+    | '/_authenticated/infrastructure/dashboard'
+    | '/_authenticated/infrastructure/map'
     | '/_authenticated/patients/$patientId'
     | '/_authenticated/patients/new'
     | '/_authenticated/staff/$staffId'
@@ -680,6 +729,7 @@ export interface FileRouteTypes {
     | '/portal/_portal/results'
     | '/portal/_portal/schedule'
     | '/portal/_portal/treatment'
+    | '/_authenticated/infrastructure/'
     | '/_authenticated/patients/'
     | '/_authenticated/staff/'
     | '/_authenticated/patients/$patientId/ai'
@@ -803,6 +853,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLaboratoryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/infrastructure': {
+      id: '/_authenticated/infrastructure'
+      path: '/infrastructure'
+      fullPath: '/infrastructure'
+      preLoaderRoute: typeof AuthenticatedInfrastructureRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/finance': {
       id: '/_authenticated/finance'
       path: '/finance'
@@ -844,6 +901,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/patients/'
       preLoaderRoute: typeof AuthenticatedPatientsIndexRouteImport
       parentRoute: typeof AuthenticatedPatientsRoute
+    }
+    '/_authenticated/infrastructure/': {
+      id: '/_authenticated/infrastructure/'
+      path: '/'
+      fullPath: '/infrastructure/'
+      preLoaderRoute: typeof AuthenticatedInfrastructureIndexRouteImport
+      parentRoute: typeof AuthenticatedInfrastructureRoute
     }
     '/portal/_portal/treatment': {
       id: '/portal/_portal/treatment'
@@ -970,6 +1034,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/patients/$patientId'
       preLoaderRoute: typeof AuthenticatedPatientsPatientIdRouteImport
       parentRoute: typeof AuthenticatedPatientsRoute
+    }
+    '/_authenticated/infrastructure/map': {
+      id: '/_authenticated/infrastructure/map'
+      path: '/map'
+      fullPath: '/infrastructure/map'
+      preLoaderRoute: typeof AuthenticatedInfrastructureMapRouteImport
+      parentRoute: typeof AuthenticatedInfrastructureRoute
+    }
+    '/_authenticated/infrastructure/dashboard': {
+      id: '/_authenticated/infrastructure/dashboard'
+      path: '/dashboard'
+      fullPath: '/infrastructure/dashboard'
+      preLoaderRoute: typeof AuthenticatedInfrastructureDashboardRouteImport
+      parentRoute: typeof AuthenticatedInfrastructureRoute
     }
     '/_authenticated/patients/$patientId/': {
       id: '/_authenticated/patients/$patientId/'
@@ -1100,6 +1178,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedInfrastructureRouteChildren {
+  AuthenticatedInfrastructureDashboardRoute: typeof AuthenticatedInfrastructureDashboardRoute
+  AuthenticatedInfrastructureMapRoute: typeof AuthenticatedInfrastructureMapRoute
+  AuthenticatedInfrastructureIndexRoute: typeof AuthenticatedInfrastructureIndexRoute
+}
+
+const AuthenticatedInfrastructureRouteChildren: AuthenticatedInfrastructureRouteChildren =
+  {
+    AuthenticatedInfrastructureDashboardRoute:
+      AuthenticatedInfrastructureDashboardRoute,
+    AuthenticatedInfrastructureMapRoute: AuthenticatedInfrastructureMapRoute,
+    AuthenticatedInfrastructureIndexRoute:
+      AuthenticatedInfrastructureIndexRoute,
+  }
+
+const AuthenticatedInfrastructureRouteWithChildren =
+  AuthenticatedInfrastructureRoute._addFileChildren(
+    AuthenticatedInfrastructureRouteChildren,
+  )
+
 interface AuthenticatedPatientsPatientIdHistoryRouteChildren {
   AuthenticatedPatientsPatientIdHistoryEntryIdRoute: typeof AuthenticatedPatientsPatientIdHistoryEntryIdRoute
   AuthenticatedPatientsPatientIdHistoryNewRoute: typeof AuthenticatedPatientsPatientIdHistoryNewRoute
@@ -1216,6 +1314,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedInfrastructureRoute: typeof AuthenticatedInfrastructureRouteWithChildren
   AuthenticatedLaboratoryRoute: typeof AuthenticatedLaboratoryRoute
   AuthenticatedMedicineSettingsRoute: typeof AuthenticatedMedicineSettingsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -1231,6 +1330,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedInfrastructureRoute:
+    AuthenticatedInfrastructureRouteWithChildren,
   AuthenticatedLaboratoryRoute: AuthenticatedLaboratoryRoute,
   AuthenticatedMedicineSettingsRoute: AuthenticatedMedicineSettingsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
