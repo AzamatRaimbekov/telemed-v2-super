@@ -28,6 +28,7 @@ from app.models.diagnosis import Diagnosis
 from app.models.document import Document
 from app.models.monitoring import RoomCamera, SensorDevice, SensorReading, MonitoringAlert, NurseCall
 from app.models.queue import QueueEntry, QueueStatus
+from app.models.document_template import DocumentTemplate, TemplateCategory
 from app.models.bms import (
     Building, Floor, Zone, BmsRoom, BmsSensor, BmsSensorReading,
     Equipment, EquipmentCommand, BmsAlert, AutomationRule, AutomationLog,
@@ -60,6 +61,7 @@ __all__ = [
     "Document",
     "RoomCamera", "SensorDevice", "SensorReading", "MonitoringAlert", "NurseCall",
     "QueueEntry", "QueueStatus",
+    "DocumentTemplate", "TemplateCategory",
     "Building", "Floor", "Zone", "BmsRoom", "BmsSensor", "BmsSensorReading",
     "Equipment", "EquipmentCommand", "BmsAlert", "AutomationRule", "AutomationLog",
 ]
