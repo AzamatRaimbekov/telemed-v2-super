@@ -12,6 +12,7 @@ from app.models.staff import StaffSchedule, Shift, Attendance
 from app.models.billing import Invoice, InvoiceItem, Payment
 from app.models.appointment import Appointment
 from app.models.notification import Notification
+from app.models.notification_log import NotificationLog, NotificationChannel, NotificationStatus
 from app.models.stroke import StrokeAssessment, RehabGoal, RehabProgress
 from app.models.facility import Department, Room, Bed, BedAssignment
 from app.models.telemedicine import TelemedicineSession, Message
@@ -44,6 +45,7 @@ __all__ = [
     "StaffSchedule", "Shift", "Attendance",
     "Invoice", "InvoiceItem", "Payment",
     "Appointment", "Notification",
+    "NotificationLog", "NotificationChannel", "NotificationStatus",
     "StrokeAssessment", "RehabGoal", "RehabProgress",
     "Department", "Room", "Bed", "BedAssignment",
     "TelemedicineSession", "Message",

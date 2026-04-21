@@ -39,6 +39,7 @@ class User(TenantMixin, Base):
     department_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("departments.id", use_alter=True))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_login_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    telegram_chat_id: Mapped[Optional[str]] = mapped_column(String(100))
 
 class Role(TenantMixin, Base):
     __tablename__ = "roles"

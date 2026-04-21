@@ -48,6 +48,17 @@ class Settings(BaseSettings):
     SMTP_FROM_NAME: str = "MedCore KG"
     SMTP_USE_TLS: bool = True
 
+    # SMS Gateway (e.g. Nikita SMS — Kyrgyzstan)
+    SMS_API_KEY: str = ""
+    SMS_API_URL: str = ""
+
+    # WhatsApp Business Cloud API
+    WHATSAPP_API_TOKEN: str = ""
+    WHATSAPP_PHONE_NUMBER_ID: str = ""
+
+    # Telegram Bot API
+    TELEGRAM_BOT_TOKEN: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         v = self.CORS_ORIGINS
