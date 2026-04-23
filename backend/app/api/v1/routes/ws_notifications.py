@@ -1,6 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from app.services.ws_manager import ws_manager
-import jwt
+from jose import jwt
 from app.core.config import settings
 
 router = APIRouter(tags=["WebSocket Notifications"])
