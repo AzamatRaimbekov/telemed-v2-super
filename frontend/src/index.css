@@ -60,6 +60,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     font-family: var(--font-display);
     @apply bg-background text-foreground antialiased;
@@ -227,3 +231,5 @@
 .dot-pulse {
   animation: dot-pulse 2s ease-in-out infinite;
 }
+
+@import "./styles/mobile.css";

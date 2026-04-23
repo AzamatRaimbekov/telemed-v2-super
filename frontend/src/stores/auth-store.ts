@@ -40,7 +40,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true });
       const { data } = await apiClient.get("/auth/me");
-      set({ user: data, isAuthenticated: true });
+      // Fetch effective permissions for the user
+      let permissions: string[] = [];
+      try {
+        const permResp = await apiClient.get(`/staff/${data.id}/permissions`);
+        permissions = permResp.data?.permissions || permResp.data?.effective_permissions || [];
+      } catch {
+        // If permissions endpoint fails (e.g. patient role), use role-based defaults
+        if (data.role === "SUPER_ADMIN" || data.role === "CLINIC_ADMIN") {
+          permissions = ["*"]; // full access
+        }
+      }
+      set({ user: { ...data, permissions }, isAuthenticated: true });
     } catch {
       set({ user: null, isAuthenticated: false });
       localStorage.removeItem("access_token");

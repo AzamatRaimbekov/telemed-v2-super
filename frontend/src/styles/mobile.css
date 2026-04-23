@@ -1,0 +1,60 @@
+/* Mobile responsive overrides for MedCore KG */
+
+/* Sidebar — hide on mobile, show hamburger */
+@media (max-width: 768px) {
+  /* Sidebar collapses to hidden */
+  aside.fixed {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  aside.fixed.mobile-open {
+    transform: translateX(0);
+    z-index: 60;
+  }
+
+  /* Main content full width */
+  .ml-\[260px\], .ml-\[72px\] {
+    margin-left: 0 !important;
+  }
+
+  /* Stack grids */
+  .grid-cols-2, .md\:grid-cols-2 { grid-template-columns: 1fr !important; }
+  .grid-cols-3, .md\:grid-cols-3 { grid-template-columns: 1fr !important; }
+  .grid-cols-4, .lg\:grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Reduce paddings */
+  .p-6, .lg\:p-6, .xl\:p-8 { padding: 1rem !important; }
+  .px-6, .lg\:px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+  /* Tables scroll horizontally */
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+
+  /* Smaller text on mobile */
+  .text-4xl { font-size: 1.5rem !important; }
+  .text-3xl { font-size: 1.25rem !important; }
+  .text-2xl { font-size: 1.125rem !important; }
+
+  /* Quick actions button smaller */
+  .fixed.bottom-6.right-6 {
+    bottom: 1rem !important;
+    right: 1rem !important;
+  }
+
+  /* Command palette wider */
+  .max-w-lg { max-width: calc(100vw - 2rem) !important; }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .grid-cols-4, .lg\:grid-cols-4 { grid-template-columns: 1fr !important; }
+  .flex-row { flex-direction: column !important; }
+  .gap-6 { gap: 1rem !important; }
+}
+
+/* Print styles */
+@media print {
+  nav, aside, header, .fixed, button { display: none !important; }
+  main { margin: 0 !important; padding: 0 !important; }
+  .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl { box-shadow: none !important; }
+  .border { border-color: #ddd !important; }
+}

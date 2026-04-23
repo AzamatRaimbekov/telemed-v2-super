@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedCore KG — Оффлайн</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F6FAF9;
+      color: #1a1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .container {
+      text-align: center;
+      max-width: 400px;
+    }
+    .logo {
+      width: 72px;
+      height: 72px;
+      background: #7E78D2;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1a1a2e;
+    }
+    p {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .retry-btn {
+      display: inline-block;
+      padding: 12px 32px;
+      background: #7E78D2;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .retry-btn:hover {
+      background: #6b65c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">M</div>
+    <h1>Нет подключения к интернету</h1>
+    <p>Проверьте соединение и попробуйте снова.</p>
+    <button class="retry-btn" onclick="window.location.reload()">Повторить</button>
+  </div>
+</body>
+</html>

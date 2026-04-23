@@ -1,0 +1,313 @@
+[    2139ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:21608
+[    2275ms] [WARNING] Please ensure that the container has a non-static position, like 'relative', 'fixed', or 'absolute' to ensure scroll offset is calculated correctly. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:695
+[    5757ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[    5759ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[    5760ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[    5760ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[    5763ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[    5781ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[    2651ms] [ERROR] The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:945:40)
+    at section
+    at LandingHero (http://localhost:3000/src/features/landing/components/LandingHero.tsx:38:32)
+    at main
+    at div
+    at LandingPage
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at Suspense
+    at OutletImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7290:18)
+    at component
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at CatchBoundaryImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5514:5)
+    at CatchBoundary (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5499:32)
+    at MatchesInner (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7438:18)
+    at Suspense
+    at Matches (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7428:18)
+    at RouterContextProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7539:34)
+    at RouterProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7555:27)
+    at QueryClientProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-query.js?v=a8d50021:3194:3)
+    at App (http://localhost:3000/src/App.tsx:29:16)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:14079
+[    2652ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7448
+[    2652ms] [WARNING] Warning: Cannot read properties of undefined (reading 'S') @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7449
+[    2652ms] [ERROR] The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:945:40)
+    at section
+    at SectionWrapper (http://localhost:3000/src/features/landing/components/SectionWrapper.tsx:20:34)
+    at LandingPortal
+    at main
+    at div
+    at LandingPage
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at Suspense
+    at OutletImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7290:18)
+    at component
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at CatchBoundaryImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5514:5)
+    at CatchBoundary (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5499:32)
+    at MatchesInner (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7438:18)
+    at Suspense
+    at Matches (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7428:18)
+    at RouterContextProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7539:34)
+    at RouterProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7555:27)
+    at QueryClientProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-query.js?v=a8d50021:3194:3)
+    at App (http://localhost:3000/src/App.tsx:29:16)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:14079
+[    2652ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7448
+[    2652ms] [WARNING] Warning: Cannot read properties of undefined (reading 'S') @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7449
+[    2652ms] [ERROR] The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:945:40)
+    at section
+    at SectionWrapper (http://localhost:3000/src/features/landing/components/SectionWrapper.tsx:20:34)
+    at LandingMonitoring
+    at main
+    at div
+    at LandingPage
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at Suspense
+    at OutletImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7290:18)
+    at component
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at CatchBoundaryImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5514:5)
+    at CatchBoundary (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5499:32)
+    at MatchesInner (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7438:18)
+    at Suspense
+    at Matches (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7428:18)
+    at RouterContextProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7539:34)
+    at RouterProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7555:27)
+    at QueryClientProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-query.js?v=a8d50021:3194:3)
+    at App (http://localhost:3000/src/App.tsx:29:16)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:14079
+[    2652ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7448
+[    2652ms] [WARNING] Warning: Cannot read properties of undefined (reading 'S') @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7449
+[  396418ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:21608
+[  396633ms] [WARNING] Please ensure that the container has a non-static position, like 'relative', 'fixed', or 'absolute' to ensure scroll offset is calculated correctly. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:695
+[  396997ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[  396998ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[  396998ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[  396999ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[  396999ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[  396999ms] TypeError: Cannot read properties of undefined (reading 'S')
+    at Tt.exports (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:7932:528)
+    at createReconciler (http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9116:23)
+    at http://localhost:3000/node_modules/.vite/deps/chunk-Q3WJYZ7D.js?v=0ebf3f3e:9328:18
+[  396702ms] [ERROR] The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:945:40)
+    at section
+    at LandingHero (http://localhost:3000/src/features/landing/components/LandingHero.tsx:38:32)
+    at main
+    at div
+    at LandingPage
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at Suspense
+    at OutletImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7290:18)
+    at component
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at CatchBoundaryImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5514:5)
+    at CatchBoundary (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5499:32)
+    at MatchesInner (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7438:18)
+    at Suspense
+    at Matches (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7428:18)
+    at RouterContextProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7539:34)
+    at RouterProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7555:27)
+    at QueryClientProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-query.js?v=a8d50021:3194:3)
+    at App (http://localhost:3000/src/App.tsx:29:16)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:14079
+[  396702ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7448
+[  396702ms] [WARNING] Warning: Cannot read properties of undefined (reading 'S') @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7449
+[  396702ms] [ERROR] The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:945:40)
+    at section
+    at SectionWrapper (http://localhost:3000/src/features/landing/components/SectionWrapper.tsx:20:34)
+    at LandingPortal
+    at main
+    at div
+    at LandingPage
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at Suspense
+    at OutletImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7290:18)
+    at component
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at CatchBoundaryImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5514:5)
+    at CatchBoundary (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5499:32)
+    at MatchesInner (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7438:18)
+    at Suspense
+    at Matches (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7428:18)
+    at RouterContextProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7539:34)
+    at RouterProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7555:27)
+    at QueryClientProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-query.js?v=a8d50021:3194:3)
+    at App (http://localhost:3000/src/App.tsx:29:16)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:14079
+[  396702ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7448
+[  396702ms] [WARNING] Warning: Cannot read properties of undefined (reading 'S') @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7449
+[  396702ms] [ERROR] The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=570a9407:945:40)
+    at section
+    at SectionWrapper (http://localhost:3000/src/features/landing/components/SectionWrapper.tsx:20:34)
+    at LandingMonitoring
+    at main
+    at div
+    at LandingPage
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at Suspense
+    at OutletImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7290:18)
+    at component
+    at MatchInnerImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7163:59)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at SafeFragment (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7014:87)
+    at MatchView (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7101:22)
+    at MatchImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7049:49)
+    at CatchBoundaryImpl (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5514:5)
+    at CatchBoundary (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:5499:32)
+    at MatchesInner (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7438:18)
+    at Suspense
+    at Matches (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7428:18)
+    at RouterContextProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7539:34)
+    at RouterProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7555:27)
+    at QueryClientProvider (http://localhost:3000/node_modules/.vite/deps/@tanstack_react-query.js?v=a8d50021:3194:3)
+    at App (http://localhost:3000/src/App.tsx:29:16)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundaryImpl. @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=0ebf3f3e:14079
+[  396702ms] [WARNING] Warning: The following error wasn't caught by any route! At the very least, consider setting an 'errorComponent' in your RootRoute! @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7448
+[  396702ms] [WARNING] Warning: Cannot read properties of undefined (reading 'S') @ http://localhost:3000/node_modules/.vite/deps/@tanstack_react-router.js?v=8ab0b509:7449
+[  400166ms] [ERROR] WebSocket connection to 'ws://localhost:3000/?token=V5_Zmw_VnoY9' failed:  @ http://localhost:3000/@vite/client:801
+[  400170ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:3000/@vite/client:963
+[  401404ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034
+[  402408ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034
+[  403413ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034
+[  404417ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034
+[  405421ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034
+[  406425ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034
+[  407437ms] [ERROR] WebSocket connection to 'ws://localhost:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/@vite/client:1034

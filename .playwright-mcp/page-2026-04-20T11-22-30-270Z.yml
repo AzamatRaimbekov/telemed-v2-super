@@ -1,0 +1,376 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e5]:
+        - link "M MedCoreKG" [ref=e6] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e7]: M
+          - generic [ref=e8]: MedCoreKG
+        - generic [ref=e9]:
+          - link "Возможности" [ref=e10] [cursor=pointer]:
+            - /url: "#pain-solution"
+          - link "Модули" [ref=e11] [cursor=pointer]:
+            - /url: "#modules"
+          - link "Безопасность" [ref=e12] [cursor=pointer]:
+            - /url: "#security"
+          - link "Контакты" [ref=e13] [cursor=pointer]:
+            - /url: "#cta"
+        - generic [ref=e14]:
+          - link "Войти" [ref=e15] [cursor=pointer]:
+            - /url: /login
+          - link "Заказать демо" [ref=e16] [cursor=pointer]:
+            - /url: "#cta"
+    - main [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e20]: Единая платформа для клиник
+        - heading "Вся клиника в одном экране" [level=1] [ref=e21]
+        - paragraph [ref=e22]: EHR, аптека, лаборатория, биллинг, мониторинг, телемедицина, AI — 16 модулей в одной системе
+        - generic [ref=e23]:
+          - link "Попробовать бесплатно" [ref=e24] [cursor=pointer]:
+            - /url: "#cta"
+          - link "Смотреть демо ▶" [ref=e25] [cursor=pointer]:
+            - /url: "#demo"
+      - generic [ref=e30]:
+        - heading "Знакомые проблемы?" [level=2] [ref=e31]
+        - paragraph [ref=e32]: Мы решаем их каждый день
+        - generic [ref=e33]:
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e37]:
+                - img [ref=e39]
+                - generic [ref=e42]: Проблема
+              - paragraph [ref=e43]: Медсёстры тратят часы на бумажные отчёты
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - img [ref=e47]
+                - generic [ref=e49]: Решение
+              - paragraph [ref=e50]: Электронные медкарты заполняются за минуты
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - img [ref=e56]
+                - generic [ref=e59]: Проблема
+              - paragraph [ref=e60]: Пациенты уходят — нет удобного сервиса
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - img [ref=e64]
+                - generic [ref=e66]: Решение
+              - paragraph [ref=e67]: Личный портал с голосовым ассистентом
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - generic [ref=e71]:
+                - img [ref=e73]
+                - generic [ref=e76]: Проблема
+              - paragraph [ref=e77]: 10 программ, данные не связаны между собой
+            - generic [ref=e78]:
+              - generic [ref=e79]:
+                - img [ref=e81]
+                - generic [ref=e83]: Решение
+              - paragraph [ref=e84]: Единая платформа — всё в одном окне
+          - generic [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - img [ref=e90]
+                - generic [ref=e93]: Проблема
+              - paragraph [ref=e94]: Нет контроля за оборудованием и зданием
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - img [ref=e98]
+                - generic [ref=e100]: Решение
+              - paragraph [ref=e101]: IoT мониторинг + автоматизация BMS
+      - generic [ref=e103]:
+        - heading "16 модулей. Одна подписка." [level=2] [ref=e104]
+        - paragraph [ref=e105]: Каждый работает отдельно и вместе с остальными
+        - generic [ref=e106]:
+          - generic [ref=e109]: Медицина
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - img [ref=e113]
+              - heading "Электронные медкарты" [level=3] [ref=e116]
+              - paragraph [ref=e117]: Карточки пациентов, визиты, диагнозы МКБ-10
+            - generic [ref=e118]:
+              - img [ref=e120]
+              - heading "Фармация" [level=3] [ref=e123]
+              - paragraph [ref=e124]: Аптека, рецепты, склад, поставщики
+            - generic [ref=e125]:
+              - img [ref=e127]
+              - heading "Лаборатория" [level=3] [ref=e129]
+              - paragraph [ref=e130]: Заказы анализов, результаты, утверждение
+            - generic [ref=e131]:
+              - img [ref=e133]
+              - heading "Лечение" [level=3] [ref=e137]
+              - paragraph [ref=e138]: Планы лечения, назначения, контроль
+            - generic [ref=e139]:
+              - img [ref=e141]
+              - heading "Реабилитация" [level=3] [ref=e151]
+              - paragraph [ref=e152]: Инсульт, упражнения с AI, цели восстановления
+            - generic [ref=e153]:
+              - img [ref=e155]
+              - heading "Аналитика" [level=3] [ref=e157]
+              - paragraph [ref=e158]: Отчёты по пациентам, финансам, персоналу
+        - generic [ref=e159]:
+          - generic [ref=e162]: Управление
+          - generic [ref=e163]:
+            - generic [ref=e164]:
+              - img [ref=e166]
+              - heading "Расписание" [level=3] [ref=e168]
+              - paragraph [ref=e169]: Приёмы, смены, загрузка врачей
+            - generic [ref=e170]:
+              - img [ref=e172]
+              - heading "Биллинг" [level=3] [ref=e175]
+              - paragraph [ref=e176]: Счета, платежи, финансовая аналитика
+            - generic [ref=e177]:
+              - img [ref=e179]
+              - heading "Персонал" [level=3] [ref=e184]
+              - paragraph [ref=e185]: Профили, роли, посещаемость
+            - generic [ref=e186]:
+              - img [ref=e188]
+              - heading "Палаты" [level=3] [ref=e191]
+              - paragraph [ref=e192]: Койки, размещение, статус занятости
+            - generic [ref=e193]:
+              - img [ref=e195]
+              - heading "Аудит" [level=3] [ref=e198]
+              - paragraph [ref=e199]: Журнал всех действий в системе
+        - generic [ref=e200]:
+          - generic [ref=e203]: Технологии
+          - generic [ref=e204]:
+            - generic [ref=e205]:
+              - img [ref=e207]
+              - heading "Телемедицина" [level=3] [ref=e210]
+              - paragraph [ref=e211]: Видеоконсультации через Daily.co
+            - generic [ref=e212]:
+              - img [ref=e214]
+              - heading "AI ассистент" [level=3] [ref=e217]
+              - paragraph [ref=e218]: Голосовое управление, умные подсказки
+            - generic [ref=e219]:
+              - img [ref=e221]
+              - heading "IoT мониторинг" [level=3] [ref=e227]
+              - paragraph [ref=e228]: Датчики, алерты, показатели в реальном времени
+            - generic [ref=e229]:
+              - img [ref=e231]
+              - heading "BMS" [level=3] [ref=e235]
+              - paragraph [ref=e236]: Управление зданием, климат, безопасность
+            - generic [ref=e237]:
+              - img [ref=e239]
+              - heading "Портал пациента" [level=3] [ref=e243]
+              - paragraph [ref=e244]: Личный кабинет, запись, результаты
+      - generic [ref=e246]:
+        - heading "Цифровая трансформация за один шаг" [level=2] [ref=e247]
+        - paragraph [ref=e248]: От хаоса к единой системе
+        - generic [ref=e249]:
+          - generic [ref=e250]:
+            - generic [ref=e251]: Было
+            - generic [ref=e252]:
+              - generic [ref=e253]:
+                - img [ref=e255]
+                - generic [ref=e258]: Разрозненные данные
+              - generic [ref=e259]:
+                - img [ref=e261]
+                - generic [ref=e263]: Ручной учёт
+              - generic [ref=e264]:
+                - img [ref=e266]
+                - generic [ref=e268]: Потерянные карточки
+              - generic [ref=e269]:
+                - img [ref=e271]
+                - generic [ref=e273]: Нет аналитики
+          - generic [ref=e274]:
+            - generic [ref=e275]: Стало
+            - generic [ref=e276]:
+              - generic [ref=e277]:
+                - img [ref=e279]
+                - generic [ref=e281]: Всё в одном окне
+              - generic [ref=e282]:
+                - img [ref=e284]
+                - generic [ref=e286]: Автоматический учёт
+              - generic [ref=e287]:
+                - img [ref=e289]
+                - generic [ref=e292]: Мгновенный поиск
+              - generic [ref=e293]:
+                - img [ref=e295]
+                - generic [ref=e297]: Аналитика в реальном времени
+      - generic [ref=e299]:
+        - heading "Посмотрите как это работает" [level=2] [ref=e300]
+        - paragraph [ref=e301]: Единый интерфейс для всей клиники
+        - generic [ref=e302]:
+          - generic [ref=e310]: app.medcore.kg/dashboard
+          - generic [ref=e312]:
+            - generic [ref=e314]: ▶
+            - paragraph [ref=e315]: Видео-демонстрация платформы
+        - generic [ref=e316]:
+          - paragraph [ref=e317]: Хотите персональную демонстрацию?
+          - link "Заказать демо" [ref=e318] [cursor=pointer]:
+            - /url: "#cta"
+      - generic [ref=e320]:
+        - heading "Каждому — своё рабочее место" [level=2] [ref=e321]
+        - paragraph [ref=e322]: Один вход, разные возможности
+        - generic [ref=e323]:
+          - button "Главврач" [ref=e324] [cursor=pointer]:
+            - img [ref=e325]
+            - generic [ref=e328]: Главврач
+          - button "Врач" [ref=e329] [cursor=pointer]:
+            - img [ref=e330]
+            - generic [ref=e334]: Врач
+          - button "Медсестра" [ref=e335] [cursor=pointer]:
+            - img [ref=e336]
+            - generic [ref=e338]: Медсестра
+          - button "Регистратура" [ref=e339] [cursor=pointer]:
+            - img [ref=e340]
+            - generic [ref=e344]: Регистратура
+          - button "Пациент" [ref=e345] [cursor=pointer]:
+            - img [ref=e346]
+            - generic [ref=e350]: Пациент
+        - generic [ref=e352]:
+          - generic [ref=e353]:
+            - img [ref=e355]
+            - heading "Главврач" [level=3] [ref=e358]
+          - list [ref=e359]:
+            - listitem [ref=e360]:
+              - img [ref=e362]
+              - generic [ref=e364]: Полная аналитика по клинике в реальном времени
+            - listitem [ref=e365]:
+              - img [ref=e367]
+              - generic [ref=e369]: Контроль загрузки врачей и палат
+            - listitem [ref=e370]:
+              - img [ref=e372]
+              - generic [ref=e374]: Аудит всех действий персонала
+            - listitem [ref=e375]:
+              - img [ref=e377]
+              - generic [ref=e379]: Финансовые отчёты и прогнозы
+            - listitem [ref=e380]:
+              - img [ref=e382]
+              - generic [ref=e384]: Управление зданием (BMS) и оборудованием
+      - generic [ref=e388]:
+        - heading "Пациент всегда на связи" [level=2] [ref=e389]
+        - paragraph [ref=e390]: Личный кабинет с голосовым управлением
+        - list [ref=e391]:
+          - listitem [ref=e392]:
+            - img [ref=e394]
+            - generic [ref=e396]: Запись на приём к любому врачу
+          - listitem [ref=e397]:
+            - img [ref=e399]
+            - generic [ref=e401]: Результаты анализов — как только врач утвердит
+          - listitem [ref=e402]:
+            - img [ref=e404]
+            - generic [ref=e406]: Видеоконсультация без установки приложения
+          - listitem [ref=e407]:
+            - img [ref=e409]
+            - generic [ref=e411]: Упражнения для реабилитации с камерой (MediaPipe)
+          - listitem [ref=e412]:
+            - img [ref=e414]
+            - generic [ref=e416]: Голосовой ассистент — скажи «запишись к терапевту»
+          - listitem [ref=e417]:
+            - img [ref=e419]
+            - generic [ref=e421]: Оплата счетов и история лечения
+        - generic [ref=e422]:
+          - img [ref=e423]
+          - generic [ref=e426]: Голосовой ассистент включён
+      - generic [ref=e430]:
+        - heading "Умная палата в реальном времени" [level=2] [ref=e431]
+        - paragraph [ref=e432]: Каждый датчик на контроле. Каждый алерт — мгновенно.
+        - generic [ref=e435]:
+          - generic [ref=e436]: SpO298%
+          - generic [ref=e437]: HR72 bpm
+          - generic [ref=e438]: Temp36.6°
+          - generic [ref=e439]: Fall Detection✓
+        - paragraph [ref=e440]: 10 типов датчиков · Алерты за <1 сек · WebSocket real-time · Кнопка вызова медсестры
+      - generic [ref=e442]:
+        - heading "Медицинские данные под защитой" [level=2] [ref=e443]
+        - paragraph [ref=e444]: Безопасность на каждом уровне
+        - generic [ref=e445]:
+          - generic [ref=e446]:
+            - img [ref=e448]
+            - heading "Шифрование" [level=3] [ref=e450]
+            - paragraph [ref=e451]: Данные зашифрованы при передаче и хранении. HTTPS, bcrypt для паролей.
+          - generic [ref=e452]:
+            - img [ref=e454]
+            - heading "Полный аудит" [level=3] [ref=e457]
+            - paragraph [ref=e458]: Каждое действие записывается. Кто, когда, что изменил — всегда известно.
+          - generic [ref=e459]:
+            - img [ref=e461]
+            - heading "9 ролей доступа" [level=3] [ref=e466]
+            - paragraph [ref=e467]: От главврача до регистратора. Каждый видит только своё. Динамические права.
+          - generic [ref=e468]:
+            - img [ref=e470]
+            - heading "Изоляция данных" [level=3] [ref=e473]
+            - paragraph [ref=e474]: "Мультитенантность: данные каждой клиники полностью изолированы друг от друга."
+      - generic [ref=e476]:
+        - heading "Работает с тем, что у вас уже есть" [level=2] [ref=e477]
+        - paragraph [ref=e478]: Интеграции с оборудованием и сервисами
+        - generic [ref=e479]:
+          - generic [ref=e480]:
+            - img [ref=e482]
+            - generic [ref=e488]: IoT датчики
+          - generic [ref=e489]:
+            - img [ref=e491]
+            - generic [ref=e494]: Камеры
+          - generic [ref=e495]:
+            - img [ref=e497]
+            - generic [ref=e500]: Daily.co
+          - generic [ref=e501]:
+            - img [ref=e503]
+            - generic [ref=e506]: МКБ-10
+          - generic [ref=e507]:
+            - img [ref=e509]
+            - generic [ref=e511]: SMS
+          - generic [ref=e512]:
+            - img [ref=e514]
+            - generic [ref=e516]: WhatsApp
+          - generic [ref=e517]:
+            - img [ref=e519]
+            - generic [ref=e522]: Telegram
+          - generic [ref=e523]:
+            - img [ref=e525]
+            - generic [ref=e528]: MediaPipe
+          - generic [ref=e529]:
+            - img [ref=e531]
+            - generic [ref=e534]: Google Gemini
+          - generic [ref=e535]:
+            - img [ref=e537]
+            - generic [ref=e540]: Email SMTP
+      - generic [ref=e542]:
+        - heading "Нам доверяют" [level=2] [ref=e543]
+        - generic [ref=e544]:
+          - generic [ref=e546]: Клиника №1
+          - generic [ref=e548]: Мед. центр
+          - generic [ref=e550]: Поликлиника
+          - generic [ref=e552]: Госпиталь
+        - blockquote [ref=e553]:
+          - paragraph [ref=e554]: «MedCore заменил нам 8 разных программ. Теперь всё в одном месте — от регистратуры до лаборатории.»
+          - text: — Главврач, Бишкек
+        - link "Хотите стать одним из первых? →" [ref=e556] [cursor=pointer]:
+          - /url: "#cta"
+      - generic [ref=e559]:
+        - heading "Готовы к переменам?" [level=2] [ref=e560]
+        - paragraph [ref=e561]: Бесплатная демонстрация. Настройка за 1 день.
+        - generic [ref=e562]:
+          - generic [ref=e563]:
+            - img [ref=e564]
+            - textbox "+996 XXX XXX XXX" [ref=e566]
+          - generic [ref=e567]:
+            - img [ref=e568]
+            - textbox "Название клиники" [ref=e572]
+          - button "Заказать демо" [ref=e573] [cursor=pointer]
+        - generic [ref=e574]:
+          - link "WhatsApp" [ref=e575] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e576]
+            - text: WhatsApp
+          - link "Telegram" [ref=e578] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e579]
+            - text: Telegram
+          - link "info@medcore.kg" [ref=e582] [cursor=pointer]:
+            - /url: mailto:info@medcore.kg
+            - img [ref=e583]
+            - text: info@medcore.kg
+    - contentinfo [ref=e586]:
+      - generic [ref=e587]:
+        - generic [ref=e588]:
+          - generic [ref=e589]: M
+          - generic [ref=e590]: © 2026 MedCore KG. Бишкек, Кыргызстан.
+        - generic [ref=e591]:
+          - link "Вход для персонала" [ref=e592] [cursor=pointer]:
+            - /url: /login
+          - link "Портал пациента" [ref=e593] [cursor=pointer]:
+            - /url: /portal/login
+  - region "Notifications alt+T"

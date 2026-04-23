@@ -1,0 +1,7 @@
+{"type":"server-started","port":50530,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50530","screen_dir":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/content","state_dir":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/state"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/content/visual-style.html"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/content/concept-medcore.html"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/content/waiting.html"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/content/page-structure.html"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/96281-1776680432/content/waiting-2.html"}
+{"type":"server-stopped","reason":"idle timeout"}

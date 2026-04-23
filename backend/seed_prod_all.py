@@ -48,12 +48,12 @@ EXERCISE_IDS = [
     "ab8a824b-cb24-4e67-a671-b800893b35d7",
 ]
 
-# Existing lab test catalog IDs
-LAB_HEMOGLOBIN_ID = "e4df8b46-5526-4322-9f85-c862375d4020"
-LAB_BIOCHEM_ID = "437547bd-e80f-41e2-811c-ce7f1263e52c"
-LAB_CRP_ID = "030e6c1c-f5ac-458a-9d7d-641e3050c842"
-LAB_GLUCOSE_ID = "f2767ab5-945d-4324-9bd3-fdebb3a8fd1e"
-LAB_CHOLESTEROL_ID = "adf6f632-3206-4937-988e-9a89126f4f7d"
+# Lab test catalog IDs — will be resolved at runtime
+LAB_HEMOGLOBIN_ID = None  # ОАК
+LAB_BIOCHEM_ID = None     # Биохимия крови
+LAB_CRP_ID = None         # С-реактивный белок
+LAB_GLUCOSE_ID = None     # Глюкоза крови
+LAB_CHOLESTEROL_ID = None # Холестерин общий
 
 now = datetime.now(timezone.utc)
 random.seed(42)
@@ -128,15 +128,20 @@ async def seed_base_data(conn: asyncpg.Connection):
         "SELECT 1 FROM clinics WHERE id = $1", uuid.UUID(CLINIC_ID)
     )
     if not clinic_exists:
+        # Detect subscription_plan enum type
+        enum_exists = await conn.fetchval(
+            "SELECT 1 FROM pg_type WHERE typname = 'subscriptionplan'"
+        )
+        sp_cast = "::subscriptionplan" if enum_exists else ""
         await conn.execute(
-            """
+            f"""
             INSERT INTO clinics
                 (id, clinic_id, name, slug, address, phone, email,
                  working_hours, subscription_plan, is_active,
                  is_deleted, created_at, updated_at)
             VALUES
                 ($1, $1, $2, $3, $4, $5, $6,
-                 $7::jsonb, $8::subscriptionplan, true,
+                 $7::jsonb, $8{sp_cast}, true,
                  false, $9, $9)
             ON CONFLICT (id) DO NOTHING
             """,
@@ -161,21 +166,32 @@ async def seed_base_data(conn: asyncpg.Connection):
         ("d0000001-0000-4000-a000-000000000004", "Аптека", "PHAR"),
         ("d0000001-0000-4000-a000-000000000005", "Лаборатория", "LAB"),
     ]
+    # Check if code column exists
+    has_code = await conn.fetchval(
+        "SELECT 1 FROM information_schema.columns WHERE table_name='departments' AND column_name='code'"
+    )
     dept_added = 0
     for dept_id, dept_name, dept_code in departments:
         exists = await conn.fetchval(
             "SELECT 1 FROM departments WHERE id = $1", uuid.UUID(dept_id)
         )
         if not exists:
-            await conn.execute(
-                """
-                INSERT INTO departments (id, clinic_id, name, code, is_deleted, created_at, updated_at)
-                VALUES ($1, $2, $3, $4, false, $5, $5)
-                ON CONFLICT (id) DO NOTHING
-                """,
-                uuid.UUID(dept_id), uuid.UUID(CLINIC_ID), dept_name, dept_code, now,
-            )
-            dept_added += 1
+            try:
+                if has_code:
+                    await conn.execute(
+                        """INSERT INTO departments (id, clinic_id, name, code, is_deleted, created_at, updated_at)
+                        VALUES ($1, $2, $3, $4, false, $5, $5) ON CONFLICT (id) DO NOTHING""",
+                        uuid.UUID(dept_id), uuid.UUID(CLINIC_ID), dept_name, dept_code, now,
+                    )
+                else:
+                    await conn.execute(
+                        """INSERT INTO departments (id, clinic_id, name, is_deleted, created_at, updated_at)
+                        VALUES ($1, $2, $3, false, $4, $4) ON CONFLICT (id) DO NOTHING""",
+                        uuid.UUID(dept_id), uuid.UUID(CLINIC_ID), dept_name, now,
+                    )
+                dept_added += 1
+            except Exception as e:
+                print(f"   -> dept {dept_name} error: {e}")
     print(f"   -> {dept_added} departments added")
 
     # --- Admin user ---
@@ -776,14 +792,29 @@ async def seed_treatment_plans(conn: asyncpg.Connection):
 async def seed_lab_results(conn: asyncpg.Connection):
     print("9. Seeding lab orders & results ...")
 
+    # Resolve lab test IDs from catalog
+    catalog = await conn.fetch("SELECT id, code FROM lab_test_catalog")
+    code_map = {r["code"]: str(r["id"]) for r in catalog}
+    if not code_map:
+        print("   -> SKIPPED (no lab_test_catalog entries)")
+        return
+
     lab_specs = [
-        # (test_id, label, unit, ref_range, start_val, end_val, hi_threshold)
-        (LAB_HEMOGLOBIN_ID, "Гемоглобин", "г/Л", "120-160", 95.0, 125.0, 120.0),
-        (LAB_BIOCHEM_ID, "Лейкоциты", "×10⁹/Л", "4.0-10.0", 15.2, 7.8, 10.0),
-        (LAB_CRP_ID, "СРБ", "мг/Л", "0-5", 85.0, 3.2, 5.0),
-        (LAB_GLUCOSE_ID, "Глюкоза", "ммоль/Л", "3.9-6.1", 9.1, 5.4, 6.1),
-        (LAB_CHOLESTEROL_ID, "Холестерин", "ммоль/Л", "3.0-5.2", 7.2, 5.1, 5.2),
+        # (test_code, label, unit, ref_range, start_val, end_val, hi_threshold)
+        ("LAB-001", "Гемоглобин", "г/Л", "120-160", 95.0, 125.0, 120.0),
+        ("LAB-002", "Лейкоциты", "×10⁹/Л", "4.0-10.0", 15.2, 7.8, 10.0),
+        ("LAB-011", "СРБ", "мг/Л", "0-5", 85.0, 3.2, 5.0),
+        ("LAB-005", "Глюкоза", "ммоль/Л", "3.9-6.1", 9.1, 5.4, 6.1),
+        ("LAB-006", "Холестерин", "ммоль/Л", "3.0-5.2", 7.2, 5.1, 5.2),
     ]
+    # Resolve codes to UUIDs, skip missing
+    resolved_specs = []
+    for code, *rest in lab_specs:
+        if code in code_map:
+            resolved_specs.append((code_map[code], *rest))
+        else:
+            print(f"   -> lab test {code} not in catalog, skipping")
+    lab_specs = resolved_specs
 
     time_points = [(-28, "URGENT"), (-14, "ROUTINE"), (-3, "ROUTINE")]
     added = 0
@@ -1473,26 +1504,20 @@ async def main():
         print(f"   Found enums: {[r['typname'] for r in enum_types]}")
         print()
 
-        await seed_base_data(conn)
-        await seed_users(conn)
-        await seed_patients(conn)
-        await seed_medical_cards(conn)
-        await seed_visits(conn)
-        await seed_vital_signs(conn)
-        await seed_diagnoses(conn)
-        await seed_medical_history(conn)
-        await seed_treatment_plans(conn)
-        await seed_lab_results(conn)
-        await seed_appointments(conn)
-        await seed_documents(conn)
-        await seed_telemedicine(conn)
-        await seed_messages(conn)
-        await seed_notifications(conn)
-        await seed_audit_logs(conn)
-        await seed_recovery_goals(conn)
-        await seed_stroke_assessments(conn)
-        await seed_exercise_sessions(conn)
-        await seed_rehab_goals(conn)
+        steps = [
+            seed_base_data, seed_users, seed_patients, seed_medical_cards,
+            seed_visits, seed_vital_signs, seed_diagnoses, seed_medical_history,
+            seed_treatment_plans, seed_lab_results, seed_appointments,
+            seed_documents, seed_telemedicine, seed_messages, seed_notifications,
+            seed_audit_logs, seed_recovery_goals, seed_stroke_assessments,
+            seed_exercise_sessions, seed_rehab_goals,
+        ]
+        for step in steps:
+            try:
+                await step(conn)
+            except Exception as e:
+                print(f"   !! {step.__name__} failed: {e}")
+                print(f"   !! Continuing with next step...")
 
         print()
         print("=" * 60)

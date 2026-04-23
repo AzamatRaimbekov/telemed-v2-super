@@ -1,0 +1,96 @@
+<h2>Визуальный стиль ленди��га</h2>
+<p class="subtitle">Какой визуальный язык лучше передаёт "премиальная медицинская платформа"?</p>
+
+<div class="cards">
+  <div class="card" data-choice="dark-futuristic" onclick="toggleSelect(this)">
+    <div class="card-image" style="height:280px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0a0e1a 0%,#1a1f3a 50%,#0d1525 100%);display:flex;align-items:center;justify-content:center;">
+      <!-- Dark futuristic mockup -->
+      <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 30% 40%,rgba(59,130,246,0.15) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(139,92,246,0.1) 0%,transparent 50%);"></div>
+      <div style="position:relative;text-align:center;color:#fff;">
+        <div style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(96,165,250,0.8);margin-bottom:12px;">MedCore KG</div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:8px;">Умная клиника</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);">Одна платформа — вся медицина</div>
+        <div style="margin-top:20px;display:flex;gap:8px;justify-content:center;">
+          <div style="width:100px;height:36px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;">Демо</div>
+          <div style="width:100px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,0.7);">Подробнее</div>
+        </div>
+        <!-- Floating cards -->
+        <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;">
+          <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;text-align:left;">
+            <div style="font-size:10px;color:rgba(96,165,250,0.8);">Пациенты</div>
+            <div style="font-size:18px;font-weight:600;">12,847</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;text-align:left;">
+            <div style="font-size:10px;color:rgba(139,92,246,0.8);">Приёмов</div>
+            <div style="font-size:18px;font-weight:600;">3,291</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Тёмный футуристичный</h3>
+      <p>Тёмный фон, неоновые акценты, glassmorphism-карточки, градиенты blue→purple. Как Apple Vision Pro или Vercel. Ощущение технологичности и премиума.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="light-clean" onclick="toggleSelect(this)">
+    <div class="card-image" style="height:280px;position:relative;overflow:hidden;background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);display:flex;align-items:center;justify-content:center;">
+      <div style="position:relative;text-align:center;color:#0f172a;">
+        <div style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6;margin-bottom:12px;font-weight:600;">MedCore KG</div>
+        <div style="font-size:24px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#0f172a,#334155);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Единая платформа</div>
+        <div style="font-size:13px;color:#64748b;">для управления клин��кой</div>
+        <div style="margin-top:20px;display:flex;gap:8px;justify-content:center;">
+          <div style="width:100px;height:36px;border-radius:8px;background:#0f172a;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;">Демо</div>
+          <div style="width:100px;height:36px;border-radius:8px;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#334155;">Подробнее</div>
+        </div>
+        <!-- Clean cards -->
+        <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;text-align:left;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <div style="font-size:10px;color:#3b82f6;font-weight:600;">Пациен��ы</div>
+            <div style="font-size:18px;font-weight:700;color:#0f172a;">12,847</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;text-align:left;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <div style="font-size:10px;color:#10b981;font-weight:600;">Приёмов</div>
+            <div style="font-size:18px;font-weight:700;color:#0f172a;">3,291</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Светлый чистый</h3>
+      <p>Белый фон, чёткая типографика, минимальные тени, синие акценты. Как Linear или Stripe. Доверие, профессионализм, чистота — важно для медицины.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="dark-gradient-3d" onclick="toggleSelect(this)">
+    <div class="card-image" style="height:280px;position:relative;overflow:hidden;background:linear-gradient(160deg,#020617 0%,#0c1929 40%,#0f172a 100%);display:flex;align-items:center;justify-content:center;">
+      <!-- 3D-ish floating elements -->
+      <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 0%,rgba(14,165,233,0.15) 0%,transparent 60%);"></div>
+      <div style="position:absolute;top:40px;left:20px;width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(59,130,246,0.05));border:1px solid rgba(59,130,246,0.15);transform:rotate(-12deg) perspective(500px) rotateY(15deg);backdrop-filter:blur(8px);"></div>
+      <div style="position:absolute;bottom:40px;right:20px;width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.15);transform:rotate(8deg) perspective(500px) rotateY(-10deg);backdrop-filter:blur(8px);"></div>
+      <div style="position:relative;text-align:center;color:#fff;">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 32px rgba(14,165,233,0.4);">+</div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:6px;">MedCore KG</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.6);max-width:240px;line-height:1.4;">Замените 10 систем одной платформой</div>
+        <div style="margin-top:16px;">
+          <div style="display:inline-block;width:120px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600;box-shadow:0 4px 20px rgba(14,165,233,0.3);">Попробовать</div>
+        </div>
+        <!-- Orbiting elements -->
+        <div style="margin-top:16px;display:flex;gap:16px;justify-content:center;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#0ea5e9;display:inline-block;"></span>EHR</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;display:inline-block;"></span>IoT</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;"></span>AI</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>BMS</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Тёмный с 3D-элементами</h3>
+      <p>Глубокий тёмный фон, парящие 3D-элементы, свечение, перспектива. Как Framer или Spline. Hero-секция с интерактивной 3D-моделью клиники. Максимальный wow-эффект.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <p class="subtitle" style="text-align:center;">Кликни на вариант, который нравится. Вариант C подразумевает Three.js/Spline для 3D.</p>
+</div>

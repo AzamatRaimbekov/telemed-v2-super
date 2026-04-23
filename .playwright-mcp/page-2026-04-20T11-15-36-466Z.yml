@@ -1,0 +1,5 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - strong [ref=e5]: Something went wrong!
+    - button "Hide Error" [ref=e6] [cursor=pointer]
+  - code [ref=e10]: Cannot read properties of undefined (reading 'S')

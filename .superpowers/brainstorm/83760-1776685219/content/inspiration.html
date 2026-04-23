@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCore KG — Вдохновение</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #e0e0e0; font-family: 'Inter', system-ui, sans-serif; }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+  .subtitle { color: #888; font-size: 14px; margin-bottom: 40px; }
+
+  .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+
+  .ref-card {
+    border: 2px solid #1a1a1a;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .ref-card:hover { border-color: #333; transform: translateY(-2px); }
+  .ref-card.selected { border-color: #BDEDE0; box-shadow: 0 0 30px rgba(189,237,224,0.15); }
+  .ref-card.selected::after {
+    content: '✓';
+    position: absolute; top: 12px; right: 12px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #BDEDE0; color: #0a0a0a;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px;
+  }
+
+  .ref-preview {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ref-info { padding: 16px; }
+  .ref-info h3 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .ref-info p { font-size: 12px; color: #666; line-height: 1.5; }
+  .ref-info .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-top: 8px; }
+
+  /* --- Concept A: Apple Health/Linear style --- */
+  .preview-a {
+    background: linear-gradient(135deg, #000 0%, #0a1628 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .preview-a .mockup {
+    position: relative;
+    width: 80%; height: 80%;
+  }
+  .preview-a .hero-text {
+    position: absolute; top: 15%; left: 5%;
+    font-size: 22px; font-weight: 800; color: #fff; line-height: 1.2;
+  }
+  .preview-a .hero-text span {
+    background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .preview-a .float-card {
+    position: absolute; border-radius: 12px; padding: 10px;
+    background: rgba(255,255,255,0.05); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .preview-a .float-card.c1 { bottom: 10%; right: 5%; width: 45%; }
+  .preview-a .float-card.c2 { bottom: 35%; right: 15%; width: 35%; }
+  .preview-a .card-line { height: 3px; border-radius: 2px; margin: 4px 0; }
+
+  /* --- Concept B: Stripe/Vercel gradient mesh --- */
+  .preview-b {
+    background: #000;
+    position: relative;
+  }
+  .preview-b .gradient-mesh {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(189,237,224,0.25) 0%, transparent 50%),
+      radial-gradient(circle at 80% 30%, rgba(126,120,210,0.2) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(16,185,129,0.15) 0%, transparent 50%);
+  }
+  .preview-b .content {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; text-align: center; padding: 20px;
+  }
+  .preview-b .pill {
+    padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 600;
+    background: rgba(189,237,224,0.1); border: 1px solid rgba(189,237,224,0.2);
+    color: #BDEDE0; margin-bottom: 12px;
+  }
+  .preview-b h2 { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .preview-b h2 em { font-style: normal; color: #BDEDE0; }
+  .preview-b .sub { font-size: 11px; color: #666; }
+
+  /* --- Concept C: Bento grid dashboard --- */
+  .preview-c {
+    background: #0a0a0a;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
+    height: 100%;
+  }
+  .bento-item {
+    border-radius: 10px; padding: 10px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .bento-item .label { font-size: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+  .bento-item .value { font-size: 18px; font-weight: 800; }
+  .bento-item .bar { height: 3px; border-radius: 2px; margin-top: 6px; }
+  .b1 { background: linear-gradient(135deg, rgba(189,237,224,0.12), rgba(189,237,224,0.04)); border: 1px solid rgba(189,237,224,0.1); grid-row: span 2; color: #BDEDE0; }
+  .b2 { background: rgba(126,120,210,0.08); border: 1px solid rgba(126,120,210,0.1); color: #9B95E0; }
+  .b3 { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.1); color: #34D399; }
+  .b4 { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.1); color: #FBBF24; }
+  .b5 { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #94A3B8; }
+
+  /* --- Concept D: Immersive 3D product showcase --- */
+  .preview-d {
+    background: radial-gradient(ellipse at center, #0f1729 0%, #050810 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .preview-d .ring {
+    position: absolute; border-radius: 50%; border: 1px solid rgba(189,237,224,0.06);
+  }
+  .preview-d .ring.r1 { width: 300px; height: 300px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .preview-d .ring.r2 { width: 200px; height: 200px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .preview-d .ring.r3 { width: 100px; height: 100px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .preview-d .center-glow {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(189,237,224,0.3) 0%, rgba(189,237,224,0.05) 50%, transparent 70%);
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #BDEDE0;
+  }
+  .preview-d .orbit-dot {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  }
+  .preview-d .d1 { top: 25%; left: 70%; background: #BDEDE0; box-shadow: 0 0 12px rgba(189,237,224,0.5); }
+  .preview-d .d2 { top: 70%; left: 25%; background: #7E78D2; box-shadow: 0 0 12px rgba(126,120,210,0.5); }
+  .preview-d .d3 { top: 30%; left: 20%; background: #10B981; box-shadow: 0 0 12px rgba(16,185,129,0.5); }
+  .preview-d .d4 { top: 75%; left: 75%; background: #F59E0B; box-shadow: 0 0 12px rgba(245,158,11,0.5); }
+
+  .section-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+
+  .note {
+    margin-top: 40px; padding: 20px; border-radius: 12px;
+    background: rgba(189,237,224,0.04); border: 1px solid rgba(189,237,224,0.1);
+    font-size: 13px; color: #888; line-height: 1.6; text-align: center;
+  }
+  .note strong { color: #BDEDE0; }
+
+  .multiselect-hint {
+    text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;
+  }
+</style>
+<script>
+  function toggleSelect(el) {
+    el.classList.toggle('selected');
+    const allSelected = document.querySelectorAll('.ref-card.selected');
+    const choices = Array.from(allSelected).map(c => c.dataset.choice);
+
+    // Post to parent
+    if (window.__reportSelection) {
+      window.__reportSelection(choices.join(','));
+    }
+  }
+</script>
+</head>
+<body>
+<div class="container">
+  <h1>Какой стиль тебе заходит?</h1>
+  <p class="subtitle">Можно выбрать несколько — я миксану лучшее из каждого</p>
+  <p class="multiselect-hint">Кликай на карточки которые нравятся</p>
+
+  <div class="ref-grid">
+    <!-- A: Apple/Linear glassmorphism -->
+    <div class="ref-card" data-choice="glass-editorial" onclick="toggleSelect(this)">
+      <div class="ref-preview preview-a">
+        <div class="mockup">
+          <div class="hero-text">
+            Управляй<br>клиникой<br><span>умнее</span>
+          </div>
+          <div class="float-card c2">
+            <div class="card-line" style="width:60%;background:rgba(189,237,224,0.3)"></div>
+            <div class="card-line" style="width:80%;background:rgba(189,237,224,0.15)"></div>
+            <div class="card-line" style="width:40%;background:rgba(126,120,210,0.2)"></div>
+          </div>
+          <div class="float-card c1">
+            <div style="font-size:8px;color:#BDEDE0;font-weight:600;">ПАЦИЕНТЫ</div>
+            <div style="font-size:16px;font-weight:800;color:#fff;margin-top:2px;">12,847</div>
+            <div class="card-line" style="width:100%;background:linear-gradient(90deg,#BDEDE0,#7E78D2)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ref-info">
+        <h3>Glass Editorial</h3>
+        <p>Как Linear/Raycast — крупная типографика, парящие glass-карточки с данными, минимум текста, максимум пространства</p>
+        <span class="tag" style="background:rgba(96,165,250,0.15);color:#60a5fa;">Apple + Linear</span>
+      </div>
+    </div>
+
+    <!-- B: Gradient mesh -->
+    <div class="ref-card" data-choice="gradient-mesh" onclick="toggleSelect(this)">
+      <div class="ref-preview preview-b">
+        <div class="gradient-mesh"></div>
+        <div class="content">
+          <div class="pill">16 модулей · 1 платформа</div>
+          <h2>Вся клиника<br><em>в одном экране</em></h2>
+          <div class="sub">Замените 10 программ одной</div>
+        </div>
+      </div>
+      <div class="ref-info">
+        <h3>Gradient Mesh</h3>
+        <p>Как Stripe/Vercel — мягкие цветные градиенты, чистый центрированный текст, воздух, элегантность без агрессии</p>
+        <span class="tag" style="background:rgba(189,237,224,0.15);color:#BDEDE0;">Stripe + Vercel</span>
+      </div>
+    </div>
+
+    <!-- C: Bento grid -->
+    <div class="ref-card" data-choice="bento-dashboard" onclick="toggleSelect(this)">
+      <div class="ref-preview preview-c">
+        <div class="bento-item b1">
+          <div class="label">Пациенты</div>
+          <div class="value">EHR</div>
+          <div class="bar" style="width:70%;background:rgba(189,237,224,0.4)"></div>
+        </div>
+        <div class="bento-item b2">
+          <div class="label">Аптека</div>
+          <div class="value">Rx</div>
+        </div>
+        <div class="bento-item b3">
+          <div class="label">Лаб</div>
+          <div class="value">🔬</div>
+        </div>
+        <div class="bento-item b4">
+          <div class="label">IoT</div>
+          <div class="value">98%</div>
+        </div>
+        <div class="bento-item b5">
+          <div class="label">AI</div>
+          <div class="value">🤖</div>
+        </div>
+      </div>
+      <div class="ref-info">
+        <h3>Bento Dashboard</h3>
+        <p>Как Apple/GitHub — модули показаны как bento-grid карточки с живыми данными. Каждая карточка — мини-демо модуля. Интерактивно.</p>
+        <span class="tag" style="background:rgba(245,158,11,0.15);color:#FBBF24;">Apple + GitHub</span>
+      </div>
+    </div>
+
+    <!-- D: Immersive 3D -->
+    <div class="ref-card" data-choice="immersive-3d" onclick="toggleSelect(this)">
+      <div class="ref-preview preview-d">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="center-glow">M</div>
+        <div class="orbit-dot d1"></div>
+        <div class="orbit-dot d2"></div>
+        <div class="orbit-dot d3"></div>
+        <div class="orbit-dot d4"></div>
+      </div>
+      <div class="ref-info">
+        <h3>Immersive 3D Product</h3>
+        <p>Как Spline/Framer — полноэкранные 3D сцены, интерактивная модель клиники, mouse tracking, particles. Максимальный wow.</p>
+        <span class="tag" style="background:rgba(126,120,210,0.15);color:#9B95E0;">Spline + Framer</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Кликни на 1-2 стиля</strong> которые заходят, и скажи мне в терминале.<br>
+    Я сделаю полный mockup hero-секции в выбранном стиле прежде чем кодить.
+  </div>
+</div>
+</body>
+</html>

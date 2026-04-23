@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCore KG — Gradient Mesh Hero</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ===== ANIMATED GRADIENT MESH ===== */
+  .mesh-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background: #000;
+  }
+  .mesh-bg::before {
+    content: '';
+    position: absolute; inset: -50%;
+    background:
+      radial-gradient(circle at 25% 35%, rgba(189,237,224,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 75% 25%, rgba(126,120,210,0.14) 0%, transparent 50%),
+      radial-gradient(circle at 50% 75%, rgba(16,185,129,0.10) 0%, transparent 45%),
+      radial-gradient(circle at 85% 70%, rgba(189,237,224,0.06) 0%, transparent 40%);
+    animation: meshMove 20s ease-in-out infinite alternate;
+  }
+  @keyframes meshMove {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-3%, 2%) scale(1.02); }
+    66% { transform: translate(2%, -2%) scale(0.98); }
+    100% { transform: translate(-1%, 1%) scale(1.01); }
+  }
+
+  /* Grain overlay */
+  .grain {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .page { position: relative; z-index: 2; }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 0 40px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo .mark {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: linear-gradient(135deg, #BDEDE0, #7ECDB8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900; color: #000;
+  }
+  .nav-logo span { font-size: 15px; font-weight: 700; }
+  .nav-logo span em { font-style: normal; color: rgba(255,255,255,0.35); font-weight: 400; margin-left: 4px; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: rgba(255,255,255,0.9); }
+  .nav-cta {
+    height: 36px; padding: 0 20px; border-radius: 10px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+    color: #fff; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-cta:hover { background: rgba(255,255,255,0.14); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+  }
+
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px 6px 8px;
+    border-radius: 100px;
+    background: rgba(189,237,224,0.06);
+    border: 1px solid rgba(189,237,224,0.12);
+    font-size: 12px; font-weight: 500; color: rgba(189,237,224,0.8);
+    margin-bottom: 32px;
+  }
+  .hero-pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #BDEDE0;
+    box-shadow: 0 0 8px rgba(189,237,224,0.6);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    max-width: 800px;
+    margin-bottom: 24px;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, #BDEDE0 0%, #7ECDB8 40%, #7E78D2 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .hero .sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.4);
+    max-width: 520px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+
+  .hero-actions {
+    display: flex; gap: 12px; align-items: center;
+  }
+  .btn-primary {
+    height: 48px; padding: 0 28px; border-radius: 12px;
+    background: linear-gradient(135deg, #BDEDE0, #7ECDB8);
+    color: #000; font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    border: none; cursor: pointer;
+    box-shadow: 0 0 40px rgba(189,237,224,0.2);
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 60px rgba(189,237,224,0.35);
+    transform: translateY(-1px);
+  }
+  .btn-primary .arrow { font-size: 16px; transition: transform 0.2s; }
+  .btn-primary:hover .arrow { transform: translateX(3px); }
+
+  .btn-secondary {
+    height: 48px; padding: 0 28px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+  /* ===== FLOATING CARDS ===== */
+  .float-cards {
+    position: relative;
+    width: 100%; max-width: 700px;
+    height: 200px;
+    margin-top: 60px;
+  }
+  .float-card {
+    position: absolute;
+    border-radius: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(40px) saturate(150%);
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transition: transform 0.4s ease;
+  }
+  .float-card:hover { transform: translateY(-4px); }
+
+  .fc-1 {
+    left: 0; top: 20px;
+    width: 200px;
+    animation: float1 6s ease-in-out infinite;
+  }
+  .fc-2 {
+    left: 50%; top: 0; transform: translateX(-50%);
+    width: 220px;
+    animation: float2 7s ease-in-out infinite;
+  }
+  .fc-3 {
+    right: 0; top: 30px;
+    width: 190px;
+    animation: float3 5.5s ease-in-out infinite;
+  }
+
+  @keyframes float1 { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes float2 { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-14px); } }
+  @keyframes float3 { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .fc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .fc-value { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .fc-sub { font-size: 11px; color: rgba(255,255,255,0.3); }
+  .fc-bar { height: 3px; border-radius: 2px; margin-top: 10px; }
+  .fc-bar-fill { height: 100%; border-radius: 2px; }
+
+  .fc-1 .fc-label { color: rgba(189,237,224,0.6); }
+  .fc-1 .fc-value { color: #BDEDE0; }
+  .fc-1 .fc-bar { background: rgba(189,237,224,0.1); }
+  .fc-1 .fc-bar-fill { width: 72%; background: linear-gradient(90deg, #BDEDE0, #7ECDB8); }
+
+  .fc-2 .fc-label { color: rgba(155,149,224,0.6); }
+  .fc-2 .fc-value { color: #9B95E0; }
+  .fc-2 .fc-bar { background: rgba(126,120,210,0.1); }
+  .fc-2 .fc-bar-fill { width: 58%; background: linear-gradient(90deg, #7E78D2, #9B95E0); }
+
+  .fc-3 .fc-label { color: rgba(52,211,153,0.6); }
+  .fc-3 .fc-value { color: #34D399; }
+  .fc-3 .fc-bar { background: rgba(16,185,129,0.1); }
+  .fc-3 .fc-bar-fill { width: 85%; background: linear-gradient(90deg, #10B981, #34D399); }
+
+  /* ===== SECTION: MODULES ===== */
+  .section {
+    padding: 120px 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .section-header .overline {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 3px; color: rgba(189,237,224,0.5);
+    margin-bottom: 16px;
+  }
+  .section-header h2 {
+    font-size: 44px; font-weight: 800; letter-spacing: -1px;
+    line-height: 1.15; margin-bottom: 12px;
+  }
+  .section-header p {
+    font-size: 16px; color: rgba(255,255,255,0.35); max-width: 400px; margin: 0 auto;
+  }
+
+  /* Bento modules */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .bento-card {
+    border-radius: 16px;
+    padding: 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .bento-card:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+  }
+  .bento-card .icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 14px;
+  }
+  .bento-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .bento-card p { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.5; }
+
+  .bento-card.featured {
+    grid-column: span 2;
+    grid-row: span 2;
+    padding: 32px;
+    background: linear-gradient(135deg, rgba(189,237,224,0.06) 0%, rgba(126,120,210,0.04) 100%);
+    border-color: rgba(189,237,224,0.08);
+  }
+  .bento-card.featured .icon { width: 48px; height: 48px; font-size: 24px; margin-bottom: 20px; }
+  .bento-card.featured h4 { font-size: 18px; margin-bottom: 8px; }
+  .bento-card.featured p { font-size: 13px; color: rgba(255,255,255,0.4); }
+  .bento-card.featured .demo-area {
+    margin-top: 20px; height: 100px; border-radius: 10px;
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .bento-card.featured .demo-area .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #10B981;
+    box-shadow: 0 0 8px rgba(16,185,129,0.5);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  .bento-card.featured .demo-area span { font-size: 10px; color: rgba(255,255,255,0.25); }
+
+  .icon-mint { background: rgba(189,237,224,0.1); color: #BDEDE0; }
+  .icon-purple { background: rgba(126,120,210,0.1); color: #9B95E0; }
+  .icon-green { background: rgba(16,185,129,0.1); color: #34D399; }
+  .icon-amber { background: rgba(245,158,11,0.1); color: #FBBF24; }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px; max-width: 200px; margin: 0 auto;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+
+  /* ===== FOOTER NOTE ===== */
+  .footer-note {
+    text-align: center; padding: 60px 24px;
+    font-size: 12px; color: rgba(255,255,255,0.2);
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh-bg"></div>
+<div class="grain"></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      <div class="mark">M</div>
+      <span>MedCore<em>KG</em></span>
+    </div>
+    <div class="nav-links">
+      <a href="#">Возможности</a>
+      <a href="#">Модули</a>
+      <a href="#">Безопасность</a>
+      <a href="#">Контакты</a>
+    </div>
+    <div class="nav-cta">Заказать демо</div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-pill">
+      <span class="dot"></span>
+      Единая платформа для клиник
+    </div>
+
+    <h1>
+      Вся клиника<br>
+      <span class="gradient">в одном экране</span>
+    </h1>
+
+    <p class="sub">
+      16 модулей — от регистратуры до лаборатории.<br>
+      Замените 10 программ одной.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">
+        Начать бесплатно
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="btn-secondary">
+        <span style="font-size:16px;">▶</span>
+        Смотреть демо
+      </a>
+    </div>
+
+    <!-- Floating data cards -->
+    <div class="float-cards">
+      <div class="float-card fc-1">
+        <div class="fc-label">Пациенты сегодня</div>
+        <div class="fc-value">127</div>
+        <div class="fc-sub">+12% к прошлой неделе</div>
+        <div class="fc-bar"><div class="fc-bar-fill"></div></div>
+      </div>
+      <div class="float-card fc-2">
+        <div class="fc-label">Приёмов в очереди</div>
+        <div class="fc-value">48</div>
+        <div class="fc-sub">3 врача на смене</div>
+        <div class="fc-bar"><div class="fc-bar-fill"></div></div>
+      </div>
+      <div class="float-card fc-3">
+        <div class="fc-label">Загрузка палат</div>
+        <div class="fc-value">85%</div>
+        <div class="fc-sub">34 из 40 коек</div>
+        <div class="fc-bar"><div class="fc-bar-fill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MODULES BENTO -->
+  <section class="section">
+    <div class="section-header">
+      <div class="overline">Модули</div>
+      <h2>Всё что нужно клинике</h2>
+      <p>Каждый модуль работает отдельно и вместе</p>
+    </div>
+
+    <div class="bento-grid">
+      <div class="bento-card featured">
+        <div class="icon icon-mint" style="font-size:24px;">📋</div>
+        <h4>Электронные медкарты</h4>
+        <p>Карточки пациентов, визиты, диагнозы МКБ-10. Вся история болезни в один клик.</p>
+        <div class="demo-area">
+          <div class="live-dot"></div>
+          <span>Живая демонстрация</span>
+        </div>
+      </div>
+
+      <div class="bento-card">
+        <div class="icon icon-purple">💊</div>
+        <h4>Фармация</h4>
+        <p>Аптека, рецепты, склад</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-green">🔬</div>
+        <h4>Лаборатория</h4>
+        <p>Анализы и результаты</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-mint">📹</div>
+        <h4>Телемедицина</h4>
+        <p>Видеоконсультации</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-amber">🤖</div>
+        <h4>AI ассистент</h4>
+        <p>Голосовое управление</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-purple">📡</div>
+        <h4>IoT мониторинг</h4>
+        <p>Датчики реального времени</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-green">🏢</div>
+        <h4>BMS</h4>
+        <p>Управление зданием</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-mint">💰</div>
+        <h4>Биллинг</h4>
+        <p>Счета и платежи</p>
+      </div>
+      <div class="bento-card">
+        <div class="icon icon-amber">📅</div>
+        <h4>Расписание</h4>
+        <p>Приёмы и смены</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Это mockup — нажми в терминале если нравится направление
+  </div>
+
+</div>
+</body>
+</html>

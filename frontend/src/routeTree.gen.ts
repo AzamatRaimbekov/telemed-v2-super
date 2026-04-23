@@ -10,21 +10,41 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LobbyRouteImport } from './routes/lobby'
+import { Route as BedsideRouteImport } from './routes/bedside'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalLoginRouteImport } from './routes/portal/login'
 import { Route as PortalPortalRouteImport } from './routes/portal/_portal'
+import { Route as AuthenticatedWristbandsRouteImport } from './routes/_authenticated/wristbands'
+import { Route as AuthenticatedVisitSummariesRouteImport } from './routes/_authenticated/visit-summaries'
 import { Route as AuthenticatedTelemedicineRouteImport } from './routes/_authenticated/telemedicine'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedSurgeryRouteImport } from './routes/_authenticated/surgery'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
+import { Route as AuthenticatedScheduleCalendarRouteImport } from './routes/_authenticated/schedule-calendar'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
+import { Route as AuthenticatedRbacUserRouteImport } from './routes/_authenticated/rbac-user'
+import { Route as AuthenticatedRbacRouteImport } from './routes/_authenticated/rbac'
+import { Route as AuthenticatedQueueRouteImport } from './routes/_authenticated/queue'
+import { Route as AuthenticatedQrScanRouteImport } from './routes/_authenticated/qr-scan'
+import { Route as AuthenticatedPredictionsRouteImport } from './routes/_authenticated/predictions'
 import { Route as AuthenticatedPharmacyRouteImport } from './routes/_authenticated/pharmacy'
 import { Route as AuthenticatedPatientsRouteImport } from './routes/_authenticated/patients'
+import { Route as AuthenticatedNurseDiaryRouteImport } from './routes/_authenticated/nurse-diary'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedNotificationLogsRouteImport } from './routes/_authenticated/notification-logs'
 import { Route as AuthenticatedMedicineSettingsRouteImport } from './routes/_authenticated/medicine-settings'
 import { Route as AuthenticatedLaboratoryRouteImport } from './routes/_authenticated/laboratory'
 import { Route as AuthenticatedInfrastructureRouteImport } from './routes/_authenticated/infrastructure'
+import { Route as AuthenticatedInfectionControlRouteImport } from './routes/_authenticated/infection-control'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedDocumentTemplatesRouteImport } from './routes/_authenticated/document-templates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedChiefDashboardRouteImport } from './routes/_authenticated/chief-dashboard'
+import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
@@ -33,17 +53,23 @@ import { Route as AuthenticatedInfrastructureIndexRouteImport } from './routes/_
 import { Route as PortalPortalTreatmentRouteImport } from './routes/portal/_portal/treatment'
 import { Route as PortalPortalScheduleRouteImport } from './routes/portal/_portal/schedule'
 import { Route as PortalPortalResultsRouteImport } from './routes/portal/_portal/results'
+import { Route as PortalPortalRemindersRouteImport } from './routes/portal/_portal/reminders'
 import { Route as PortalPortalRecoveryRouteImport } from './routes/portal/_portal/recovery'
+import { Route as PortalPortalRatingsRouteImport } from './routes/portal/_portal/ratings'
 import { Route as PortalPortalProfileRouteImport } from './routes/portal/_portal/profile'
 import { Route as PortalPortalMessagesRouteImport } from './routes/portal/_portal/messages'
 import { Route as PortalPortalMedicalCardRouteImport } from './routes/portal/_portal/medical-card'
+import { Route as PortalPortalLoyaltyRouteImport } from './routes/portal/_portal/loyalty'
 import { Route as PortalPortalHistoryRouteImport } from './routes/portal/_portal/history'
+import { Route as PortalPortalFamilyRouteImport } from './routes/portal/_portal/family'
 import { Route as PortalPortalExercisesRouteImport } from './routes/portal/_portal/exercises'
 import { Route as PortalPortalExerciseSessionRouteImport } from './routes/portal/_portal/exercise-session'
 import { Route as PortalPortalExerciseProgressRouteImport } from './routes/portal/_portal/exercise-progress'
 import { Route as PortalPortalDashboardRouteImport } from './routes/portal/_portal/dashboard'
+import { Route as PortalPortalClinicInfoRouteImport } from './routes/portal/_portal/clinic-info'
 import { Route as PortalPortalBillingRouteImport } from './routes/portal/_portal/billing'
 import { Route as PortalPortalAppointmentsRouteImport } from './routes/portal/_portal/appointments'
+import { Route as PortalPortalAiChatRouteImport } from './routes/portal/_portal/ai-chat'
 import { Route as AuthenticatedStaffNewRouteImport } from './routes/_authenticated/staff.new'
 import { Route as AuthenticatedStaffStaffIdRouteImport } from './routes/_authenticated/staff.$staffId'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients.new'
@@ -77,6 +103,16 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LobbyRoute = LobbyRouteImport.update({
+  id: '/lobby',
+  path: '/lobby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BedsideRoute = BedsideRouteImport.update({
+  id: '/bedside',
+  path: '/bedside',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -96,22 +132,85 @@ const PortalPortalRoute = PortalPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWristbandsRoute = AuthenticatedWristbandsRouteImport.update({
+  id: '/wristbands',
+  path: '/wristbands',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedVisitSummariesRoute =
+  AuthenticatedVisitSummariesRouteImport.update({
+    id: '/visit-summaries',
+    path: '/visit-summaries',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTelemedicineRoute =
   AuthenticatedTelemedicineRouteImport.update({
     id: '/telemedicine',
     path: '/telemedicine',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSurgeryRoute = AuthenticatedSurgeryRouteImport.update({
+  id: '/surgery',
+  path: '/surgery',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedScheduleCalendarRoute =
+  AuthenticatedScheduleCalendarRouteImport.update({
+    id: '/schedule-calendar',
+    path: '/schedule-calendar',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
   id: '/schedule',
   path: '/schedule',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRbacUserRoute = AuthenticatedRbacUserRouteImport.update({
+  id: '/rbac-user',
+  path: '/rbac-user',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRbacRoute = AuthenticatedRbacRouteImport.update({
+  id: '/rbac',
+  path: '/rbac',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedQueueRoute = AuthenticatedQueueRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedQrScanRoute = AuthenticatedQrScanRouteImport.update({
+  id: '/qr-scan',
+  path: '/qr-scan',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPredictionsRoute =
+  AuthenticatedPredictionsRouteImport.update({
+    id: '/predictions',
+    path: '/predictions',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPharmacyRoute = AuthenticatedPharmacyRouteImport.update({
   id: '/pharmacy',
   path: '/pharmacy',
@@ -122,10 +221,21 @@ const AuthenticatedPatientsRoute = AuthenticatedPatientsRouteImport.update({
   path: '/patients',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNurseDiaryRoute = AuthenticatedNurseDiaryRouteImport.update({
+  id: '/nurse-diary',
+  path: '/nurse-diary',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
     path: '/notifications',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedNotificationLogsRoute =
+  AuthenticatedNotificationLogsRouteImport.update({
+    id: '/notification-logs',
+    path: '/notification-logs',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedMedicineSettingsRoute =
@@ -145,14 +255,37 @@ const AuthenticatedInfrastructureRoute =
     path: '/infrastructure',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedInfectionControlRoute =
+  AuthenticatedInfectionControlRouteImport.update({
+    id: '/infection-control',
+    path: '/infection-control',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDocumentTemplatesRoute =
+  AuthenticatedDocumentTemplatesRouteImport.update({
+    id: '/document-templates',
+    path: '/document-templates',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedChiefDashboardRoute =
+  AuthenticatedChiefDashboardRouteImport.update({
+    id: '/chief-dashboard',
+    path: '/chief-dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAuditRoute = AuthenticatedAuditRouteImport.update({
@@ -197,9 +330,19 @@ const PortalPortalResultsRoute = PortalPortalResultsRouteImport.update({
   path: '/results',
   getParentRoute: () => PortalPortalRoute,
 } as any)
+const PortalPortalRemindersRoute = PortalPortalRemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
 const PortalPortalRecoveryRoute = PortalPortalRecoveryRouteImport.update({
   id: '/recovery',
   path: '/recovery',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalRatingsRoute = PortalPortalRatingsRouteImport.update({
+  id: '/ratings',
+  path: '/ratings',
   getParentRoute: () => PortalPortalRoute,
 } as any)
 const PortalPortalProfileRoute = PortalPortalProfileRouteImport.update({
@@ -217,9 +360,19 @@ const PortalPortalMedicalCardRoute = PortalPortalMedicalCardRouteImport.update({
   path: '/medical-card',
   getParentRoute: () => PortalPortalRoute,
 } as any)
+const PortalPortalLoyaltyRoute = PortalPortalLoyaltyRouteImport.update({
+  id: '/loyalty',
+  path: '/loyalty',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
 const PortalPortalHistoryRoute = PortalPortalHistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
+const PortalPortalFamilyRoute = PortalPortalFamilyRouteImport.update({
+  id: '/family',
+  path: '/family',
   getParentRoute: () => PortalPortalRoute,
 } as any)
 const PortalPortalExercisesRoute = PortalPortalExercisesRouteImport.update({
@@ -244,6 +397,11 @@ const PortalPortalDashboardRoute = PortalPortalDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => PortalPortalRoute,
 } as any)
+const PortalPortalClinicInfoRoute = PortalPortalClinicInfoRouteImport.update({
+  id: '/clinic-info',
+  path: '/clinic-info',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
 const PortalPortalBillingRoute = PortalPortalBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -255,6 +413,11 @@ const PortalPortalAppointmentsRoute =
     path: '/appointments',
     getParentRoute: () => PortalPortalRoute,
   } as any)
+const PortalPortalAiChatRoute = PortalPortalAiChatRouteImport.update({
+  id: '/ai-chat',
+  path: '/ai-chat',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
 const AuthenticatedStaffNewRoute = AuthenticatedStaffNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -419,20 +582,40 @@ const AuthenticatedPatientsPatientIdHistoryEntryIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bedside': typeof BedsideRoute
+  '/lobby': typeof LobbyRoute
   '/login': typeof LoginRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/audit': typeof AuthenticatedAuditRoute
+  '/chat': typeof AuthenticatedChatRoute
+  '/chief-dashboard': typeof AuthenticatedChiefDashboardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/document-templates': typeof AuthenticatedDocumentTemplatesRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/infection-control': typeof AuthenticatedInfectionControlRoute
   '/infrastructure': typeof AuthenticatedInfrastructureRouteWithChildren
   '/laboratory': typeof AuthenticatedLaboratoryRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
+  '/notification-logs': typeof AuthenticatedNotificationLogsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/nurse-diary': typeof AuthenticatedNurseDiaryRoute
   '/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/pharmacy': typeof AuthenticatedPharmacyRoute
+  '/predictions': typeof AuthenticatedPredictionsRoute
+  '/qr-scan': typeof AuthenticatedQrScanRoute
+  '/queue': typeof AuthenticatedQueueRoute
+  '/rbac': typeof AuthenticatedRbacRoute
+  '/rbac-user': typeof AuthenticatedRbacUserRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/schedule': typeof AuthenticatedScheduleRoute
+  '/schedule-calendar': typeof AuthenticatedScheduleCalendarRoute
   '/staff': typeof AuthenticatedStaffRouteWithChildren
+  '/surgery': typeof AuthenticatedSurgeryRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/telemedicine': typeof AuthenticatedTelemedicineRoute
+  '/visit-summaries': typeof AuthenticatedVisitSummariesRoute
+  '/wristbands': typeof AuthenticatedWristbandsRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/infrastructure/automation': typeof AuthenticatedInfrastructureAutomationRoute
@@ -444,17 +627,23 @@ export interface FileRoutesByFullPath {
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/staff/$staffId': typeof AuthenticatedStaffStaffIdRoute
   '/staff/new': typeof AuthenticatedStaffNewRoute
+  '/portal/ai-chat': typeof PortalPortalAiChatRoute
   '/portal/appointments': typeof PortalPortalAppointmentsRoute
   '/portal/billing': typeof PortalPortalBillingRoute
+  '/portal/clinic-info': typeof PortalPortalClinicInfoRoute
   '/portal/dashboard': typeof PortalPortalDashboardRoute
   '/portal/exercise-progress': typeof PortalPortalExerciseProgressRoute
   '/portal/exercise-session': typeof PortalPortalExerciseSessionRoute
   '/portal/exercises': typeof PortalPortalExercisesRoute
+  '/portal/family': typeof PortalPortalFamilyRoute
   '/portal/history': typeof PortalPortalHistoryRoute
+  '/portal/loyalty': typeof PortalPortalLoyaltyRoute
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
   '/portal/profile': typeof PortalPortalProfileRoute
+  '/portal/ratings': typeof PortalPortalRatingsRoute
   '/portal/recovery': typeof PortalPortalRecoveryRoute
+  '/portal/reminders': typeof PortalPortalRemindersRoute
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
@@ -482,17 +671,37 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bedside': typeof BedsideRoute
+  '/lobby': typeof LobbyRoute
   '/login': typeof LoginRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/audit': typeof AuthenticatedAuditRoute
+  '/chat': typeof AuthenticatedChatRoute
+  '/chief-dashboard': typeof AuthenticatedChiefDashboardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/document-templates': typeof AuthenticatedDocumentTemplatesRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/infection-control': typeof AuthenticatedInfectionControlRoute
   '/laboratory': typeof AuthenticatedLaboratoryRoute
   '/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
+  '/notification-logs': typeof AuthenticatedNotificationLogsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/nurse-diary': typeof AuthenticatedNurseDiaryRoute
   '/pharmacy': typeof AuthenticatedPharmacyRoute
+  '/predictions': typeof AuthenticatedPredictionsRoute
+  '/qr-scan': typeof AuthenticatedQrScanRoute
+  '/queue': typeof AuthenticatedQueueRoute
+  '/rbac': typeof AuthenticatedRbacRoute
+  '/rbac-user': typeof AuthenticatedRbacUserRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/schedule': typeof AuthenticatedScheduleRoute
+  '/schedule-calendar': typeof AuthenticatedScheduleCalendarRoute
+  '/surgery': typeof AuthenticatedSurgeryRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/telemedicine': typeof AuthenticatedTelemedicineRoute
+  '/visit-summaries': typeof AuthenticatedVisitSummariesRoute
+  '/wristbands': typeof AuthenticatedWristbandsRoute
   '/portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/infrastructure/automation': typeof AuthenticatedInfrastructureAutomationRoute
@@ -503,17 +712,23 @@ export interface FileRoutesByTo {
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/staff/$staffId': typeof AuthenticatedStaffStaffIdRoute
   '/staff/new': typeof AuthenticatedStaffNewRoute
+  '/portal/ai-chat': typeof PortalPortalAiChatRoute
   '/portal/appointments': typeof PortalPortalAppointmentsRoute
   '/portal/billing': typeof PortalPortalBillingRoute
+  '/portal/clinic-info': typeof PortalPortalClinicInfoRoute
   '/portal/dashboard': typeof PortalPortalDashboardRoute
   '/portal/exercise-progress': typeof PortalPortalExerciseProgressRoute
   '/portal/exercise-session': typeof PortalPortalExerciseSessionRoute
   '/portal/exercises': typeof PortalPortalExercisesRoute
+  '/portal/family': typeof PortalPortalFamilyRoute
   '/portal/history': typeof PortalPortalHistoryRoute
+  '/portal/loyalty': typeof PortalPortalLoyaltyRoute
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
   '/portal/profile': typeof PortalPortalProfileRoute
+  '/portal/ratings': typeof PortalPortalRatingsRoute
   '/portal/recovery': typeof PortalPortalRecoveryRoute
+  '/portal/reminders': typeof PortalPortalRemindersRoute
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
@@ -542,20 +757,40 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/bedside': typeof BedsideRoute
+  '/lobby': typeof LobbyRoute
   '/login': typeof LoginRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
+  '/_authenticated/chat': typeof AuthenticatedChatRoute
+  '/_authenticated/chief-dashboard': typeof AuthenticatedChiefDashboardRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/document-templates': typeof AuthenticatedDocumentTemplatesRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/infection-control': typeof AuthenticatedInfectionControlRoute
   '/_authenticated/infrastructure': typeof AuthenticatedInfrastructureRouteWithChildren
   '/_authenticated/laboratory': typeof AuthenticatedLaboratoryRoute
   '/_authenticated/medicine-settings': typeof AuthenticatedMedicineSettingsRoute
+  '/_authenticated/notification-logs': typeof AuthenticatedNotificationLogsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/nurse-diary': typeof AuthenticatedNurseDiaryRoute
   '/_authenticated/patients': typeof AuthenticatedPatientsRouteWithChildren
   '/_authenticated/pharmacy': typeof AuthenticatedPharmacyRoute
+  '/_authenticated/predictions': typeof AuthenticatedPredictionsRoute
+  '/_authenticated/qr-scan': typeof AuthenticatedQrScanRoute
+  '/_authenticated/queue': typeof AuthenticatedQueueRoute
+  '/_authenticated/rbac': typeof AuthenticatedRbacRoute
+  '/_authenticated/rbac-user': typeof AuthenticatedRbacUserRoute
+  '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
+  '/_authenticated/schedule-calendar': typeof AuthenticatedScheduleCalendarRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRouteWithChildren
+  '/_authenticated/surgery': typeof AuthenticatedSurgeryRoute
+  '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/telemedicine': typeof AuthenticatedTelemedicineRoute
+  '/_authenticated/visit-summaries': typeof AuthenticatedVisitSummariesRoute
+  '/_authenticated/wristbands': typeof AuthenticatedWristbandsRoute
   '/portal/_portal': typeof PortalPortalRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/_authenticated/infrastructure/automation': typeof AuthenticatedInfrastructureAutomationRoute
@@ -567,17 +802,23 @@ export interface FileRoutesById {
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
   '/_authenticated/staff/$staffId': typeof AuthenticatedStaffStaffIdRoute
   '/_authenticated/staff/new': typeof AuthenticatedStaffNewRoute
+  '/portal/_portal/ai-chat': typeof PortalPortalAiChatRoute
   '/portal/_portal/appointments': typeof PortalPortalAppointmentsRoute
   '/portal/_portal/billing': typeof PortalPortalBillingRoute
+  '/portal/_portal/clinic-info': typeof PortalPortalClinicInfoRoute
   '/portal/_portal/dashboard': typeof PortalPortalDashboardRoute
   '/portal/_portal/exercise-progress': typeof PortalPortalExerciseProgressRoute
   '/portal/_portal/exercise-session': typeof PortalPortalExerciseSessionRoute
   '/portal/_portal/exercises': typeof PortalPortalExercisesRoute
+  '/portal/_portal/family': typeof PortalPortalFamilyRoute
   '/portal/_portal/history': typeof PortalPortalHistoryRoute
+  '/portal/_portal/loyalty': typeof PortalPortalLoyaltyRoute
   '/portal/_portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/_portal/messages': typeof PortalPortalMessagesRoute
   '/portal/_portal/profile': typeof PortalPortalProfileRoute
+  '/portal/_portal/ratings': typeof PortalPortalRatingsRoute
   '/portal/_portal/recovery': typeof PortalPortalRecoveryRoute
+  '/portal/_portal/reminders': typeof PortalPortalRemindersRoute
   '/portal/_portal/results': typeof PortalPortalResultsRoute
   '/portal/_portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/_portal/treatment': typeof PortalPortalTreatmentRoute
@@ -607,20 +848,40 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/bedside'
+    | '/lobby'
     | '/login'
     | '/analytics'
     | '/audit'
+    | '/chat'
+    | '/chief-dashboard'
     | '/dashboard'
+    | '/document-templates'
     | '/finance'
+    | '/infection-control'
     | '/infrastructure'
     | '/laboratory'
     | '/medicine-settings'
+    | '/notification-logs'
     | '/notifications'
+    | '/nurse-diary'
     | '/patients'
     | '/pharmacy'
+    | '/predictions'
+    | '/qr-scan'
+    | '/queue'
+    | '/rbac'
+    | '/rbac-user'
+    | '/referrals'
+    | '/reports'
     | '/schedule'
+    | '/schedule-calendar'
     | '/staff'
+    | '/surgery'
+    | '/tasks'
     | '/telemedicine'
+    | '/visit-summaries'
+    | '/wristbands'
     | '/portal'
     | '/portal/login'
     | '/infrastructure/automation'
@@ -632,17 +893,23 @@ export interface FileRouteTypes {
     | '/patients/new'
     | '/staff/$staffId'
     | '/staff/new'
+    | '/portal/ai-chat'
     | '/portal/appointments'
     | '/portal/billing'
+    | '/portal/clinic-info'
     | '/portal/dashboard'
     | '/portal/exercise-progress'
     | '/portal/exercise-session'
     | '/portal/exercises'
+    | '/portal/family'
     | '/portal/history'
+    | '/portal/loyalty'
     | '/portal/medical-card'
     | '/portal/messages'
     | '/portal/profile'
+    | '/portal/ratings'
     | '/portal/recovery'
+    | '/portal/reminders'
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
@@ -670,17 +937,37 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/bedside'
+    | '/lobby'
     | '/login'
     | '/analytics'
     | '/audit'
+    | '/chat'
+    | '/chief-dashboard'
     | '/dashboard'
+    | '/document-templates'
     | '/finance'
+    | '/infection-control'
     | '/laboratory'
     | '/medicine-settings'
+    | '/notification-logs'
     | '/notifications'
+    | '/nurse-diary'
     | '/pharmacy'
+    | '/predictions'
+    | '/qr-scan'
+    | '/queue'
+    | '/rbac'
+    | '/rbac-user'
+    | '/referrals'
+    | '/reports'
     | '/schedule'
+    | '/schedule-calendar'
+    | '/surgery'
+    | '/tasks'
     | '/telemedicine'
+    | '/visit-summaries'
+    | '/wristbands'
     | '/portal'
     | '/portal/login'
     | '/infrastructure/automation'
@@ -691,17 +978,23 @@ export interface FileRouteTypes {
     | '/patients/new'
     | '/staff/$staffId'
     | '/staff/new'
+    | '/portal/ai-chat'
     | '/portal/appointments'
     | '/portal/billing'
+    | '/portal/clinic-info'
     | '/portal/dashboard'
     | '/portal/exercise-progress'
     | '/portal/exercise-session'
     | '/portal/exercises'
+    | '/portal/family'
     | '/portal/history'
+    | '/portal/loyalty'
     | '/portal/medical-card'
     | '/portal/messages'
     | '/portal/profile'
+    | '/portal/ratings'
     | '/portal/recovery'
+    | '/portal/reminders'
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
@@ -729,20 +1022,40 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/bedside'
+    | '/lobby'
     | '/login'
     | '/_authenticated/analytics'
     | '/_authenticated/audit'
+    | '/_authenticated/chat'
+    | '/_authenticated/chief-dashboard'
     | '/_authenticated/dashboard'
+    | '/_authenticated/document-templates'
     | '/_authenticated/finance'
+    | '/_authenticated/infection-control'
     | '/_authenticated/infrastructure'
     | '/_authenticated/laboratory'
     | '/_authenticated/medicine-settings'
+    | '/_authenticated/notification-logs'
     | '/_authenticated/notifications'
+    | '/_authenticated/nurse-diary'
     | '/_authenticated/patients'
     | '/_authenticated/pharmacy'
+    | '/_authenticated/predictions'
+    | '/_authenticated/qr-scan'
+    | '/_authenticated/queue'
+    | '/_authenticated/rbac'
+    | '/_authenticated/rbac-user'
+    | '/_authenticated/referrals'
+    | '/_authenticated/reports'
     | '/_authenticated/schedule'
+    | '/_authenticated/schedule-calendar'
     | '/_authenticated/staff'
+    | '/_authenticated/surgery'
+    | '/_authenticated/tasks'
     | '/_authenticated/telemedicine'
+    | '/_authenticated/visit-summaries'
+    | '/_authenticated/wristbands'
     | '/portal/_portal'
     | '/portal/login'
     | '/_authenticated/infrastructure/automation'
@@ -754,17 +1067,23 @@ export interface FileRouteTypes {
     | '/_authenticated/patients/new'
     | '/_authenticated/staff/$staffId'
     | '/_authenticated/staff/new'
+    | '/portal/_portal/ai-chat'
     | '/portal/_portal/appointments'
     | '/portal/_portal/billing'
+    | '/portal/_portal/clinic-info'
     | '/portal/_portal/dashboard'
     | '/portal/_portal/exercise-progress'
     | '/portal/_portal/exercise-session'
     | '/portal/_portal/exercises'
+    | '/portal/_portal/family'
     | '/portal/_portal/history'
+    | '/portal/_portal/loyalty'
     | '/portal/_portal/medical-card'
     | '/portal/_portal/messages'
     | '/portal/_portal/profile'
+    | '/portal/_portal/ratings'
     | '/portal/_portal/recovery'
+    | '/portal/_portal/reminders'
     | '/portal/_portal/results'
     | '/portal/_portal/schedule'
     | '/portal/_portal/treatment'
@@ -794,6 +1113,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  BedsideRoute: typeof BedsideRoute
+  LobbyRoute: typeof LobbyRoute
   LoginRoute: typeof LoginRoute
   PortalPortalRoute: typeof PortalPortalRouteWithChildren
   PortalLoginRoute: typeof PortalLoginRoute
@@ -806,6 +1127,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lobby': {
+      id: '/lobby'
+      path: '/lobby'
+      fullPath: '/lobby'
+      preLoaderRoute: typeof LobbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bedside': {
+      id: '/bedside'
+      path: '/bedside'
+      fullPath: '/bedside'
+      preLoaderRoute: typeof BedsideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -836,11 +1171,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/wristbands': {
+      id: '/_authenticated/wristbands'
+      path: '/wristbands'
+      fullPath: '/wristbands'
+      preLoaderRoute: typeof AuthenticatedWristbandsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/visit-summaries': {
+      id: '/_authenticated/visit-summaries'
+      path: '/visit-summaries'
+      fullPath: '/visit-summaries'
+      preLoaderRoute: typeof AuthenticatedVisitSummariesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/telemedicine': {
       id: '/_authenticated/telemedicine'
       path: '/telemedicine'
       fullPath: '/telemedicine'
       preLoaderRoute: typeof AuthenticatedTelemedicineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/surgery': {
+      id: '/_authenticated/surgery'
+      path: '/surgery'
+      fullPath: '/surgery'
+      preLoaderRoute: typeof AuthenticatedSurgeryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/staff': {
@@ -850,11 +1213,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/schedule-calendar': {
+      id: '/_authenticated/schedule-calendar'
+      path: '/schedule-calendar'
+      fullPath: '/schedule-calendar'
+      preLoaderRoute: typeof AuthenticatedScheduleCalendarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/schedule': {
       id: '/_authenticated/schedule'
       path: '/schedule'
       fullPath: '/schedule'
       preLoaderRoute: typeof AuthenticatedScheduleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/referrals': {
+      id: '/_authenticated/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof AuthenticatedReferralsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/rbac-user': {
+      id: '/_authenticated/rbac-user'
+      path: '/rbac-user'
+      fullPath: '/rbac-user'
+      preLoaderRoute: typeof AuthenticatedRbacUserRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/rbac': {
+      id: '/_authenticated/rbac'
+      path: '/rbac'
+      fullPath: '/rbac'
+      preLoaderRoute: typeof AuthenticatedRbacRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/queue': {
+      id: '/_authenticated/queue'
+      path: '/queue'
+      fullPath: '/queue'
+      preLoaderRoute: typeof AuthenticatedQueueRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/qr-scan': {
+      id: '/_authenticated/qr-scan'
+      path: '/qr-scan'
+      fullPath: '/qr-scan'
+      preLoaderRoute: typeof AuthenticatedQrScanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/predictions': {
+      id: '/_authenticated/predictions'
+      path: '/predictions'
+      fullPath: '/predictions'
+      preLoaderRoute: typeof AuthenticatedPredictionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/pharmacy': {
@@ -871,11 +1290,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/nurse-diary': {
+      id: '/_authenticated/nurse-diary'
+      path: '/nurse-diary'
+      fullPath: '/nurse-diary'
+      preLoaderRoute: typeof AuthenticatedNurseDiaryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/notification-logs': {
+      id: '/_authenticated/notification-logs'
+      path: '/notification-logs'
+      fullPath: '/notification-logs'
+      preLoaderRoute: typeof AuthenticatedNotificationLogsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/medicine-settings': {
@@ -899,6 +1332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInfrastructureRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/infection-control': {
+      id: '/_authenticated/infection-control'
+      path: '/infection-control'
+      fullPath: '/infection-control'
+      preLoaderRoute: typeof AuthenticatedInfectionControlRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/finance': {
       id: '/_authenticated/finance'
       path: '/finance'
@@ -906,11 +1346,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/document-templates': {
+      id: '/_authenticated/document-templates'
+      path: '/document-templates'
+      fullPath: '/document-templates'
+      preLoaderRoute: typeof AuthenticatedDocumentTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/chief-dashboard': {
+      id: '/_authenticated/chief-dashboard'
+      path: '/chief-dashboard'
+      fullPath: '/chief-dashboard'
+      preLoaderRoute: typeof AuthenticatedChiefDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/chat': {
+      id: '/_authenticated/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AuthenticatedChatRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/audit': {
@@ -969,11 +1430,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPortalResultsRouteImport
       parentRoute: typeof PortalPortalRoute
     }
+    '/portal/_portal/reminders': {
+      id: '/portal/_portal/reminders'
+      path: '/reminders'
+      fullPath: '/portal/reminders'
+      preLoaderRoute: typeof PortalPortalRemindersRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
     '/portal/_portal/recovery': {
       id: '/portal/_portal/recovery'
       path: '/recovery'
       fullPath: '/portal/recovery'
       preLoaderRoute: typeof PortalPortalRecoveryRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/ratings': {
+      id: '/portal/_portal/ratings'
+      path: '/ratings'
+      fullPath: '/portal/ratings'
+      preLoaderRoute: typeof PortalPortalRatingsRouteImport
       parentRoute: typeof PortalPortalRoute
     }
     '/portal/_portal/profile': {
@@ -997,11 +1472,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPortalMedicalCardRouteImport
       parentRoute: typeof PortalPortalRoute
     }
+    '/portal/_portal/loyalty': {
+      id: '/portal/_portal/loyalty'
+      path: '/loyalty'
+      fullPath: '/portal/loyalty'
+      preLoaderRoute: typeof PortalPortalLoyaltyRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
     '/portal/_portal/history': {
       id: '/portal/_portal/history'
       path: '/history'
       fullPath: '/portal/history'
       preLoaderRoute: typeof PortalPortalHistoryRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/family': {
+      id: '/portal/_portal/family'
+      path: '/family'
+      fullPath: '/portal/family'
+      preLoaderRoute: typeof PortalPortalFamilyRouteImport
       parentRoute: typeof PortalPortalRoute
     }
     '/portal/_portal/exercises': {
@@ -1032,6 +1521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPortalDashboardRouteImport
       parentRoute: typeof PortalPortalRoute
     }
+    '/portal/_portal/clinic-info': {
+      id: '/portal/_portal/clinic-info'
+      path: '/clinic-info'
+      fullPath: '/portal/clinic-info'
+      preLoaderRoute: typeof PortalPortalClinicInfoRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
     '/portal/_portal/billing': {
       id: '/portal/_portal/billing'
       path: '/billing'
@@ -1044,6 +1540,13 @@ declare module '@tanstack/react-router' {
       path: '/appointments'
       fullPath: '/portal/appointments'
       preLoaderRoute: typeof PortalPortalAppointmentsRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/ai-chat': {
+      id: '/portal/_portal/ai-chat'
+      path: '/ai-chat'
+      fullPath: '/portal/ai-chat'
+      preLoaderRoute: typeof PortalPortalAiChatRouteImport
       parentRoute: typeof PortalPortalRoute
     }
     '/_authenticated/staff/new': {
@@ -1381,34 +1884,70 @@ const AuthenticatedStaffRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
+  AuthenticatedChatRoute: typeof AuthenticatedChatRoute
+  AuthenticatedChiefDashboardRoute: typeof AuthenticatedChiefDashboardRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDocumentTemplatesRoute: typeof AuthenticatedDocumentTemplatesRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedInfectionControlRoute: typeof AuthenticatedInfectionControlRoute
   AuthenticatedInfrastructureRoute: typeof AuthenticatedInfrastructureRouteWithChildren
   AuthenticatedLaboratoryRoute: typeof AuthenticatedLaboratoryRoute
   AuthenticatedMedicineSettingsRoute: typeof AuthenticatedMedicineSettingsRoute
+  AuthenticatedNotificationLogsRoute: typeof AuthenticatedNotificationLogsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedNurseDiaryRoute: typeof AuthenticatedNurseDiaryRoute
   AuthenticatedPatientsRoute: typeof AuthenticatedPatientsRouteWithChildren
   AuthenticatedPharmacyRoute: typeof AuthenticatedPharmacyRoute
+  AuthenticatedPredictionsRoute: typeof AuthenticatedPredictionsRoute
+  AuthenticatedQrScanRoute: typeof AuthenticatedQrScanRoute
+  AuthenticatedQueueRoute: typeof AuthenticatedQueueRoute
+  AuthenticatedRbacRoute: typeof AuthenticatedRbacRoute
+  AuthenticatedRbacUserRoute: typeof AuthenticatedRbacUserRoute
+  AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
+  AuthenticatedScheduleCalendarRoute: typeof AuthenticatedScheduleCalendarRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRouteWithChildren
+  AuthenticatedSurgeryRoute: typeof AuthenticatedSurgeryRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTelemedicineRoute: typeof AuthenticatedTelemedicineRoute
+  AuthenticatedVisitSummariesRoute: typeof AuthenticatedVisitSummariesRoute
+  AuthenticatedWristbandsRoute: typeof AuthenticatedWristbandsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
+  AuthenticatedChatRoute: AuthenticatedChatRoute,
+  AuthenticatedChiefDashboardRoute: AuthenticatedChiefDashboardRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDocumentTemplatesRoute: AuthenticatedDocumentTemplatesRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedInfectionControlRoute: AuthenticatedInfectionControlRoute,
   AuthenticatedInfrastructureRoute:
     AuthenticatedInfrastructureRouteWithChildren,
   AuthenticatedLaboratoryRoute: AuthenticatedLaboratoryRoute,
   AuthenticatedMedicineSettingsRoute: AuthenticatedMedicineSettingsRoute,
+  AuthenticatedNotificationLogsRoute: AuthenticatedNotificationLogsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedNurseDiaryRoute: AuthenticatedNurseDiaryRoute,
   AuthenticatedPatientsRoute: AuthenticatedPatientsRouteWithChildren,
   AuthenticatedPharmacyRoute: AuthenticatedPharmacyRoute,
+  AuthenticatedPredictionsRoute: AuthenticatedPredictionsRoute,
+  AuthenticatedQrScanRoute: AuthenticatedQrScanRoute,
+  AuthenticatedQueueRoute: AuthenticatedQueueRoute,
+  AuthenticatedRbacRoute: AuthenticatedRbacRoute,
+  AuthenticatedRbacUserRoute: AuthenticatedRbacUserRoute,
+  AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
+  AuthenticatedScheduleCalendarRoute: AuthenticatedScheduleCalendarRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRouteWithChildren,
+  AuthenticatedSurgeryRoute: AuthenticatedSurgeryRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTelemedicineRoute: AuthenticatedTelemedicineRoute,
+  AuthenticatedVisitSummariesRoute: AuthenticatedVisitSummariesRoute,
+  AuthenticatedWristbandsRoute: AuthenticatedWristbandsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -1416,34 +1955,46 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface PortalPortalRouteChildren {
+  PortalPortalAiChatRoute: typeof PortalPortalAiChatRoute
   PortalPortalAppointmentsRoute: typeof PortalPortalAppointmentsRoute
   PortalPortalBillingRoute: typeof PortalPortalBillingRoute
+  PortalPortalClinicInfoRoute: typeof PortalPortalClinicInfoRoute
   PortalPortalDashboardRoute: typeof PortalPortalDashboardRoute
   PortalPortalExerciseProgressRoute: typeof PortalPortalExerciseProgressRoute
   PortalPortalExerciseSessionRoute: typeof PortalPortalExerciseSessionRoute
   PortalPortalExercisesRoute: typeof PortalPortalExercisesRoute
+  PortalPortalFamilyRoute: typeof PortalPortalFamilyRoute
   PortalPortalHistoryRoute: typeof PortalPortalHistoryRoute
+  PortalPortalLoyaltyRoute: typeof PortalPortalLoyaltyRoute
   PortalPortalMedicalCardRoute: typeof PortalPortalMedicalCardRoute
   PortalPortalMessagesRoute: typeof PortalPortalMessagesRoute
   PortalPortalProfileRoute: typeof PortalPortalProfileRoute
+  PortalPortalRatingsRoute: typeof PortalPortalRatingsRoute
   PortalPortalRecoveryRoute: typeof PortalPortalRecoveryRoute
+  PortalPortalRemindersRoute: typeof PortalPortalRemindersRoute
   PortalPortalResultsRoute: typeof PortalPortalResultsRoute
   PortalPortalScheduleRoute: typeof PortalPortalScheduleRoute
   PortalPortalTreatmentRoute: typeof PortalPortalTreatmentRoute
 }
 
 const PortalPortalRouteChildren: PortalPortalRouteChildren = {
+  PortalPortalAiChatRoute: PortalPortalAiChatRoute,
   PortalPortalAppointmentsRoute: PortalPortalAppointmentsRoute,
   PortalPortalBillingRoute: PortalPortalBillingRoute,
+  PortalPortalClinicInfoRoute: PortalPortalClinicInfoRoute,
   PortalPortalDashboardRoute: PortalPortalDashboardRoute,
   PortalPortalExerciseProgressRoute: PortalPortalExerciseProgressRoute,
   PortalPortalExerciseSessionRoute: PortalPortalExerciseSessionRoute,
   PortalPortalExercisesRoute: PortalPortalExercisesRoute,
+  PortalPortalFamilyRoute: PortalPortalFamilyRoute,
   PortalPortalHistoryRoute: PortalPortalHistoryRoute,
+  PortalPortalLoyaltyRoute: PortalPortalLoyaltyRoute,
   PortalPortalMedicalCardRoute: PortalPortalMedicalCardRoute,
   PortalPortalMessagesRoute: PortalPortalMessagesRoute,
   PortalPortalProfileRoute: PortalPortalProfileRoute,
+  PortalPortalRatingsRoute: PortalPortalRatingsRoute,
   PortalPortalRecoveryRoute: PortalPortalRecoveryRoute,
+  PortalPortalRemindersRoute: PortalPortalRemindersRoute,
   PortalPortalResultsRoute: PortalPortalResultsRoute,
   PortalPortalScheduleRoute: PortalPortalScheduleRoute,
   PortalPortalTreatmentRoute: PortalPortalTreatmentRoute,
@@ -1456,6 +2007,8 @@ const PortalPortalRouteWithChildren = PortalPortalRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  BedsideRoute: BedsideRoute,
+  LobbyRoute: LobbyRoute,
   LoginRoute: LoginRoute,
   PortalPortalRoute: PortalPortalRouteWithChildren,
   PortalLoginRoute: PortalLoginRoute,

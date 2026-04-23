@@ -1,0 +1,2 @@
+[     323ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/chunk-5ARBDF5W.js?v=c6577c02:21608
+[     463ms] [WARNING] Please ensure that the container has a non-static position, like 'relative', 'fixed', or 'absolute' to ensure scroll offset is calculated correctly. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=c6577c02:695

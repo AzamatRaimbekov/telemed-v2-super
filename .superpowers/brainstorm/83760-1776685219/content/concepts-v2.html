@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCore KG — New Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050505; color: #fff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+  .sub { color: #555; font-size: 14px; margin-bottom: 48px; }
+
+  .concept {
+    border: 2px solid #151515;
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .concept:hover { border-color: #252525; }
+  .concept.selected { border-color: #BDEDE0; box-shadow: 0 0 60px rgba(189,237,224,0.08); }
+  .concept.selected .concept-label::after {
+    content: '✓ ВЫБРАНО';
+    position: absolute; top: 16px; right: 20px;
+    padding: 4px 12px; border-radius: 6px;
+    background: #BDEDE0; color: #000;
+    font-size: 10px; font-weight: 800;
+  }
+  .concept-label {
+    padding: 16px 20px;
+    background: #0a0a0a;
+    border-bottom: 1px solid #151515;
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; gap: 12px;
+    position: relative;
+  }
+  .concept-label .tag {
+    padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 600;
+  }
+  .concept-preview { position: relative; }
+
+  /* ============ CONCEPT A: NEON PULSE ============ */
+  .neon-hero {
+    height: 600px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Animated neon blobs */
+  .neon-blob {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+    animation: blobFloat 8s ease-in-out infinite;
+  }
+  .nb1 { width: 500px; height: 500px; top: -15%; left: -10%; background: rgba(0,240,180,0.15); animation-delay: 0s; }
+  .nb2 { width: 400px; height: 400px; top: 20%; right: -10%; background: rgba(100,80,255,0.12); animation-delay: -3s; }
+  .nb3 { width: 350px; height: 350px; bottom: -10%; left: 30%; background: rgba(0,200,255,0.10); animation-delay: -5s; }
+  @keyframes blobFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    25% { transform: translate(30px,-20px) scale(1.05); }
+    50% { transform: translate(-20px,30px) scale(0.95); }
+    75% { transform: translate(20px,10px) scale(1.02); }
+  }
+
+  .neon-nav {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 10;
+  }
+  .neon-nav .logo {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .neon-nav .logo .mark {
+    width: 36px; height: 36px; border-radius: 12px;
+    background: linear-gradient(135deg, #00F0B4, #00C8FF);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: #000;
+    box-shadow: 0 0 20px rgba(0,240,180,0.4);
+  }
+  .neon-nav .logo span { font-weight: 700; font-size: 16px; }
+  .neon-nav .cta-btn {
+    padding: 8px 20px; border-radius: 10px;
+    background: linear-gradient(135deg, #00F0B4, #00C8FF);
+    font-size: 12px; font-weight: 700; color: #000;
+    box-shadow: 0 0 30px rgba(0,240,180,0.3);
+  }
+
+  .neon-content {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; z-index: 10;
+    width: 90%;
+  }
+  .neon-content .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 50px;
+    background: rgba(0,240,180,0.08); border: 1px solid rgba(0,240,180,0.2);
+    font-size: 11px; font-weight: 600; color: #00F0B4;
+    margin-bottom: 24px;
+  }
+  .neon-content .badge .live { width: 5px; height: 5px; border-radius: 50%; background: #00F0B4; box-shadow: 0 0 6px #00F0B4; }
+  .neon-content h2 {
+    font-size: 64px; font-weight: 900; line-height: 1.05; letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  .neon-content h2 .glow {
+    background: linear-gradient(135deg, #00F0B4, #00C8FF, #6450FF);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  .neon-content .desc {
+    font-size: 16px; color: rgba(255,255,255,0.4); margin-bottom: 32px;
+    max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.6;
+  }
+  .neon-content .actions { display: flex; gap: 12px; justify-content: center; }
+  .neon-content .actions .primary {
+    height: 48px; padding: 0 28px; border-radius: 14px;
+    background: linear-gradient(135deg, #00F0B4, #00C8FF);
+    font-size: 14px; font-weight: 700; color: #000;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 40px rgba(0,240,180,0.25);
+  }
+  .neon-content .actions .secondary {
+    height: 48px; padding: 0 28px; border-radius: 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px; color: rgba(255,255,255,0.6);
+    display: flex; align-items: center;
+  }
+
+  /* Floating stats */
+  .neon-stats {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 16px; z-index: 10;
+  }
+  .neon-stat {
+    padding: 14px 20px; border-radius: 14px;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.06);
+    min-width: 140px;
+  }
+  .neon-stat .label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .neon-stat .val { font-size: 22px; font-weight: 800; }
+  .ns-mint .label { color: rgba(0,240,180,0.6); }
+  .ns-mint .val { color: #00F0B4; }
+  .ns-blue .label { color: rgba(0,200,255,0.6); }
+  .ns-blue .val { color: #00C8FF; }
+  .ns-purple .label { color: rgba(100,80,255,0.6); }
+  .ns-purple .val { color: #6450FF; }
+
+  /* ============ CONCEPT B: WARM PREMIUM ============ */
+  .warm-hero {
+    height: 600px;
+    background: linear-gradient(180deg, #0C0A09 0%, #1C1410 50%, #0C0A09 100%);
+    position: relative; overflow: hidden;
+  }
+  .warm-glow {
+    position: absolute; border-radius: 50%; filter: blur(100px);
+  }
+  .wg1 { width: 600px; height: 600px; top: -20%; left: 20%; background: rgba(234,179,8,0.08); }
+  .wg2 { width: 400px; height: 400px; bottom: -10%; right: 10%; background: rgba(251,146,60,0.06); }
+
+  .warm-nav {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 10;
+  }
+  .warm-nav .logo { display: flex; align-items: center; gap: 10px; }
+  .warm-nav .logo .mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #EAB308, #FB923C);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: #0C0A09;
+  }
+  .warm-nav .logo span { font-weight: 700; font-size: 16px; color: #FAFAF9; }
+  .warm-nav .links { display: flex; gap: 28px; }
+  .warm-nav .links a { font-size: 13px; color: rgba(250,250,249,0.4); text-decoration: none; }
+  .warm-nav .cta-btn {
+    padding: 8px 20px; border-radius: 10px;
+    background: linear-gradient(135deg, #EAB308, #FB923C);
+    font-size: 12px; font-weight: 700; color: #0C0A09;
+  }
+
+  .warm-content {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center; z-index: 10; width: 90%;
+  }
+  .warm-content .eyebrow {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 4px; color: rgba(234,179,8,0.6);
+    margin-bottom: 20px;
+  }
+  .warm-content h2 {
+    font-size: 58px; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px;
+    color: #FAFAF9; margin-bottom: 16px;
+  }
+  .warm-content h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #EAB308, #FB923C);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .warm-content .desc {
+    font-size: 16px; color: rgba(250,250,249,0.35); margin-bottom: 36px;
+    max-width: 460px; margin-left: auto; margin-right: auto; line-height: 1.6;
+  }
+  .warm-content .actions { display: flex; gap: 12px; justify-content: center; }
+  .warm-content .actions .primary {
+    height: 52px; padding: 0 32px; border-radius: 14px;
+    background: linear-gradient(135deg, #EAB308, #FB923C);
+    font-size: 15px; font-weight: 700; color: #0C0A09;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 40px rgba(234,179,8,0.2);
+  }
+  .warm-content .actions .secondary {
+    height: 52px; padding: 0 32px; border-radius: 14px;
+    background: rgba(250,250,249,0.04); border: 1px solid rgba(250,250,249,0.08);
+    font-size: 15px; color: rgba(250,250,249,0.5);
+    display: flex; align-items: center;
+  }
+
+  /* Bottom feature strip */
+  .warm-features {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    border-top: 1px solid rgba(250,250,249,0.06);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    z-index: 10;
+  }
+  .warm-feat {
+    padding: 20px 24px;
+    border-right: 1px solid rgba(250,250,249,0.06);
+    text-align: center;
+  }
+  .warm-feat:last-child { border-right: none; }
+  .warm-feat .num { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .warm-feat .txt { font-size: 11px; color: rgba(250,250,249,0.35); }
+  .wf-gold .num { color: #EAB308; }
+  .wf-orange .num { color: #FB923C; }
+  .wf-cream .num { color: #FAFAF9; }
+
+  /* ============ CONCEPT C: ELECTRIC BLUE ============ */
+  .electric-hero {
+    height: 600px;
+    background: #020617;
+    position: relative; overflow: hidden;
+  }
+  /* Grid lines */
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .grid-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, transparent 20%, #020617 70%);
+  }
+  /* Electric glow */
+  .elec-glow {
+    position: absolute; top: 30%; left: 50%; transform: translate(-50%,-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.08) 40%, transparent 70%);
+  }
+
+  .electric-nav {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between; z-index: 10;
+  }
+  .electric-nav .logo { display: flex; align-items: center; gap: 10px; }
+  .electric-nav .logo .mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: #fff;
+    box-shadow: 0 0 20px rgba(59,130,246,0.3);
+  }
+  .electric-nav .logo span { font-weight: 700; font-size: 16px; color: #E2E8F0; }
+  .electric-nav .cta-btn {
+    padding: 8px 20px; border-radius: 10px;
+    background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+    font-size: 12px; font-weight: 700; color: #fff;
+    box-shadow: 0 0 25px rgba(59,130,246,0.25);
+  }
+
+  .electric-content {
+    position: absolute; top: 42%; left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center; z-index: 10; width: 90%;
+  }
+  .electric-content .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 14px; border-radius: 8px;
+    background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+    font-size: 11px; font-weight: 600; color: #60A5FA;
+    margin-bottom: 24px;
+  }
+  .electric-content h2 {
+    font-size: 60px; font-weight: 900; line-height: 1.08; letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  .electric-content h2 .blue {
+    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .electric-content h2 .purple {
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .electric-content .desc {
+    font-size: 16px; color: #64748B; max-width: 460px;
+    margin: 0 auto 32px; line-height: 1.6;
+  }
+  .electric-content .actions { display: flex; gap: 12px; justify-content: center; }
+  .electric-content .actions .primary {
+    height: 50px; padding: 0 30px; border-radius: 14px;
+    background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+    font-size: 14px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 40px rgba(59,130,246,0.3);
+  }
+  .electric-content .actions .secondary {
+    height: 50px; padding: 0 30px; border-radius: 14px;
+    background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.15);
+    font-size: 14px; color: #60A5FA;
+    display: flex; align-items: center;
+  }
+
+  /* Dashboard mockup */
+  .electric-dashboard {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    width: 85%; max-width: 700px;
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(59,130,246,0.1);
+    background: rgba(2,6,23,0.8); backdrop-filter: blur(20px);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(59,130,246,0.05);
+    z-index: 10;
+  }
+  .ed-chrome {
+    height: 28px; background: rgba(15,23,42,0.9);
+    border-bottom: 1px solid rgba(59,130,246,0.06);
+    display: flex; align-items: center; padding: 0 12px; gap: 6px;
+  }
+  .ed-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ed-body {
+    height: 120px; padding: 12px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+  }
+  .ed-card {
+    border-radius: 8px; padding: 10px;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+  }
+  .ed-card .l { font-size: 8px; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .ed-card .v { font-size: 20px; font-weight: 800; margin-top: 4px; }
+  .ed-card .b { height: 3px; border-radius: 2px; margin-top: 8px; background: rgba(255,255,255,0.04); }
+  .ed-card .bf { height: 100%; border-radius: 2px; }
+
+  /* Footer hint */
+  .hint {
+    text-align: center; padding: 40px 24px;
+    font-size: 13px; color: #333;
+  }
+  .hint strong { color: #BDEDE0; }
+
+  /* Selection */
+  script { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>3 новых концепта</h1>
+  <p class="sub">Больше визуала, wow-эффект, другие палитры. Кликни на тот который зацепит.</p>
+
+  <!-- CONCEPT A: NEON PULSE -->
+  <div class="concept" data-choice="neon-pulse" onclick="this.classList.toggle('selected')">
+    <div class="concept-label">
+      A — Neon Pulse
+      <span class="tag" style="background:rgba(0,240,180,0.12);color:#00F0B4;">Cyan + Green + Purple</span>
+    </div>
+    <div class="concept-preview">
+      <div class="neon-hero">
+        <div class="neon-blob nb1"></div>
+        <div class="neon-blob nb2"></div>
+        <div class="neon-blob nb3"></div>
+
+        <div class="neon-nav">
+          <div class="logo">
+            <div class="mark">M</div>
+            <span>MedCore</span>
+          </div>
+          <div class="cta-btn">Начать →</div>
+        </div>
+
+        <div class="neon-content">
+          <div class="badge"><span class="live"></span> Платформа нового поколения</div>
+          <h2>Управляй клиникой<br><span class="glow">на скорости света</span></h2>
+          <p class="desc">16 модулей. Реальное время. AI. Единая система для всего — от регистратуры до лаборатории.</p>
+          <div class="actions">
+            <div class="primary">Попробовать бесплатно →</div>
+            <div class="secondary">▶ Демо</div>
+          </div>
+        </div>
+
+        <div class="neon-stats">
+          <div class="neon-stat ns-mint">
+            <div class="label">Пациенты</div>
+            <div class="val">127</div>
+          </div>
+          <div class="neon-stat ns-blue">
+            <div class="label">Приёмы</div>
+            <div class="val">48</div>
+          </div>
+          <div class="neon-stat ns-purple">
+            <div class="label">Загрузка</div>
+            <div class="val">85%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT B: WARM PREMIUM -->
+  <div class="concept" data-choice="warm-premium" onclick="this.classList.toggle('selected')">
+    <div class="concept-label">
+      B — Warm Premium
+      <span class="tag" style="background:rgba(234,179,8,0.12);color:#EAB308;">Gold + Orange</span>
+    </div>
+    <div class="concept-preview">
+      <div class="warm-hero">
+        <div class="warm-glow wg1"></div>
+        <div class="warm-glow wg2"></div>
+
+        <div class="warm-nav">
+          <div class="logo">
+            <div class="mark">M</div>
+            <span>MedCore KG</span>
+          </div>
+          <div class="links">
+            <a href="#">Модули</a>
+            <a href="#">Безопасность</a>
+            <a href="#">Цены</a>
+          </div>
+          <div class="cta-btn">Заказать демо</div>
+        </div>
+
+        <div class="warm-content">
+          <div class="eyebrow">Телемедицина нового уровня</div>
+          <h2>Клиника которая<br><em>работает сама</em></h2>
+          <p class="desc">Автоматизация, AI-ассистент, IoT-мониторинг. 16 модулей в единой экосистеме.</p>
+          <div class="actions">
+            <div class="primary">Начать бесплатно →</div>
+            <div class="secondary">Смотреть демо</div>
+          </div>
+        </div>
+
+        <div class="warm-features">
+          <div class="warm-feat wf-gold">
+            <div class="num">16</div>
+            <div class="txt">модулей</div>
+          </div>
+          <div class="warm-feat wf-orange">
+            <div class="num">9</div>
+            <div class="txt">ролей доступа</div>
+          </div>
+          <div class="warm-feat wf-cream">
+            <div class="num">24/7</div>
+            <div class="txt">мониторинг</div>
+          </div>
+          <div class="warm-feat wf-gold">
+            <div class="num">AI</div>
+            <div class="txt">голосовой ассистент</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT C: ELECTRIC BLUE -->
+  <div class="concept" data-choice="electric-blue" onclick="this.classList.toggle('selected')">
+    <div class="concept-label">
+      C — Electric Blue
+      <span class="tag" style="background:rgba(59,130,246,0.12);color:#3B82F6;">Blue + Purple</span>
+    </div>
+    <div class="concept-preview">
+      <div class="electric-hero">
+        <div class="grid-bg"></div>
+        <div class="elec-glow"></div>
+
+        <div class="electric-nav">
+          <div class="logo">
+            <div class="mark">M</div>
+            <span>MedCore KG</span>
+          </div>
+          <div class="cta-btn">Демо →</div>
+        </div>
+
+        <div class="electric-content">
+          <div class="chip">⚡ Новый стандарт медицинских IT</div>
+          <h2>
+            <span class="blue">Цифровая</span> клиника<br>
+            <span class="purple">без компромиссов</span>
+          </h2>
+          <p class="desc">EHR, фармация, лаборатория, мониторинг, телемедицина, AI — всё в одной платформе.</p>
+          <div class="actions">
+            <div class="primary">Попробовать →</div>
+            <div class="secondary">Подробнее</div>
+          </div>
+        </div>
+
+        <div class="electric-dashboard">
+          <div class="ed-chrome">
+            <div class="ed-dot" style="background:#EF4444;opacity:0.6;"></div>
+            <div class="ed-dot" style="background:#F59E0B;opacity:0.6;"></div>
+            <div class="ed-dot" style="background:#10B981;opacity:0.6;"></div>
+          </div>
+          <div class="ed-body">
+            <div class="ed-card">
+              <div class="l">Пациенты</div>
+              <div class="v" style="color:#3B82F6;">127</div>
+              <div class="b"><div class="bf" style="width:72%;background:linear-gradient(90deg,#3B82F6,#60A5FA);"></div></div>
+            </div>
+            <div class="ed-card">
+              <div class="l">Приёмы</div>
+              <div class="v" style="color:#8B5CF6;">48</div>
+              <div class="b"><div class="bf" style="width:58%;background:linear-gradient(90deg,#8B5CF6,#A78BFA);"></div></div>
+            </div>
+            <div class="ed-card">
+              <div class="l">Палаты</div>
+              <div class="v" style="color:#10B981;">85%</div>
+              <div class="b"><div class="bf" style="width:85%;background:linear-gradient(90deg,#10B981,#34D399);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    Кликни на понравившийся и скажи мне в терминале. Можно миксовать элементы.
+  </div>
+</div>
+</body>
+</html>

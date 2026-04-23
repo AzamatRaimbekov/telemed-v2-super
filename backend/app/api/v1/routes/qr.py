@@ -42,19 +42,24 @@ async def scan_qr_resolve(
     current_user: CurrentUser,
 ):
     """Resolve a scanned QR code to patient data."""
-    result = await session.execute(
-        select(Patient).where(Patient.id == patient_id, Patient.is_deleted == False)
-    )
-    patient = result.scalar_one_or_none()
-    if not patient:
+    from app.services.patient_identification import PatientIdentificationService
+    svc = PatientIdentificationService(session)
+    result = await svc.identify(str(patient_id), current_user.clinic_id)
+    if not result:
         raise HTTPException(status_code=404, detail="Patient not found")
+    return result
 
-    return {
-        "id": patient.id,
-        "first_name": patient.first_name,
-        "last_name": patient.last_name,
-        "middle_name": patient.middle_name,
-        "date_of_birth": str(patient.date_of_birth) if patient.date_of_birth else None,
-        "phone": patient.phone,
-        "inn": patient.inn,
-    }
+
+@router.get("/identify/{code}")
+async def identify_patient(
+    code: str,
+    session: DBSession,
+    current_user: CurrentUser,
+):
+    """Universal patient identification — by wristband UID, QR, patient ID, INN, or phone."""
+    from app.services.patient_identification import PatientIdentificationService
+    svc = PatientIdentificationService(session)
+    result = await svc.identify(code, current_user.clinic_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Пациент не найден. Проверьте код, ИНН или телефон.")
+    return result

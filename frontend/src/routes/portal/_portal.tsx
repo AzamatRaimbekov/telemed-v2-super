@@ -2,6 +2,8 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState, useNavigate } 
 import { usePortalAuthStore } from "@/stores/portal-auth-store";
 import { useEffect } from "react";
 import { VoiceAssistantProvider } from "@/features/voice-assistant";
+import { OnboardingTour } from "@/features/portal/onboarding";
+import { ThemeToggle } from "@/features/portal/theme-toggle";
 
 export const Route = createFileRoute("/portal/_portal")({
   beforeLoad: () => {
@@ -131,6 +133,60 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    label: "AI Помощник",
+    to: "/portal/ai-chat",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Лекарства",
+    to: "/portal/reminders",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Семья",
+    to: "/portal/family",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Оценка врачей",
+    to: "/portal/ratings",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Бонусы",
+    to: "/portal/loyalty",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
+      </svg>
+    ),
+  },
+  {
+    label: "О клинике",
+    to: "/portal/clinic-info",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>
+      </svg>
+    ),
+  },
 ];
 
 // Bottom bar shows: Главная, Лечение, Расписание, Счета, Профиль
@@ -153,6 +209,7 @@ function PortalLayout() {
 
   return (
     <VoiceAssistantProvider>
+    <OnboardingTour />
     <div className="min-h-screen bg-background">
       {/* Top header */}
       <header className="sticky top-0 z-50 h-14 bg-[var(--color-surface)]/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-4 lg:px-8">
@@ -170,6 +227,7 @@ function PortalLayout() {
               {patient.first_name} {patient.last_name}
             </span>
           )}
+          <ThemeToggle />
           <button
             onClick={async () => { await logout(); navigate({ to: "/portal/login" }); }}
             className="p-2 rounded-lg text-[var(--color-text-tertiary)] hover:text-destructive hover:bg-destructive/10 transition-all"

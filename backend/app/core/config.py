@@ -59,6 +59,14 @@ class Settings(BaseSettings):
     # Telegram Bot API
     TELEGRAM_BOT_TOKEN: str = ""
 
+    # KKM / eSalyk fiscal receipts
+    KKM_API_URL: str = ""
+    KKM_API_KEY: str = ""
+
+    # GSVZ — Government Health System KR
+    GSVZ_API_URL: str = ""
+    GSVZ_API_KEY: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         v = self.CORS_ORIGINS

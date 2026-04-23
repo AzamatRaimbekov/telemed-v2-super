@@ -33,6 +33,37 @@ from app.models.bms import (
     Building, Floor, Zone, BmsRoom, BmsSensor, BmsSensorReading,
     Equipment, EquipmentCommand, BmsAlert, AutomationRule, AutomationLog,
 )
+from app.models.rating import DoctorRating
+from app.models.family_link import FamilyLink
+from app.models.medication_reminder import MedicationReminder
+from app.models.visit_summary import VisitSummary, SummaryStatus
+from app.models.prediction import Prediction, PredictionType
+from app.models.fiscal import FiscalReceipt, FiscalStatus
+from app.models.loyalty import LoyaltyAccount, PointsTransaction, PointsTransactionType
+from app.models.document_signature import DocumentSignature, SignatureStatus
+from app.models.staff_task import StaffTask, TaskPriority, TaskStatus
+from app.models.staff_message import StaffMessage
+from app.models.patient_changelog import PatientChangelog
+from app.models.wristband import PatientWristband, WristbandStatus
+from app.models.nurse_diary import NurseDiaryEntry
+from app.models.infection_control import InfectionRecord, IsolationType, InfectionStatus
+from app.models.lab_queue import LabQueueEntry, LabQueueStatus
+from app.models.referral import DoctorReferral, ReferralStatus, ReferralPriority
+from app.models.surgery_protocol import SurgeryProtocol, SurgeryStatus
+from app.models.treatment_template import TreatmentTemplate
+from app.models.dicom_study import DicomStudy, StudyStatus, Modality
+from app.models.e_prescription import EPrescription, PrescriptionStatus
+from app.models.duty_schedule import DutyScheduleEntry, DutyType
+from app.models.insurance import InsuranceCompany, InsurancePolicy, InsuranceClaim
+from app.models.consumables import ConsumableItem, ConsumableUsage, ConsumableCategory
+from app.models.equipment_telemetry import MedicalEquipment, EquipmentReading, EquipmentType, EquipmentStatus
+from app.models.consent import PatientConsent, ConsentType, ConsentStatus
+from app.models.crm import CRMLead, LeadStatus, LeadSource
+from app.models.promotions import Promotion, DiscountType
+from app.models.time_tracking import TimeEntry
+from app.models.corporate import CorporateContract, CorporateEmployee
+from app.models.sick_leave import SickLeave, SickLeaveStatus
+from app.models.checklist import ChecklistTemplate, ChecklistInstance
 
 __all__ = [
     "Base", "Clinic",
@@ -64,4 +95,35 @@ __all__ = [
     "DocumentTemplate", "TemplateCategory",
     "Building", "Floor", "Zone", "BmsRoom", "BmsSensor", "BmsSensorReading",
     "Equipment", "EquipmentCommand", "BmsAlert", "AutomationRule", "AutomationLog",
+    "DoctorRating",
+    "FamilyLink",
+    "MedicationReminder",
+    "VisitSummary", "SummaryStatus",
+    "Prediction", "PredictionType",
+    "FiscalReceipt", "FiscalStatus",
+    "LoyaltyAccount", "PointsTransaction", "PointsTransactionType",
+    "DocumentSignature", "SignatureStatus",
+    "StaffTask", "TaskPriority", "TaskStatus",
+    "StaffMessage",
+    "PatientChangelog",
+    "PatientWristband", "WristbandStatus",
+    "NurseDiaryEntry",
+    "InfectionRecord", "IsolationType", "InfectionStatus",
+    "LabQueueEntry", "LabQueueStatus",
+    "DoctorReferral", "ReferralStatus", "ReferralPriority",
+    "SurgeryProtocol", "SurgeryStatus",
+    "TreatmentTemplate",
+    "DicomStudy", "StudyStatus", "Modality",
+    "EPrescription", "PrescriptionStatus",
+    "DutyScheduleEntry", "DutyType",
+    "InsuranceCompany", "InsurancePolicy", "InsuranceClaim",
+    "ConsumableItem", "ConsumableUsage", "ConsumableCategory",
+    "MedicalEquipment", "EquipmentReading", "EquipmentType", "EquipmentStatus",
+    "PatientConsent", "ConsentType", "ConsentStatus",
+    "CRMLead", "LeadStatus", "LeadSource",
+    "Promotion", "DiscountType",
+    "TimeEntry",
+    "CorporateContract", "CorporateEmployee",
+    "SickLeave", "SickLeaveStatus",
+    "ChecklistTemplate", "ChecklistInstance",
 ]

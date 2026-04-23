@@ -3,6 +3,11 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationsApi, type Notification } from "@/lib/notifications-api";
+import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { CommandPalette } from "@/components/shared/command-palette";
+import { QuickActions } from "@/components/shared/quick-actions";
+import { useHotkeys } from "@/hooks/useHotkeys";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context }) => {
@@ -27,6 +32,36 @@ const navItems = [
     ),
   },
   {
+    label: "KPI Дашборд",
+    to: "/chief-dashboard" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M21 12a9 9 0 1 1-9-9" />
+        <path d="M21 3v6h-6" />
+        <path d="M21 3l-9 9" />
+      </svg>
+    ),
+  },
+  {
+    label: "AI Суммаризация",
+    to: "/visit-summaries" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M12 3v2m0 14v2M5.636 5.636l1.414 1.414m9.9 9.9l1.414 1.414M3 12h2m14 0h2M5.636 18.364l1.414-1.414m9.9-9.9l1.414-1.414"/>
+        <circle cx="12" cy="12" r="4"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Прогнозы",
+    to: "/predictions" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+      </svg>
+    ),
+  },
+  {
     label: "Пациенты",
     to: "/patients" as const,
     icon: (
@@ -47,6 +82,23 @@ const navItems = [
         <line x1="16" x2="16" y1="2" y2="6" />
         <line x1="8" x2="8" y1="2" y2="6" />
         <line x1="3" x2="21" y1="10" y2="10" />
+      </svg>
+    ),
+  },
+  {
+    label: "Календарь",
+    to: "/schedule-calendar" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+        <line x1="16" x2="16" y1="2" y2="6" />
+        <line x1="8" x2="8" y1="2" y2="6" />
+        <line x1="3" x2="21" y1="10" y2="10" />
+        <path d="M8 14h.01" />
+        <path d="M12 14h.01" />
+        <path d="M16 14h.01" />
+        <path d="M8 18h.01" />
+        <path d="M12 18h.01" />
       </svg>
     ),
   },
@@ -128,6 +180,19 @@ const navItems = [
     ),
   },
   {
+    label: "Отчёты",
+    to: "/reports" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="8" x2="16" y1="13" y2="13" />
+        <line x1="8" x2="12" y1="17" y2="17" />
+        <line x1="8" x2="10" y1="9" y2="9" />
+      </svg>
+    ),
+  },
+  {
     label: "Аудит",
     to: "/audit" as const,
     icon: (
@@ -137,6 +202,16 @@ const navItems = [
         <line x1="16" x2="8" y1="13" y2="13" />
         <line x1="16" x2="8" y1="17" y2="17" />
         <polyline points="10 9 9 9 8 9" />
+      </svg>
+    ),
+  },
+  {
+    label: "Роли и права",
+    to: "/rbac" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4"/>
       </svg>
     ),
   },
@@ -159,6 +234,138 @@ const navItems = [
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
         <polygon points="23 7 16 12 23 17 23 7" />
         <rect width="15" height="14" x="1" y="5" rx="2" ry="2" />
+      </svg>
+    ),
+  },
+  {
+    label: "Направления",
+    to: "/referrals" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M15 3h6v6" />
+        <path d="M10 14L21 3" />
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      </svg>
+    ),
+  },
+  {
+    label: "Операции",
+    to: "/surgery" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M7 12h10" />
+        <path d="M12 7v10" />
+        <circle cx="12" cy="12" r="10" />
+      </svg>
+    ),
+  },
+  {
+    label: "Дневник медсестры",
+    to: "/nurse-diary" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <path d="M12 18v-6" />
+        <path d="M9 15h6" />
+      </svg>
+    ),
+  },
+  {
+    label: "Инфекции",
+    to: "/infection-control" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+    ),
+  },
+  {
+    label: "Очередь приёма",
+    to: "/queue" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <line x1="19" x2="19" y1="8" y2="14" />
+        <line x1="22" x2="16" y1="11" y2="11" />
+      </svg>
+    ),
+  },
+  {
+    label: "QR Сканер",
+    to: "/qr-scan" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <rect width="5" height="5" x="3" y="3" rx="1" />
+        <rect width="5" height="5" x="16" y="3" rx="1" />
+        <rect width="5" height="5" x="3" y="16" rx="1" />
+        <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+        <path d="M21 21v.01" />
+        <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+        <path d="M3 12h.01" />
+        <path d="M12 3h.01" />
+        <path d="M12 16v.01" />
+        <path d="M16 12h1" />
+        <path d="M21 12v.01" />
+        <path d="M12 21v-1" />
+      </svg>
+    ),
+  },
+  {
+    label: "Браслеты",
+    to: "/wristbands" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
+        <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Шаблоны документов",
+    to: "/document-templates" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" x2="8" y1="13" y2="13" />
+        <line x1="16" x2="8" y1="17" y2="17" />
+        <line x1="10" x2="8" y1="9" y2="9" />
+      </svg>
+    ),
+  },
+  {
+    label: "Задачи",
+    to: "/tasks" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <rect width="6" height="14" x="2" y="6" rx="1" />
+        <rect width="6" height="10" x="9" y="10" rx="1" />
+        <rect width="6" height="16" x="16" y="4" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    label: "Чат",
+    to: "/chat" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Журнал уведомлений",
+    to: "/notification-logs" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0" />
+        <path d="M3.34 5.34A6.45 6.45 0 0 0 2 9" />
+        <path d="M20.66 5.34A6.45 6.45 0 0 1 22 9" />
       </svg>
     ),
   },
@@ -365,6 +572,7 @@ function AuthenticatedLayout() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  useHotkeys();
 
   useEffect(() => {
     if (isAuthenticated && !user) {
@@ -376,6 +584,8 @@ function AuthenticatedLayout() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <CommandPalette />
+      <QuickActions />
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen bg-[var(--color-surface)] border-r border-border flex flex-col transition-all duration-300 z-50 ${
@@ -474,6 +684,20 @@ function AuthenticatedLayout() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {/* Search shortcut hint */}
+            <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:border-[var(--color-text-tertiary)] transition-all duration-200 text-sm"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <span className="text-xs">Поиск</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-[var(--color-muted)] text-[10px] font-mono leading-none">&#8984;K</kbd>
+            </button>
+            {/* Language switcher */}
+            <LanguageSwitcher />
             {/* Notifications bell */}
             <NotificationBell />
             {/* Settings gear */}
@@ -488,7 +712,9 @@ function AuthenticatedLayout() {
 
         {/* Page content */}
         <main className="p-4 lg:p-6 xl:p-8">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

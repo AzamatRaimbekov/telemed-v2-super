@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCore KG — Новые концепты v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050505; color: #fff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+  .sub { color: #555; font-size: 14px; margin-bottom: 48px; }
+
+  .concept {
+    border: 2px solid #151515;
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .concept:hover { border-color: #252525; }
+  .concept.selected { border-color: #fff; box-shadow: 0 0 60px rgba(255,255,255,0.05); }
+  .concept.selected .concept-label::after {
+    content: '✓ ВЫБРАНО'; position: absolute; top: 16px; right: 20px;
+    padding: 4px 12px; border-radius: 6px; background: #fff; color: #000;
+    font-size: 10px; font-weight: 800;
+  }
+  .concept-label {
+    padding: 16px 20px; background: #0a0a0a; border-bottom: 1px solid #151515;
+    font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px;
+    position: relative;
+  }
+  .concept-label .tag {
+    padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 600;
+  }
+
+  /* ============ A: AURORA — Northern lights ============ */
+  .aurora-hero {
+    height: 650px; background: #020008; position: relative; overflow: hidden;
+  }
+  .aurora-wave {
+    position: absolute; width: 150%; height: 300px; left: -25%;
+    filter: blur(60px); opacity: 0.6;
+    animation: auroraShift 12s ease-in-out infinite alternate;
+  }
+  .aw1 {
+    top: 5%;
+    background: linear-gradient(90deg, transparent 0%, #1a0040 15%, #4a00e0 30%, #00b4d8 50%, #00f5a0 70%, #1a0040 85%, transparent 100%);
+  }
+  .aw2 {
+    top: 12%;
+    background: linear-gradient(90deg, transparent 0%, #00f5a0 20%, #00b4d8 40%, #7b2ff7 60%, #f72585 80%, transparent 100%);
+    animation-delay: -4s; animation-duration: 15s;
+  }
+  .aw3 {
+    top: 2%; opacity: 0.3;
+    background: linear-gradient(90deg, transparent 0%, #f72585 25%, #7b2ff7 50%, #00b4d8 75%, transparent 100%);
+    animation-delay: -8s; animation-duration: 18s;
+  }
+  @keyframes auroraShift {
+    0% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(-10%) scaleY(1.3); }
+    100% { transform: translateX(5%) scaleY(0.8); }
+  }
+  /* Stars */
+  .stars {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(1px 1px at 10% 20%, #fff 100%, transparent),
+      radial-gradient(1px 1px at 30% 10%, #fff 100%, transparent),
+      radial-gradient(1px 1px at 50% 30%, rgba(255,255,255,0.6) 100%, transparent),
+      radial-gradient(1px 1px at 70% 15%, #fff 100%, transparent),
+      radial-gradient(1px 1px at 85% 25%, rgba(255,255,255,0.4) 100%, transparent),
+      radial-gradient(1px 1px at 15% 35%, rgba(255,255,255,0.5) 100%, transparent),
+      radial-gradient(1px 1px at 60% 5%, #fff 100%, transparent),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3) 100%, transparent),
+      radial-gradient(1.5px 1.5px at 40% 8%, #fff 100%, transparent),
+      radial-gradient(1px 1px at 25% 45%, rgba(255,255,255,0.4) 100%, transparent);
+  }
+
+  .aurora-content {
+    position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+    text-align: center; z-index: 10; width: 90%;
+  }
+  .aurora-content h2 {
+    font-size: 68px; font-weight: 900; line-height: 1.05; letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  .aurora-content h2 .shimmer {
+    background: linear-gradient(135deg, #00f5a0, #00b4d8, #7b2ff7, #f72585, #00f5a0);
+    background-size: 300% 300%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shimmerBg 6s linear infinite;
+  }
+  @keyframes shimmerBg {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+  .aurora-content .desc { font-size: 16px; color: rgba(255,255,255,0.5); max-width: 480px; margin: 0 auto 32px; line-height: 1.6; }
+  .aurora-content .actions { display: flex; gap: 12px; justify-content: center; }
+  .aurora-btn-primary {
+    height: 52px; padding: 0 32px; border-radius: 16px;
+    background: linear-gradient(135deg, #00f5a0, #00b4d8);
+    font-size: 15px; font-weight: 700; color: #000;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 0 50px rgba(0,245,160,0.2), 0 0 100px rgba(0,180,216,0.1);
+  }
+  .aurora-btn-secondary {
+    height: 52px; padding: 0 32px; border-radius: 16px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    font-size: 15px; color: rgba(255,255,255,0.6);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ============ B: DEPTH — Layered cards parallax ============ */
+  .depth-hero {
+    height: 650px; background: #07080a; position: relative; overflow: hidden;
+  }
+  .depth-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse at 50% 60%, black 20%, transparent 70%);
+  }
+  .depth-spotlight {
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+  }
+
+  .depth-content {
+    position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+    text-align: center; z-index: 10; width: 90%;
+  }
+  .depth-content .overline {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 5px;
+    color: rgba(255,255,255,0.25); margin-bottom: 20px;
+  }
+  .depth-content h2 {
+    font-size: 60px; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px;
+    color: #fff; margin-bottom: 16px;
+  }
+  .depth-content h2 em {
+    font-style: normal; color: rgba(255,255,255,0.4);
+  }
+  .depth-content .desc {
+    font-size: 15px; color: rgba(255,255,255,0.3); max-width: 420px; margin: 0 auto 32px; line-height: 1.6;
+  }
+  .depth-btn {
+    height: 48px; padding: 0 28px; border-radius: 12px;
+    background: #fff; color: #000; font-size: 14px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 20px 60px rgba(255,255,255,0.08);
+  }
+
+  /* Stacked cards */
+  .depth-cards {
+    position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+    width: 85%; max-width: 750px; height: 220px;
+    perspective: 1000px; z-index: 10;
+  }
+  .dcard {
+    position: absolute; border-radius: 20px; padding: 24px;
+    backdrop-filter: blur(30px); transition: transform 0.5s;
+  }
+  .dc1 {
+    width: 90%; height: 180px; bottom: 0; left: 5%;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+    transform: translateZ(0);
+  }
+  .dc2 {
+    width: 82%; height: 160px; bottom: 20px; left: 9%;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+    transform: translateZ(20px);
+  }
+  .dc3 {
+    width: 74%; height: 140px; bottom: 40px; left: 13%;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    transform: translateZ(40px);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: center;
+  }
+  .dc3-stat { text-align: center; }
+  .dc3-stat .v { font-size: 28px; font-weight: 800; }
+  .dc3-stat .l { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+
+  /* ============ C: CINEMATIC — Full-bleed visual ============ */
+  .cinema-hero {
+    height: 650px; position: relative; overflow: hidden;
+    background: linear-gradient(180deg, #000 0%, #0a0512 30%, #120520 60%, #0a0512 80%, #000 100%);
+  }
+  .cinema-orbs {
+    position: absolute; inset: 0;
+  }
+  .cinema-orb {
+    position: absolute; border-radius: 50%;
+  }
+  .co1 {
+    width: 400px; height: 400px; top: 10%; left: 15%;
+    background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);
+    animation: orbMove 10s ease-in-out infinite;
+  }
+  .co2 {
+    width: 350px; height: 350px; top: 20%; right: 10%;
+    background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%);
+    animation: orbMove 12s ease-in-out infinite reverse;
+  }
+  .co3 {
+    width: 500px; height: 500px; bottom: -10%; left: 30%;
+    background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
+    animation: orbMove 14s ease-in-out infinite;
+  }
+  @keyframes orbMove {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(20px, -15px); }
+    66% { transform: translate(-15px, 10px); }
+  }
+
+  .cinema-content {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center; z-index: 10; width: 90%;
+  }
+  .cinema-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 50px;
+    background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);
+    font-size: 11px; font-weight: 600; color: #c084fc; margin-bottom: 28px;
+  }
+  .cinema-content h2 {
+    font-size: 72px; font-weight: 900; line-height: 1.02; letter-spacing: -3px;
+    margin-bottom: 20px;
+  }
+  .cinema-content h2 .line1 { color: rgba(255,255,255,0.9); }
+  .cinema-content h2 .line2 {
+    display: block;
+    background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .cinema-content .desc {
+    font-size: 17px; color: rgba(255,255,255,0.35); max-width: 500px;
+    margin: 0 auto 36px; line-height: 1.6;
+  }
+  .cinema-actions { display: flex; gap: 14px; justify-content: center; }
+  .cinema-primary {
+    height: 56px; padding: 0 36px; border-radius: 16px;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    font-size: 15px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 0 50px rgba(168,85,247,0.25), 0 0 100px rgba(236,72,153,0.1);
+    letter-spacing: -0.3px;
+  }
+  .cinema-secondary {
+    height: 56px; padding: 0 36px; border-radius: 16px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    font-size: 15px; color: rgba(255,255,255,0.5);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Bottom modules strip */
+  .cinema-modules {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 10;
+  }
+  .cinema-mod {
+    padding: 10px 16px; border-radius: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: rgba(255,255,255,0.5);
+  }
+  .cinema-mod .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .hint {
+    text-align: center; padding: 40px 24px;
+    font-size: 13px; color: #333;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Ещё 3 концепта</h1>
+  <p class="sub">Другой уровень визуала. Кликни на тот что реально заходит.</p>
+
+  <!-- A: AURORA -->
+  <div class="concept" data-choice="aurora" onclick="this.classList.toggle('selected')">
+    <div class="concept-label">
+      A — Aurora
+      <span class="tag" style="background:rgba(0,245,160,0.12);color:#00f5a0;">Northern Lights</span>
+      <span class="tag" style="background:rgba(123,47,247,0.12);color:#7b2ff7;margin-left:4px;">Анимированное сияние</span>
+    </div>
+    <div class="concept-preview">
+      <div class="aurora-hero">
+        <div class="stars"></div>
+        <div class="aurora-wave aw1"></div>
+        <div class="aurora-wave aw2"></div>
+        <div class="aurora-wave aw3"></div>
+        <div class="aurora-content">
+          <h2>Управляй клиникой<br><span class="shimmer">на новом уровне</span></h2>
+          <p class="desc">16 модулей. Реальное время. AI. Единая система для всей клиники.</p>
+          <div class="actions">
+            <div class="aurora-btn-primary">Начать бесплатно →</div>
+            <div class="aurora-btn-secondary">▶ Демо</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: DEPTH -->
+  <div class="concept" data-choice="depth" onclick="this.classList.toggle('selected')">
+    <div class="concept-label">
+      B — Depth
+      <span class="tag" style="background:rgba(255,255,255,0.08);color:#999;">Монохром + белый</span>
+      <span class="tag" style="background:rgba(255,255,255,0.08);color:#999;margin-left:4px;">Стопка карточек</span>
+    </div>
+    <div class="concept-preview">
+      <div class="depth-hero">
+        <div class="depth-grid"></div>
+        <div class="depth-spotlight"></div>
+        <div class="depth-content">
+          <div class="overline">MedCore KG</div>
+          <h2>Единая платформа.<br><em>Нулевой хаос.</em></h2>
+          <p class="desc">Замените 10 программ одной. EHR, аптека, лаборатория, мониторинг, AI — всё здесь.</p>
+          <div class="depth-btn">Попробовать бесплатно →</div>
+        </div>
+        <div class="depth-cards">
+          <div class="dcard dc1"></div>
+          <div class="dcard dc2"></div>
+          <div class="dcard dc3">
+            <div class="dc3-stat"><div class="v">16</div><div class="l">модулей</div></div>
+            <div class="dc3-stat"><div class="v">24/7</div><div class="l">мониторинг</div></div>
+            <div class="dc3-stat"><div class="v">AI</div><div class="l">ассистент</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C: CINEMATIC -->
+  <div class="concept" data-choice="cinematic" onclick="this.classList.toggle('selected')">
+    <div class="concept-label">
+      C — Cinematic
+      <span class="tag" style="background:rgba(168,85,247,0.12);color:#a855f7;">Purple + Pink + Blue</span>
+      <span class="tag" style="background:rgba(236,72,153,0.12);color:#ec4899;margin-left:4px;">Кинематографичный</span>
+    </div>
+    <div class="concept-preview">
+      <div class="cinema-hero">
+        <div class="cinema-orbs">
+          <div class="cinema-orb co1"></div>
+          <div class="cinema-orb co2"></div>
+          <div class="cinema-orb co3"></div>
+        </div>
+        <div class="cinema-content">
+          <div class="cinema-badge">
+            <span style="width:5px;height:5px;border-radius:50%;background:#c084fc;box-shadow:0 0 6px #c084fc;"></span>
+            Телемедицина нового поколения
+          </div>
+          <h2>
+            <span class="line1">Клиника будущего</span>
+            <span class="line2">уже сегодня</span>
+          </h2>
+          <p class="desc">От регистратуры до лаборатории. 16 модулей, AI-ассистент, IoT-мониторинг в единой экосистеме.</p>
+          <div class="cinema-actions">
+            <div class="cinema-primary">Начать бесплатно <span style="font-size:18px;">→</span></div>
+            <div class="cinema-secondary">Смотреть демо</div>
+          </div>
+        </div>
+        <div class="cinema-modules">
+          <div class="cinema-mod"><div class="dot" style="background:#a855f7;box-shadow:0 0 6px #a855f7;"></div>EHR</div>
+          <div class="cinema-mod"><div class="dot" style="background:#ec4899;box-shadow:0 0 6px #ec4899;"></div>Аптека</div>
+          <div class="cinema-mod"><div class="dot" style="background:#3b82f6;box-shadow:0 0 6px #3b82f6;"></div>Лаб</div>
+          <div class="cinema-mod"><div class="dot" style="background:#a855f7;box-shadow:0 0 6px #a855f7;"></div>AI</div>
+          <div class="cinema-mod"><div class="dot" style="background:#ec4899;box-shadow:0 0 6px #ec4899;"></div>IoT</div>
+          <div class="cinema-mod"><div class="dot" style="background:#3b82f6;box-shadow:0 0 6px #3b82f6;"></div>BMS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">Кликни на понравившийся и скажи мне в терминале.</div>
+</div>
+</body>
+</html>

@@ -3,11 +3,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
 import { APIError } from "@/types/api";
+import { AxiosError } from "axios";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
@@ -15,14 +17,33 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       await login(email, password);
       toast.success("Добро пожаловать!");
       navigate({ to: "/dashboard" });
     } catch (error) {
       if (error instanceof APIError) {
-        toast.error(error.message);
+        if (error.status === 401) {
+          setErrorMessage("Неверный email или пароль");
+          toast.error("Неверный email или пароль");
+        } else {
+          setErrorMessage(error.message);
+          toast.error(error.message);
+        }
+      } else if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          setErrorMessage("Неверный email или пароль");
+          toast.error("Неверный email или пароль");
+        } else if (error.response?.data?.detail) {
+          setErrorMessage(error.response.data.detail);
+          toast.error(error.response.data.detail);
+        } else {
+          setErrorMessage("Ошибка подключения к серверу");
+          toast.error("Ошибка подключения к серверу");
+        }
       } else {
+        setErrorMessage("Ошибка подключения к серверу");
         toast.error("Ошибка подключения к серверу");
       }
     } finally {
@@ -103,6 +124,18 @@ export function LoginForm() {
           />
         </div>
       </div>
+
+      {/* Error message */}
+      {errorMessage && (
+        <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-destructive/10 border border-destructive/20">
+          <svg className="w-4 h-4 text-destructive flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          <span className="text-sm text-destructive font-medium">{errorMessage}</span>
+        </div>
+      )}
 
       {/* Submit */}
       <button

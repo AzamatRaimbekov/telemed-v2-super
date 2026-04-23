@@ -1,0 +1,6 @@
+{"type":"server-started","port":62263,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:62263","screen_dir":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/83760-1776685219/content","state_dir":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/83760-1776685219/state"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/83760-1776685219/content/inspiration.html"}
+{"source":"user-event","type":"click","text":"16 модулей · 1 платформа\n          Вся клиникав одном экране\n          Замените 10 программ одной\n        \n      \n      \n        Gradient Mesh\n        Как Stripe/Vercel — мягкие цветные градиенты, чистый центрированный текст, воздух, элегантность без агрессии\n        Stripe + Vercel","choice":"gradient-mesh","id":null,"timestamp":1776686114963}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/83760-1776685219/content/gradient-mesh-hero.html"}
+{"type":"screen-added","file":"/Users/azamat/Desktop/telemed-v2-super/.superpowers/brainstorm/83760-1776685219/content/concepts-v2.html"}
+{"type":"server-stopped","reason":"idle timeout"}

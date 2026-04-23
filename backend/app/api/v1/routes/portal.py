@@ -212,7 +212,7 @@ async def get_today_treatment(patient: PortalPatient, session: DBSession):
             "status": i.status.value,
             "frequency": i.frequency,
             "scheduled_at": str(i.scheduled_at) if i.scheduled_at else None,
-            "scheduled_time": str(i.scheduled_at).split("T")[1][:5] if i.scheduled_at else None,
+            "scheduled_time": (str(i.scheduled_at).split("T")[1][:5] if "T" in str(i.scheduled_at) else None) if i.scheduled_at else None,
             "description": i.description,
             # Medication-specific
             "drug_name": cfg.get("drug_name") or i.title,
