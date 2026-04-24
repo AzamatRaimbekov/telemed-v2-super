@@ -359,6 +359,15 @@ const navItems = [
     ),
   },
   {
+    label: "Зубная карта",
+    to: "/dental-chart" as const,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+        <path d="M12 5.5C10 3 7.5 2 5.5 3.5S2 8 4 11c2.5 3.5 6 8 8 10.5 2-2.5 5.5-7 8-10.5 2-3 1-5.5-1-7S14 3 12 5.5z" />
+      </svg>
+    ),
+  },
+  {
     label: "Журнал уведомлений",
     to: "/notification-logs" as const,
     icon: (

@@ -42,6 +42,7 @@ import { Route as AuthenticatedInfrastructureRouteImport } from './routes/_authe
 import { Route as AuthenticatedInfectionControlRouteImport } from './routes/_authenticated/infection-control'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedDocumentTemplatesRouteImport } from './routes/_authenticated/document-templates'
+import { Route as AuthenticatedDentalChartRouteImport } from './routes/_authenticated/dental-chart'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedChiefDashboardRouteImport } from './routes/_authenticated/chief-dashboard'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
@@ -50,6 +51,7 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
 import { Route as AuthenticatedInfrastructureIndexRouteImport } from './routes/_authenticated/infrastructure/index'
+import { Route as PortalPortalVideosRouteImport } from './routes/portal/_portal/videos'
 import { Route as PortalPortalTreatmentRouteImport } from './routes/portal/_portal/treatment'
 import { Route as PortalPortalScheduleRouteImport } from './routes/portal/_portal/schedule'
 import { Route as PortalPortalResultsRouteImport } from './routes/portal/_portal/results'
@@ -60,11 +62,13 @@ import { Route as PortalPortalProfileRouteImport } from './routes/portal/_portal
 import { Route as PortalPortalMessagesRouteImport } from './routes/portal/_portal/messages'
 import { Route as PortalPortalMedicalCardRouteImport } from './routes/portal/_portal/medical-card'
 import { Route as PortalPortalLoyaltyRouteImport } from './routes/portal/_portal/loyalty'
+import { Route as PortalPortalInstallmentsRouteImport } from './routes/portal/_portal/installments'
 import { Route as PortalPortalHistoryRouteImport } from './routes/portal/_portal/history'
 import { Route as PortalPortalFamilyRouteImport } from './routes/portal/_portal/family'
 import { Route as PortalPortalExercisesRouteImport } from './routes/portal/_portal/exercises'
 import { Route as PortalPortalExerciseSessionRouteImport } from './routes/portal/_portal/exercise-session'
 import { Route as PortalPortalExerciseProgressRouteImport } from './routes/portal/_portal/exercise-progress'
+import { Route as PortalPortalDentalChartRouteImport } from './routes/portal/_portal/dental-chart'
 import { Route as PortalPortalDashboardRouteImport } from './routes/portal/_portal/dashboard'
 import { Route as PortalPortalClinicInfoRouteImport } from './routes/portal/_portal/clinic-info'
 import { Route as PortalPortalBillingRouteImport } from './routes/portal/_portal/billing'
@@ -272,6 +276,12 @@ const AuthenticatedDocumentTemplatesRoute =
     path: '/document-templates',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDentalChartRoute =
+  AuthenticatedDentalChartRouteImport.update({
+    id: '/dental-chart',
+    path: '/dental-chart',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -315,6 +325,11 @@ const AuthenticatedInfrastructureIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedInfrastructureRoute,
   } as any)
+const PortalPortalVideosRoute = PortalPortalVideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
 const PortalPortalTreatmentRoute = PortalPortalTreatmentRouteImport.update({
   id: '/treatment',
   path: '/treatment',
@@ -365,6 +380,12 @@ const PortalPortalLoyaltyRoute = PortalPortalLoyaltyRouteImport.update({
   path: '/loyalty',
   getParentRoute: () => PortalPortalRoute,
 } as any)
+const PortalPortalInstallmentsRoute =
+  PortalPortalInstallmentsRouteImport.update({
+    id: '/installments',
+    path: '/installments',
+    getParentRoute: () => PortalPortalRoute,
+  } as any)
 const PortalPortalHistoryRoute = PortalPortalHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -392,6 +413,11 @@ const PortalPortalExerciseProgressRoute =
     path: '/exercise-progress',
     getParentRoute: () => PortalPortalRoute,
   } as any)
+const PortalPortalDentalChartRoute = PortalPortalDentalChartRouteImport.update({
+  id: '/dental-chart',
+  path: '/dental-chart',
+  getParentRoute: () => PortalPortalRoute,
+} as any)
 const PortalPortalDashboardRoute = PortalPortalDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -590,6 +616,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof AuthenticatedChatRoute
   '/chief-dashboard': typeof AuthenticatedChiefDashboardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dental-chart': typeof AuthenticatedDentalChartRoute
   '/document-templates': typeof AuthenticatedDocumentTemplatesRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/infection-control': typeof AuthenticatedInfectionControlRoute
@@ -632,11 +659,13 @@ export interface FileRoutesByFullPath {
   '/portal/billing': typeof PortalPortalBillingRoute
   '/portal/clinic-info': typeof PortalPortalClinicInfoRoute
   '/portal/dashboard': typeof PortalPortalDashboardRoute
+  '/portal/dental-chart': typeof PortalPortalDentalChartRoute
   '/portal/exercise-progress': typeof PortalPortalExerciseProgressRoute
   '/portal/exercise-session': typeof PortalPortalExerciseSessionRoute
   '/portal/exercises': typeof PortalPortalExercisesRoute
   '/portal/family': typeof PortalPortalFamilyRoute
   '/portal/history': typeof PortalPortalHistoryRoute
+  '/portal/installments': typeof PortalPortalInstallmentsRoute
   '/portal/loyalty': typeof PortalPortalLoyaltyRoute
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
@@ -647,6 +676,7 @@ export interface FileRoutesByFullPath {
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
+  '/portal/videos': typeof PortalPortalVideosRoute
   '/infrastructure/': typeof AuthenticatedInfrastructureIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/staff/': typeof AuthenticatedStaffIndexRoute
@@ -679,6 +709,7 @@ export interface FileRoutesByTo {
   '/chat': typeof AuthenticatedChatRoute
   '/chief-dashboard': typeof AuthenticatedChiefDashboardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dental-chart': typeof AuthenticatedDentalChartRoute
   '/document-templates': typeof AuthenticatedDocumentTemplatesRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/infection-control': typeof AuthenticatedInfectionControlRoute
@@ -717,11 +748,13 @@ export interface FileRoutesByTo {
   '/portal/billing': typeof PortalPortalBillingRoute
   '/portal/clinic-info': typeof PortalPortalClinicInfoRoute
   '/portal/dashboard': typeof PortalPortalDashboardRoute
+  '/portal/dental-chart': typeof PortalPortalDentalChartRoute
   '/portal/exercise-progress': typeof PortalPortalExerciseProgressRoute
   '/portal/exercise-session': typeof PortalPortalExerciseSessionRoute
   '/portal/exercises': typeof PortalPortalExercisesRoute
   '/portal/family': typeof PortalPortalFamilyRoute
   '/portal/history': typeof PortalPortalHistoryRoute
+  '/portal/installments': typeof PortalPortalInstallmentsRoute
   '/portal/loyalty': typeof PortalPortalLoyaltyRoute
   '/portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/messages': typeof PortalPortalMessagesRoute
@@ -732,6 +765,7 @@ export interface FileRoutesByTo {
   '/portal/results': typeof PortalPortalResultsRoute
   '/portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/treatment': typeof PortalPortalTreatmentRoute
+  '/portal/videos': typeof PortalPortalVideosRoute
   '/infrastructure': typeof AuthenticatedInfrastructureIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/staff': typeof AuthenticatedStaffIndexRoute
@@ -765,6 +799,7 @@ export interface FileRoutesById {
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/chief-dashboard': typeof AuthenticatedChiefDashboardRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dental-chart': typeof AuthenticatedDentalChartRoute
   '/_authenticated/document-templates': typeof AuthenticatedDocumentTemplatesRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/infection-control': typeof AuthenticatedInfectionControlRoute
@@ -807,11 +842,13 @@ export interface FileRoutesById {
   '/portal/_portal/billing': typeof PortalPortalBillingRoute
   '/portal/_portal/clinic-info': typeof PortalPortalClinicInfoRoute
   '/portal/_portal/dashboard': typeof PortalPortalDashboardRoute
+  '/portal/_portal/dental-chart': typeof PortalPortalDentalChartRoute
   '/portal/_portal/exercise-progress': typeof PortalPortalExerciseProgressRoute
   '/portal/_portal/exercise-session': typeof PortalPortalExerciseSessionRoute
   '/portal/_portal/exercises': typeof PortalPortalExercisesRoute
   '/portal/_portal/family': typeof PortalPortalFamilyRoute
   '/portal/_portal/history': typeof PortalPortalHistoryRoute
+  '/portal/_portal/installments': typeof PortalPortalInstallmentsRoute
   '/portal/_portal/loyalty': typeof PortalPortalLoyaltyRoute
   '/portal/_portal/medical-card': typeof PortalPortalMedicalCardRoute
   '/portal/_portal/messages': typeof PortalPortalMessagesRoute
@@ -822,6 +859,7 @@ export interface FileRoutesById {
   '/portal/_portal/results': typeof PortalPortalResultsRoute
   '/portal/_portal/schedule': typeof PortalPortalScheduleRoute
   '/portal/_portal/treatment': typeof PortalPortalTreatmentRoute
+  '/portal/_portal/videos': typeof PortalPortalVideosRoute
   '/_authenticated/infrastructure/': typeof AuthenticatedInfrastructureIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/staff/': typeof AuthenticatedStaffIndexRoute
@@ -856,6 +894,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/chief-dashboard'
     | '/dashboard'
+    | '/dental-chart'
     | '/document-templates'
     | '/finance'
     | '/infection-control'
@@ -898,11 +937,13 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/clinic-info'
     | '/portal/dashboard'
+    | '/portal/dental-chart'
     | '/portal/exercise-progress'
     | '/portal/exercise-session'
     | '/portal/exercises'
     | '/portal/family'
     | '/portal/history'
+    | '/portal/installments'
     | '/portal/loyalty'
     | '/portal/medical-card'
     | '/portal/messages'
@@ -913,6 +954,7 @@ export interface FileRouteTypes {
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
+    | '/portal/videos'
     | '/infrastructure/'
     | '/patients/'
     | '/staff/'
@@ -945,6 +987,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/chief-dashboard'
     | '/dashboard'
+    | '/dental-chart'
     | '/document-templates'
     | '/finance'
     | '/infection-control'
@@ -983,11 +1026,13 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/clinic-info'
     | '/portal/dashboard'
+    | '/portal/dental-chart'
     | '/portal/exercise-progress'
     | '/portal/exercise-session'
     | '/portal/exercises'
     | '/portal/family'
     | '/portal/history'
+    | '/portal/installments'
     | '/portal/loyalty'
     | '/portal/medical-card'
     | '/portal/messages'
@@ -998,6 +1043,7 @@ export interface FileRouteTypes {
     | '/portal/results'
     | '/portal/schedule'
     | '/portal/treatment'
+    | '/portal/videos'
     | '/infrastructure'
     | '/patients'
     | '/staff'
@@ -1030,6 +1076,7 @@ export interface FileRouteTypes {
     | '/_authenticated/chat'
     | '/_authenticated/chief-dashboard'
     | '/_authenticated/dashboard'
+    | '/_authenticated/dental-chart'
     | '/_authenticated/document-templates'
     | '/_authenticated/finance'
     | '/_authenticated/infection-control'
@@ -1072,11 +1119,13 @@ export interface FileRouteTypes {
     | '/portal/_portal/billing'
     | '/portal/_portal/clinic-info'
     | '/portal/_portal/dashboard'
+    | '/portal/_portal/dental-chart'
     | '/portal/_portal/exercise-progress'
     | '/portal/_portal/exercise-session'
     | '/portal/_portal/exercises'
     | '/portal/_portal/family'
     | '/portal/_portal/history'
+    | '/portal/_portal/installments'
     | '/portal/_portal/loyalty'
     | '/portal/_portal/medical-card'
     | '/portal/_portal/messages'
@@ -1087,6 +1136,7 @@ export interface FileRouteTypes {
     | '/portal/_portal/results'
     | '/portal/_portal/schedule'
     | '/portal/_portal/treatment'
+    | '/portal/_portal/videos'
     | '/_authenticated/infrastructure/'
     | '/_authenticated/patients/'
     | '/_authenticated/staff/'
@@ -1353,6 +1403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocumentTemplatesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dental-chart': {
+      id: '/_authenticated/dental-chart'
+      path: '/dental-chart'
+      fullPath: '/dental-chart'
+      preLoaderRoute: typeof AuthenticatedDentalChartRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1408,6 +1465,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/infrastructure/'
       preLoaderRoute: typeof AuthenticatedInfrastructureIndexRouteImport
       parentRoute: typeof AuthenticatedInfrastructureRoute
+    }
+    '/portal/_portal/videos': {
+      id: '/portal/_portal/videos'
+      path: '/videos'
+      fullPath: '/portal/videos'
+      preLoaderRoute: typeof PortalPortalVideosRouteImport
+      parentRoute: typeof PortalPortalRoute
     }
     '/portal/_portal/treatment': {
       id: '/portal/_portal/treatment'
@@ -1479,6 +1543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPortalLoyaltyRouteImport
       parentRoute: typeof PortalPortalRoute
     }
+    '/portal/_portal/installments': {
+      id: '/portal/_portal/installments'
+      path: '/installments'
+      fullPath: '/portal/installments'
+      preLoaderRoute: typeof PortalPortalInstallmentsRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
     '/portal/_portal/history': {
       id: '/portal/_portal/history'
       path: '/history'
@@ -1512,6 +1583,13 @@ declare module '@tanstack/react-router' {
       path: '/exercise-progress'
       fullPath: '/portal/exercise-progress'
       preLoaderRoute: typeof PortalPortalExerciseProgressRouteImport
+      parentRoute: typeof PortalPortalRoute
+    }
+    '/portal/_portal/dental-chart': {
+      id: '/portal/_portal/dental-chart'
+      path: '/dental-chart'
+      fullPath: '/portal/dental-chart'
+      preLoaderRoute: typeof PortalPortalDentalChartRouteImport
       parentRoute: typeof PortalPortalRoute
     }
     '/portal/_portal/dashboard': {
@@ -1887,6 +1965,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedChiefDashboardRoute: typeof AuthenticatedChiefDashboardRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDentalChartRoute: typeof AuthenticatedDentalChartRoute
   AuthenticatedDocumentTemplatesRoute: typeof AuthenticatedDocumentTemplatesRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedInfectionControlRoute: typeof AuthenticatedInfectionControlRoute
@@ -1921,6 +2000,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedChiefDashboardRoute: AuthenticatedChiefDashboardRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDentalChartRoute: AuthenticatedDentalChartRoute,
   AuthenticatedDocumentTemplatesRoute: AuthenticatedDocumentTemplatesRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedInfectionControlRoute: AuthenticatedInfectionControlRoute,
@@ -1960,11 +2040,13 @@ interface PortalPortalRouteChildren {
   PortalPortalBillingRoute: typeof PortalPortalBillingRoute
   PortalPortalClinicInfoRoute: typeof PortalPortalClinicInfoRoute
   PortalPortalDashboardRoute: typeof PortalPortalDashboardRoute
+  PortalPortalDentalChartRoute: typeof PortalPortalDentalChartRoute
   PortalPortalExerciseProgressRoute: typeof PortalPortalExerciseProgressRoute
   PortalPortalExerciseSessionRoute: typeof PortalPortalExerciseSessionRoute
   PortalPortalExercisesRoute: typeof PortalPortalExercisesRoute
   PortalPortalFamilyRoute: typeof PortalPortalFamilyRoute
   PortalPortalHistoryRoute: typeof PortalPortalHistoryRoute
+  PortalPortalInstallmentsRoute: typeof PortalPortalInstallmentsRoute
   PortalPortalLoyaltyRoute: typeof PortalPortalLoyaltyRoute
   PortalPortalMedicalCardRoute: typeof PortalPortalMedicalCardRoute
   PortalPortalMessagesRoute: typeof PortalPortalMessagesRoute
@@ -1975,6 +2057,7 @@ interface PortalPortalRouteChildren {
   PortalPortalResultsRoute: typeof PortalPortalResultsRoute
   PortalPortalScheduleRoute: typeof PortalPortalScheduleRoute
   PortalPortalTreatmentRoute: typeof PortalPortalTreatmentRoute
+  PortalPortalVideosRoute: typeof PortalPortalVideosRoute
 }
 
 const PortalPortalRouteChildren: PortalPortalRouteChildren = {
@@ -1983,11 +2066,13 @@ const PortalPortalRouteChildren: PortalPortalRouteChildren = {
   PortalPortalBillingRoute: PortalPortalBillingRoute,
   PortalPortalClinicInfoRoute: PortalPortalClinicInfoRoute,
   PortalPortalDashboardRoute: PortalPortalDashboardRoute,
+  PortalPortalDentalChartRoute: PortalPortalDentalChartRoute,
   PortalPortalExerciseProgressRoute: PortalPortalExerciseProgressRoute,
   PortalPortalExerciseSessionRoute: PortalPortalExerciseSessionRoute,
   PortalPortalExercisesRoute: PortalPortalExercisesRoute,
   PortalPortalFamilyRoute: PortalPortalFamilyRoute,
   PortalPortalHistoryRoute: PortalPortalHistoryRoute,
+  PortalPortalInstallmentsRoute: PortalPortalInstallmentsRoute,
   PortalPortalLoyaltyRoute: PortalPortalLoyaltyRoute,
   PortalPortalMedicalCardRoute: PortalPortalMedicalCardRoute,
   PortalPortalMessagesRoute: PortalPortalMessagesRoute,
@@ -1998,6 +2083,7 @@ const PortalPortalRouteChildren: PortalPortalRouteChildren = {
   PortalPortalResultsRoute: PortalPortalResultsRoute,
   PortalPortalScheduleRoute: PortalPortalScheduleRoute,
   PortalPortalTreatmentRoute: PortalPortalTreatmentRoute,
+  PortalPortalVideosRoute: PortalPortalVideosRoute,
 }
 
 const PortalPortalRouteWithChildren = PortalPortalRoute._addFileChildren(

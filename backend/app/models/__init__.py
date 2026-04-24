@@ -64,6 +64,12 @@ from app.models.time_tracking import TimeEntry
 from app.models.corporate import CorporateContract, CorporateEmployee
 from app.models.sick_leave import SickLeave, SickLeaveStatus
 from app.models.checklist import ChecklistTemplate, ChecklistInstance
+from app.models.dental_chart import DentalChart, ToothTreatment, ToothStatus
+from app.models.dental_image import DentalImage, DentalImageType
+from app.models.dental_procedure import DentalProcedure
+from app.models.ortho_treatment import OrthoTreatment, OrthoType
+from app.models.referral_program import ReferralCode, ReferralUse
+from app.models.installment import InstallmentPlan, InstallmentPayment
 
 __all__ = [
     "Base", "Clinic",
@@ -126,4 +132,10 @@ __all__ = [
     "CorporateContract", "CorporateEmployee",
     "SickLeave", "SickLeaveStatus",
     "ChecklistTemplate", "ChecklistInstance",
+    "DentalChart", "ToothTreatment", "ToothStatus",
+    "DentalImage", "DentalImageType",
+    "DentalProcedure",
+    "OrthoTreatment", "OrthoType",
+    "ReferralCode", "ReferralUse",
+    "InstallmentPlan", "InstallmentPayment",
 ]

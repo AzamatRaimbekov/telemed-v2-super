@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.routes import auth, clinics, health, users, portal, portal_voice, portal_ratings, portal_family, portal_reminders, portal_clinic_info, portal_ai_chat, patients, registration, staff, medical_history, rooms, ai, treatment, stroke, settings, recovery, diagnoses, icd10, audit, schedule, notifications, analytics, telemedicine, patient_ai, pharmacy, billing, laboratory, monitoring, infrastructure, qr, chief_dashboard, queue, notification_logs, telegram_bot, export, document_templates, visit_summary, predictions, fiscal, dashboard_ws, loyalty, gsvz, signatures, whatsapp_booking, schedule_calendar, clinic_map, print_documents, staff_tasks, staff_chat, patient_changelog, wristbands, nurse_diary, infection_control, auto_assignment, lab_queue, referrals, surgery, reports_doctors, reports_departments, reports_financial, auto_billing, relative_notify, treatment_templates, dicom, e_prescriptions, duty_schedule, insurance, consumables, equipment_telemetry, bedside, consents, wait_time, discharge, crm, promotions, time_tracking, corporate, ws_notifications, patient_telegram, hl7_fhir, sick_leave, checklists
+from app.api.v1.routes import auth, clinics, health, users, portal, portal_voice, portal_ratings, portal_family, portal_reminders, portal_clinic_info, portal_ai_chat, patients, registration, staff, medical_history, rooms, ai, treatment, stroke, settings, recovery, diagnoses, icd10, audit, schedule, notifications, analytics, telemedicine, patient_ai, pharmacy, billing, laboratory, monitoring, infrastructure, qr, chief_dashboard, queue, notification_logs, telegram_bot, export, document_templates, visit_summary, predictions, fiscal, dashboard_ws, loyalty, gsvz, signatures, whatsapp_booking, schedule_calendar, clinic_map, print_documents, staff_tasks, staff_chat, patient_changelog, wristbands, nurse_diary, infection_control, auto_assignment, lab_queue, referrals, surgery, reports_doctors, reports_departments, reports_financial, auto_billing, relative_notify, treatment_templates, dicom, e_prescriptions, duty_schedule, insurance, consumables, equipment_telemetry, bedside, consents, wait_time, discharge, crm, promotions, time_tracking, corporate, ws_notifications, patient_telegram, hl7_fhir, sick_leave, checklists, dental, dental_images, ortho, dental_portal, referral_program, patient_photo_consult, installments, video_instructions
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health.router)
@@ -89,3 +89,11 @@ api_router.include_router(patient_telegram.router)
 api_router.include_router(hl7_fhir.router)
 api_router.include_router(sick_leave.router)
 api_router.include_router(checklists.router)
+api_router.include_router(dental.router)
+api_router.include_router(dental_images.router)
+api_router.include_router(ortho.router)
+api_router.include_router(dental_portal.router)
+api_router.include_router(referral_program.router)
+api_router.include_router(patient_photo_consult.router)
+api_router.include_router(installments.router)
+api_router.include_router(video_instructions.router)

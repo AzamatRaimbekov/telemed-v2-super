@@ -187,6 +187,33 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    label: "Мои зубы",
+    to: "/portal/dental-chart",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M7 2C4.5 2 3 4.5 3 7c0 3 2 5 3 8s1 5 2 7c.5 1 1.5 1 2 0 .5-1 1-3 2-3s1.5 2 2 3c.5 1 1.5 1 2 0 1-2 1-4 2-7s3-5 3-8c0-2.5-1.5-5-4-5-1.5 0-2.5 1-3 2-.5-1-1.5-2-3-2z"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Видео",
+    to: "/portal/videos",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Рассрочка",
+    to: "/portal/installments",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+      </svg>
+    ),
+  },
 ];
 
 // Bottom bar shows: Главная, Лечение, Расписание, Счета, Профиль
