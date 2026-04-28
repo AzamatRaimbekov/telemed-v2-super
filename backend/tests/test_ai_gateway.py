@@ -72,3 +72,54 @@ async def test_router_unknown_task_uses_default():
     router = ProviderRouter(providers=providers, task_model_map=TASK_MODEL_MAP)
     result = await router.complete("unknown_task", "system", "user")
     assert result.provider == "fake"
+
+
+from app.services.ai.prompt_manager import PromptManager
+from app.services.ai.response_parser import ResponseParser
+
+
+# --- PromptManager ---
+
+def test_prompt_manager_render():
+    pm = PromptManager()
+    template = "Пациент: {patient_name}, жалобы: {complaints}"
+    result = pm.render(template, patient_name="Иванов", complaints="головная боль")
+    assert result == "Пациент: Иванов, жалобы: головная боль"
+
+
+def test_prompt_manager_render_missing_var():
+    pm = PromptManager()
+    template = "Пациент: {patient_name}, возраст: {age}"
+    result = pm.render(template, patient_name="Иванов")
+    assert "Иванов" in result
+    assert "{age}" in result  # missing vars stay as-is
+
+
+# --- ResponseParser ---
+
+def test_response_parser_extract_json():
+    parser = ResponseParser()
+    text = 'Some text before ```json\n{"diagnoses": ["J06.9"]}\n``` and after'
+    result = parser.extract_json(text)
+    assert result == {"diagnoses": ["J06.9"]}
+
+
+def test_response_parser_extract_json_no_fence():
+    parser = ResponseParser()
+    text = '{"diagnoses": ["J06.9"]}'
+    result = parser.extract_json(text)
+    assert result == {"diagnoses": ["J06.9"]}
+
+
+def test_response_parser_extract_json_invalid():
+    parser = ResponseParser()
+    text = "This is not JSON at all"
+    result = parser.extract_json(text)
+    assert result is None
+
+
+def test_response_parser_extract_json_nested_in_text():
+    parser = ResponseParser()
+    text = 'Вот мой ответ:\n{"suggestions": [{"icd_code": "J06.9", "title": "ОРВИ"}]}\nСпасибо!'
+    result = parser.extract_json(text)
+    assert result["suggestions"][0]["icd_code"] == "J06.9"
