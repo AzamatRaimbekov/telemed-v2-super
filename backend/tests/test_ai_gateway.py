@@ -203,3 +203,55 @@ async def test_gateway_generate_conclusion():
         )
     assert "conclusion_text" in result
     assert result["provider"] == "gemini"
+
+
+@pytest.mark.asyncio
+async def test_full_flow_diagnosis_to_conclusion():
+    """Integration test: diagnose -> exam -> conclusion pipeline."""
+    gateway = AIGateway()
+
+    # Step 1: Diagnose
+    diagnosis_response = ProviderResponse(
+        text='{"suggestions": [{"icd_code": "J06.9", "title": "ОРВИ", "confidence": 0.9, "reasoning": "Типичные симптомы"}]}',
+        model="gemini-2.0-flash",
+        provider="gemini",
+        input_tokens=50,
+        output_tokens=30,
+        latency_ms=200,
+    )
+
+    # Step 2: Exam
+    exam_response = ProviderResponse(
+        text='{"examination_text": "Общее состояние удовлетворительное. Ротоглотка гиперемирована."}',
+        model="gemini-2.0-flash",
+        provider="gemini",
+        input_tokens=40,
+        output_tokens=25,
+        latency_ms=180,
+    )
+
+    # Step 3: Conclusion
+    conclusion_response = ProviderResponse(
+        text='{"conclusion_text": "Заключение: ОРВИ (J06.9), лёгкое течение. Рекомендовано: обильное питьё, парацетамол при T>38.5."}',
+        model="groq-llama",
+        provider="groq",
+        input_tokens=60,
+        output_tokens=35,
+        latency_ms=150,
+    )
+
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock) as mock_complete:
+        mock_complete.side_effect = [diagnosis_response, exam_response, conclusion_response]
+
+        diag = await gateway.suggest_diagnoses(symptoms="боль в горле, температура 38.2, насморк")
+        assert diag["suggestions"][0]["icd_code"] == "J06.9"
+
+        exam = await gateway.generate_exam(complaints="боль в горле, температура 38.2")
+        assert "Ротоглотка" in exam["examination_text"]
+
+        conclusion = await gateway.generate_conclusion(
+            diagnoses=["J06.9 ОРВИ"],
+            exam_notes=exam["examination_text"],
+            treatment="Парацетамол 500мг при T>38.5",
+        )
+        assert "ОРВИ" in conclusion["conclusion_text"]
