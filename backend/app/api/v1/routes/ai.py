@@ -15,7 +15,8 @@ from app.schemas.ai import (
     ConclusionGenerateRequest,
 )
 from app.services.ai.gateway import AIGateway
-from app.models.ai import AIUsageLog, AIGeneratedContent
+from sqlalchemy import select, func
+from app.models.ai import AIUsageLog, AIGeneratedContent, AIPromptTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -342,3 +343,105 @@ async def generate_conclusion(
     except Exception as e:
         logger.exception("AI conclusion generate failed")
         raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.get("/usage")
+async def get_ai_usage(
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.CLINIC_ADMIN, UserRole.SUPER_ADMIN),
+):
+    clinic_id = current_user.clinic_id
+
+    total_q = await session.execute(
+        select(func.count(AIUsageLog.id)).where(AIUsageLog.clinic_id == clinic_id)
+    )
+    total = total_q.scalar() or 0
+
+    success_q = await session.execute(
+        select(func.count(AIUsageLog.id)).where(AIUsageLog.clinic_id == clinic_id, AIUsageLog.success == True)
+    )
+    successful = success_q.scalar() or 0
+
+    avg_lat_q = await session.execute(
+        select(func.avg(AIUsageLog.latency_ms)).where(AIUsageLog.clinic_id == clinic_id, AIUsageLog.success == True)
+    )
+    avg_latency = round(avg_lat_q.scalar() or 0, 1)
+
+    tokens_q = await session.execute(
+        select(func.sum(AIUsageLog.input_tokens + AIUsageLog.output_tokens)).where(AIUsageLog.clinic_id == clinic_id)
+    )
+    tokens_used = tokens_q.scalar() or 0
+
+    by_provider_q = await session.execute(
+        select(AIUsageLog.provider_used, func.count(AIUsageLog.id))
+        .where(AIUsageLog.clinic_id == clinic_id)
+        .group_by(AIUsageLog.provider_used)
+    )
+    by_provider = {row[0]: row[1] for row in by_provider_q.all()}
+
+    by_task_q = await session.execute(
+        select(AIUsageLog.task_type, func.count(AIUsageLog.id))
+        .where(AIUsageLog.clinic_id == clinic_id)
+        .group_by(AIUsageLog.task_type)
+    )
+    by_task = {row[0]: row[1] for row in by_task_q.all()}
+
+    return {
+        "total_requests": total,
+        "successful_requests": successful,
+        "failed_requests": total - successful,
+        "avg_latency_ms": avg_latency,
+        "tokens_used": tokens_used,
+        "by_provider": by_provider,
+        "by_task_type": by_task,
+    }
+
+
+@router.get("/prompts")
+async def list_prompts(
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.SUPER_ADMIN),
+):
+    result = await session.execute(
+        select(AIPromptTemplate).where(AIPromptTemplate.is_deleted == False).order_by(AIPromptTemplate.task_type)
+    )
+    templates = result.scalars().all()
+    return [
+        {
+            "id": str(t.id),
+            "task_type": t.task_type,
+            "system_prompt": t.system_prompt,
+            "user_prompt_template": t.user_prompt_template,
+            "model_tier": t.model_tier.value,
+            "version": t.version,
+            "is_active": t.is_active,
+            "created_at": t.created_at.isoformat(),
+        }
+        for t in templates
+    ]
+
+
+@router.put("/prompts/{prompt_id}")
+async def update_prompt(
+    prompt_id: uuid.UUID,
+    body: dict,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.SUPER_ADMIN),
+):
+    result = await session.execute(
+        select(AIPromptTemplate).where(AIPromptTemplate.id == prompt_id, AIPromptTemplate.is_deleted == False)
+    )
+    template = result.scalar_one_or_none()
+    if not template:
+        raise HTTPException(status_code=404, detail="Prompt template not found")
+
+    for field in ["system_prompt", "user_prompt_template", "model_tier", "is_active"]:
+        if field in body and body[field] is not None:
+            setattr(template, field, body[field])
+    template.version += 1
+    await session.flush()
+    await session.refresh(template)
+    return {"id": str(template.id), "task_type": template.task_type, "version": template.version}
