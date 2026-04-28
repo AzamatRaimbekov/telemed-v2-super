@@ -74,8 +74,10 @@ async def test_router_unknown_task_uses_default():
     assert result.provider == "fake"
 
 
+from unittest.mock import patch, AsyncMock
 from app.services.ai.prompt_manager import PromptManager
 from app.services.ai.response_parser import ResponseParser
+from app.services.ai.gateway import AIGateway
 
 
 # --- PromptManager ---
@@ -123,3 +125,81 @@ def test_response_parser_extract_json_nested_in_text():
     text = 'Вот мой ответ:\n{"suggestions": [{"icd_code": "J06.9", "title": "ОРВИ"}]}\nСпасибо!'
     result = parser.extract_json(text)
     assert result["suggestions"][0]["icd_code"] == "J06.9"
+
+
+@pytest.mark.asyncio
+async def test_gateway_diagnose():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"suggestions": [{"icd_code": "J06.9", "title": "ОРВИ", "confidence": 0.85, "reasoning": "По симптомам"}]}',
+        model="gemini-2.0-flash",
+        provider="gemini",
+        input_tokens=50,
+        output_tokens=30,
+        latency_ms=200,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.suggest_diagnoses(
+            symptoms="головная боль, температура 38",
+            age=35,
+            sex="M",
+        )
+    assert len(result["suggestions"]) == 1
+    assert result["suggestions"][0]["icd_code"] == "J06.9"
+    assert result["provider"] == "gemini"
+    assert result["model"] == "gemini-2.0-flash"
+
+
+@pytest.mark.asyncio
+async def test_gateway_generate_exam():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"examination_text": "Общее состояние удовлетворительное. Кожные покровы обычной окраски."}',
+        model="gemini-2.0-flash",
+        provider="gemini",
+        input_tokens=40,
+        output_tokens=25,
+        latency_ms=150,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.generate_exam(complaints="боль в горле, насморк")
+    assert "examination_text" in result
+    assert result["provider"] == "gemini"
+
+
+@pytest.mark.asyncio
+async def test_gateway_summarize_patient():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"summary": "Пациент 35 лет, хронический гастрит.", "key_diagnoses": ["K29.5"], "key_medications": ["Омепразол"], "risk_factors": ["Курение"]}',
+        model="llama-3.3-70b-versatile",
+        provider="groq",
+        input_tokens=100,
+        output_tokens=40,
+        latency_ms=300,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.summarize_patient(history_text="Хронический гастрит с 2020 г.")
+    assert "summary" in result
+    assert result["provider"] == "groq"
+
+
+@pytest.mark.asyncio
+async def test_gateway_generate_conclusion():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"conclusion_text": "Заключение: ОРВИ, лёгкое течение. Рекомендовано: постельный режим."}',
+        model="gemini-2.0-flash",
+        provider="gemini",
+        input_tokens=60,
+        output_tokens=30,
+        latency_ms=180,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.generate_conclusion(
+            diagnoses=["J06.9 ОРВИ"],
+            exam_notes="Температура 37.5",
+            treatment="Парацетамол",
+        )
+    assert "conclusion_text" in result
+    assert result["provider"] == "gemini"
