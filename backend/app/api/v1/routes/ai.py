@@ -8,12 +8,28 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 from app.api.deps import CurrentUser, DBSession, require_role
 from app.models.user import UserRole
 from app.core.config import settings
+from app.schemas.ai import (
+    DiagnosisSuggestRequest,
+    ExamGenerateRequest,
+    PatientSummaryRequest,
+    ConclusionGenerateRequest,
+)
+from app.services.ai.gateway import AIGateway
+from app.models.ai import AIUsageLog, AIGeneratedContent
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "uploads")
+
+_gateway: AIGateway | None = None
+
+def get_gateway() -> AIGateway:
+    global _gateway
+    if _gateway is None:
+        _gateway = AIGateway()
+    return _gateway
 
 
 @router.post("/analyze-medical-document")
@@ -143,3 +159,186 @@ async def transcribe_audio(
     except Exception as e:
         logger.exception("Transcription failed")
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+
+
+@router.post("/diagnosis/suggest")
+async def suggest_diagnoses(
+    body: DiagnosisSuggestRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
+):
+    try:
+        gateway = get_gateway()
+        result = await gateway.suggest_diagnoses(
+            symptoms=body.symptoms,
+            age=body.age,
+            sex=body.sex,
+            existing_diagnoses=body.existing_diagnoses,
+        )
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="diagnosis",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0,
+            output_tokens=0,
+            latency_ms=0,
+            success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="diagnosis",
+            input_data=body.model_dump(mode="json"),
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI diagnosis suggest failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.post("/exam/generate")
+async def generate_exam(
+    body: ExamGenerateRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
+):
+    try:
+        gateway = get_gateway()
+        result = await gateway.generate_exam(
+            complaints=body.complaints,
+            visit_type=body.visit_type,
+        )
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="exam",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0,
+            output_tokens=0,
+            latency_ms=0,
+            success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="exam",
+            input_data=body.model_dump(mode="json"),
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI exam generate failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.post("/summary/patient")
+async def summarize_patient(
+    body: PatientSummaryRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN, UserRole.NURSE),
+):
+    try:
+        from sqlalchemy import select
+        from app.models.medical import Visit
+        from app.models.diagnosis import Diagnosis
+
+        visits_q = await session.execute(
+            select(Visit).where(Visit.patient_id == body.patient_id).order_by(Visit.created_at.desc()).limit(20)
+        )
+        visits = visits_q.scalars().all()
+
+        diagnoses_q = await session.execute(
+            select(Diagnosis).where(Diagnosis.patient_id == body.patient_id, Diagnosis.is_deleted == False)
+        )
+        diagnoses = diagnoses_q.scalars().all()
+
+        history_parts = []
+        for v in visits:
+            history_parts.append(f"Визит ({v.visit_type.value}): жалобы={v.chief_complaint or 'н/д'}, осмотр={v.examination_notes or 'н/д'}, диагноз={v.diagnosis_text or 'н/д'}")
+        for d in diagnoses:
+            history_parts.append(f"Диагноз: {d.icd_code} {d.title} (статус: {d.status.value})")
+
+        history_text = "\n".join(history_parts) if history_parts else "История болезни пуста."
+
+        gateway = get_gateway()
+        result = await gateway.summarize_patient(history_text=history_text)
+
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="summary",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0,
+            output_tokens=0,
+            latency_ms=0,
+            success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="summary",
+            input_data={"patient_id": str(body.patient_id)},
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI patient summary failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.post("/conclusion/generate")
+async def generate_conclusion(
+    body: ConclusionGenerateRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
+):
+    try:
+        gateway = get_gateway()
+        result = await gateway.generate_conclusion(
+            diagnoses=body.diagnoses,
+            exam_notes=body.exam_notes,
+            treatment=body.treatment,
+        )
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="conclusion",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0,
+            output_tokens=0,
+            latency_ms=0,
+            success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="conclusion",
+            input_data=body.model_dump(mode="json"),
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI conclusion generate failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
