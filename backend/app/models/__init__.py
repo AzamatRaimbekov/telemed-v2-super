@@ -70,6 +70,7 @@ from app.models.dental_procedure import DentalProcedure
 from app.models.ortho_treatment import OrthoTreatment, OrthoType
 from app.models.referral_program import ReferralCode, ReferralUse
 from app.models.installment import InstallmentPlan, InstallmentPayment
+from app.models.ai import AIProvider, AIPromptTemplate, AIUsageLog, AIGeneratedContent, ModelTier
 
 __all__ = [
     "Base", "Clinic",
@@ -138,4 +139,5 @@ __all__ = [
     "OrthoTreatment", "OrthoType",
     "ReferralCode", "ReferralUse",
     "InstallmentPlan", "InstallmentPayment",
+    "AIProvider", "AIPromptTemplate", "AIUsageLog", "AIGeneratedContent", "ModelTier",
 ]

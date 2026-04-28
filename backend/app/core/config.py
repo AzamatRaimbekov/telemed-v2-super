@@ -35,6 +35,15 @@ class Settings(BaseSettings):
     # Voice Assistant AI providers
     GEMINI_API_KEY: str = ""
     DEEPSEEK_API_KEY: str = ""
+
+    # AI Gateway providers
+    GROQ_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
+    HF_API_TOKEN: str = ""
+    CF_ACCOUNT_ID: str = ""
+    CF_API_TOKEN: str = ""
+    AI_REQUEST_TIMEOUT: int = 30  # seconds
+
     WHISPER_MODEL_SIZE: str = "base"  # tiny, base, small, medium, large
     VOICE_AI_TIMEOUT: int = 5  # seconds
     VOICE_RATE_LIMIT: int = 30  # requests per minute per patient
