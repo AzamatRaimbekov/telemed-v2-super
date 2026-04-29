@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { AnimatePresence } from "framer-motion";
 import { patientsApi } from "@/features/patients/api";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
@@ -9,6 +10,11 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { Badge } from "@/components/ui/badge";
 import { CustomSelect } from "@/components/ui/select-custom";
+import { aiApi } from "@/features/ai/api";
+import { useAI } from "@/features/ai/useAI";
+import { AITriggerButton } from "@/features/ai/components/AITriggerButton";
+import { AIResultPanel } from "@/features/ai/components/AIResultPanel";
+import { AISummaryResult } from "@/features/ai/components/AISummaryResult";
 
 
 export const Route = createFileRoute(
@@ -435,6 +441,7 @@ function AuditLogSection({ patientId }: { patientId: string }) {
 function OverviewPage() {
   const { patientId } = Route.useParams();
   const user = useAuthStore((s) => s.user);
+  const aiSummary = useAI("patient-summary", aiApi.summarizePatient);
 
   const isAdmin =
     user && ["SUPER_ADMIN", "CLINIC_ADMIN"].includes(user.role);
@@ -473,6 +480,35 @@ function OverviewPage() {
 
   return (
     <div className="space-y-4">
+      {/* Page heading with AI trigger */}
+      <div className="flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-foreground">Обзор</h2>
+        <AITriggerButton
+          onClick={() => aiSummary.trigger({ patient_id: patientId })}
+          isPending={aiSummary.isPending}
+          tooltip="AI: резюме пациента"
+        />
+      </div>
+
+      {/* AI summary result panel */}
+      <AnimatePresence>
+        {aiSummary.result && (
+          <AIResultPanel
+            provider={aiSummary.result.provider}
+            model={aiSummary.result.model}
+            onReject={() => aiSummary.reset()}
+            onRetry={() => aiSummary.trigger({ patient_id: patientId })}
+          >
+            <AISummaryResult
+              summary={aiSummary.result.summary}
+              keyDiagnoses={aiSummary.result.key_diagnoses}
+              keyMedications={aiSummary.result.key_medications}
+              riskFactors={aiSummary.result.risk_factors}
+            />
+          </AIResultPanel>
+        )}
+      </AnimatePresence>
+
       {/* Personal + Medical info row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Personal data */}
