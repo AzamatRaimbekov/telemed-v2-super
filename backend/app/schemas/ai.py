@@ -40,12 +40,23 @@ class TreatmentSuggestRequest(BaseModel):
     patient_id: uuid.UUID
     diagnosis_code: str
     diagnosis_title: str
+    age: int | None = None
+    comorbidities: str | None = None
 
 
 class LabOrderSuggestRequest(BaseModel):
     patient_id: uuid.UUID
     diagnosis_code: str
     diagnosis_title: str
+    current_labs: str | None = None
+
+
+class DischargeSummaryRequest(BaseModel):
+    patient_id: uuid.UUID
+    diagnoses: list[str] = Field(default_factory=list)
+    treatment: str | None = None
+    duration: str | None = None
+    lab_results: str | None = None
 
 
 # --- Responses ---

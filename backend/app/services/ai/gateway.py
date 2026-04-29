@@ -22,6 +22,7 @@ TASK_MODEL_MAP = {
     "treatment":   {"tier": "powerful", "providers": ["gemini", "deepseek", "openrouter"]},
     "lab_suggest": {"tier": "fast",     "providers": ["groq", "deepseek", "cloudflare"]},
     "predict":     {"tier": "fast",     "providers": ["groq", "gemini", "cloudflare"]},
+    "discharge_summary": {"tier": "powerful", "providers": ["gemini", "deepseek", "openrouter"]},
 }
 
 PROMPTS = {
@@ -56,6 +57,30 @@ PROMPTS = {
             "Ответь строго в JSON: {\"conclusion_text\": \"...\"}"
         ),
         "user": "Диагнозы: {diagnoses}\nОсмотр: {exam_notes}\nЛечение: {treatment}",
+    },
+    "treatment": {
+        "system": (
+            "Ты — опытный врач. Предложи план лечения по диагнозу. "
+            "Включи: медикаменты с дозировками, процедуры, рекомендации по режиму. "
+            "Ответь строго в JSON: {\"plan\": \"...\", \"medications\": [\"...\"], \"procedures\": [\"...\"]}"
+        ),
+        "user": "Диагноз: {diagnosis_code} {diagnosis_title}\nВозраст: {age}\nСопутствующие: {comorbidities}",
+    },
+    "lab_suggest": {
+        "system": (
+            "Ты — опытный врач. Предложи набор лабораторных анализов для подтверждения и мониторинга диагноза. "
+            "Укажи список анализов и обоснование для каждого. "
+            "Ответь строго в JSON: {\"suggested_tests\": [\"...\"], \"reasoning\": \"...\"}"
+        ),
+        "user": "Диагноз: {diagnosis_code} {diagnosis_title}\nТекущие анализы: {current_labs}",
+    },
+    "discharge_summary": {
+        "system": (
+            "Ты — врач, составляющий выписной эпикриз. Сформируй структурированную выписку. "
+            "Включи: основной диагноз, проведённое лечение, результаты, рекомендации при выписке. "
+            "Ответь строго в JSON: {\"discharge_text\": \"...\", \"recommendations\": [\"...\"]}"
+        ),
+        "user": "Диагнозы: {diagnoses}\nЛечение: {treatment}\nДлительность: {duration}\nРезультаты анализов: {lab_results}",
     },
 }
 
@@ -156,3 +181,64 @@ class AIGateway:
         if parsed and "conclusion_text" in parsed:
             return {**parsed, "provider": response.provider, "model": response.model}
         return {"conclusion_text": response.text, "provider": response.provider, "model": response.model}
+
+    async def suggest_treatment(
+        self,
+        diagnosis_code: str,
+        diagnosis_title: str,
+        age: int | None = None,
+        comorbidities: str | None = None,
+    ) -> dict:
+        prompts = PROMPTS["treatment"]
+        user_prompt = self.prompt_manager.render(
+            prompts["user"],
+            diagnosis_code=diagnosis_code,
+            diagnosis_title=diagnosis_title,
+            age=str(age or "не указан"),
+            comorbidities=comorbidities or "нет",
+        )
+        response = await self.router.complete("treatment", prompts["system"], user_prompt)
+        parsed = self.parser.extract_json(response.text)
+        if parsed and "plan" in parsed:
+            return {**parsed, "provider": response.provider, "model": response.model}
+        return {"plan": response.text, "medications": [], "procedures": [], "provider": response.provider, "model": response.model}
+
+    async def suggest_lab_orders(
+        self,
+        diagnosis_code: str,
+        diagnosis_title: str,
+        current_labs: str | None = None,
+    ) -> dict:
+        prompts = PROMPTS["lab_suggest"]
+        user_prompt = self.prompt_manager.render(
+            prompts["user"],
+            diagnosis_code=diagnosis_code,
+            diagnosis_title=diagnosis_title,
+            current_labs=current_labs or "нет данных",
+        )
+        response = await self.router.complete("lab_suggest", prompts["system"], user_prompt)
+        parsed = self.parser.extract_json(response.text)
+        if parsed and "suggested_tests" in parsed:
+            return {**parsed, "provider": response.provider, "model": response.model}
+        return {"suggested_tests": [], "reasoning": response.text, "provider": response.provider, "model": response.model}
+
+    async def generate_discharge_summary(
+        self,
+        diagnoses: list[str],
+        treatment: str | None = None,
+        duration: str | None = None,
+        lab_results: str | None = None,
+    ) -> dict:
+        prompts = PROMPTS["discharge_summary"]
+        user_prompt = self.prompt_manager.render(
+            prompts["user"],
+            diagnoses=", ".join(diagnoses),
+            treatment=treatment or "не указано",
+            duration=duration or "не указана",
+            lab_results=lab_results or "нет данных",
+        )
+        response = await self.router.complete("discharge_summary", prompts["system"], user_prompt)
+        parsed = self.parser.extract_json(response.text)
+        if parsed and "discharge_text" in parsed:
+            return {**parsed, "provider": response.provider, "model": response.model}
+        return {"discharge_text": response.text, "recommendations": [], "provider": response.provider, "model": response.model}

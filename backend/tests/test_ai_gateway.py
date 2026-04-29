@@ -255,3 +255,51 @@ async def test_full_flow_diagnosis_to_conclusion():
             treatment="Парацетамол 500мг при T>38.5",
         )
         assert "ОРВИ" in conclusion["conclusion_text"]
+
+
+@pytest.mark.asyncio
+async def test_gateway_suggest_treatment():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"plan": "Антибактериальная терапия", "medications": ["Амоксициллин 500мг 3р/день"], "procedures": ["Ингаляции"]}',
+        model="gemini-2.0-flash", provider="gemini",
+        input_tokens=40, output_tokens=30, latency_ms=200,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.suggest_treatment(diagnosis_code="J06.9", diagnosis_title="ОРВИ")
+    assert result["plan"] == "Антибактериальная терапия"
+    assert len(result["medications"]) == 1
+    assert result["provider"] == "gemini"
+
+
+@pytest.mark.asyncio
+async def test_gateway_suggest_lab_orders():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"suggested_tests": ["ОАК", "СРБ", "Мазок из зева"], "reasoning": "Для подтверждения бактериальной инфекции"}',
+        model="groq-llama", provider="groq",
+        input_tokens=30, output_tokens=25, latency_ms=150,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.suggest_lab_orders(diagnosis_code="J06.9", diagnosis_title="ОРВИ")
+    assert len(result["suggested_tests"]) == 3
+    assert result["provider"] == "groq"
+
+
+@pytest.mark.asyncio
+async def test_gateway_generate_discharge_summary():
+    gateway = AIGateway()
+    mock_response = ProviderResponse(
+        text='{"discharge_text": "Выписной эпикриз: пациент выписан с улучшением.", "recommendations": ["Постельный режим 3 дня", "Контроль ОАК через неделю"]}',
+        model="gemini-2.0-flash", provider="gemini",
+        input_tokens=60, output_tokens=40, latency_ms=250,
+    )
+    with patch.object(gateway.router, "complete", new_callable=AsyncMock, return_value=mock_response):
+        result = await gateway.generate_discharge_summary(
+            diagnoses=["J06.9 ОРВИ"],
+            treatment="Амоксициллин 500мг",
+            duration="5 дней",
+        )
+    assert "Выписной эпикриз" in result["discharge_text"]
+    assert len(result["recommendations"]) == 2
+    assert result["provider"] == "gemini"

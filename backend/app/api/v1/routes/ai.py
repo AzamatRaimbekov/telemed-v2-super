@@ -13,6 +13,9 @@ from app.schemas.ai import (
     ExamGenerateRequest,
     PatientSummaryRequest,
     ConclusionGenerateRequest,
+    TreatmentSuggestRequest,
+    LabOrderSuggestRequest,
+    DischargeSummaryRequest,
 )
 from app.services.ai.gateway import AIGateway
 from sqlalchemy import select, func
@@ -342,6 +345,122 @@ async def generate_conclusion(
         return result
     except Exception as e:
         logger.exception("AI conclusion generate failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.post("/treatment/suggest")
+async def suggest_treatment(
+    body: TreatmentSuggestRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
+):
+    try:
+        gateway = get_gateway()
+        result = await gateway.suggest_treatment(
+            diagnosis_code=body.diagnosis_code,
+            diagnosis_title=body.diagnosis_title,
+            age=body.age,
+            comorbidities=body.comorbidities,
+        )
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="treatment",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0, output_tokens=0, latency_ms=0, success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="treatment",
+            input_data=body.model_dump(mode="json"),
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI treatment suggest failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.post("/lab-orders/suggest")
+async def suggest_lab_orders(
+    body: LabOrderSuggestRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
+):
+    try:
+        gateway = get_gateway()
+        result = await gateway.suggest_lab_orders(
+            diagnosis_code=body.diagnosis_code,
+            diagnosis_title=body.diagnosis_title,
+            current_labs=body.current_labs,
+        )
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="lab_suggest",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0, output_tokens=0, latency_ms=0, success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="lab_suggest",
+            input_data=body.model_dump(mode="json"),
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI lab orders suggest failed")
+        raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+
+
+@router.post("/discharge/generate")
+async def generate_discharge_summary(
+    body: DischargeSummaryRequest,
+    session: DBSession = None,
+    current_user: CurrentUser = None,
+    _staff=require_role(UserRole.DOCTOR, UserRole.CLINIC_ADMIN),
+):
+    try:
+        gateway = get_gateway()
+        result = await gateway.generate_discharge_summary(
+            diagnoses=body.diagnoses,
+            treatment=body.treatment,
+            duration=body.duration,
+            lab_results=body.lab_results,
+        )
+        log_entry = AIUsageLog(
+            clinic_id=current_user.clinic_id,
+            user_id=current_user.id,
+            patient_id=body.patient_id,
+            task_type="discharge_summary",
+            provider_used=result.get("provider", "unknown"),
+            model_used=result.get("model", "unknown"),
+            input_tokens=0, output_tokens=0, latency_ms=0, success=True,
+        )
+        session.add(log_entry)
+        content_entry = AIGeneratedContent(
+            clinic_id=current_user.clinic_id,
+            patient_id=body.patient_id,
+            task_type="discharge_summary",
+            input_data=body.model_dump(mode="json"),
+            output_data=result,
+        )
+        session.add(content_entry)
+        return result
+    except Exception as e:
+        logger.exception("AI discharge summary failed")
         raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
 
 
