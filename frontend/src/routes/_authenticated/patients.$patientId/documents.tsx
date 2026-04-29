@@ -9,6 +9,11 @@ import { InputField } from "@/components/ui/input-field";
 import { CustomSelect } from "@/components/ui/select-custom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { aiApi } from "@/features/ai/api";
+import { useAI } from "@/features/ai/useAI";
+import { AITriggerButton } from "@/features/ai/components/AITriggerButton";
+import { AIResultPanel } from "@/features/ai/components/AIResultPanel";
+import { AIConclusionResult } from "@/features/ai/components/AIConclusionResult";
 
 export const Route = createFileRoute(
   "/_authenticated/patients/$patientId/documents"
@@ -67,6 +72,7 @@ function getFileIcon(mimeType: string | null): string {
 function DocumentsPage() {
   const { patientId } = Route.useParams();
   const queryClient = useQueryClient();
+  const aiConclusion = useAI("conclusion-generate", aiApi.generateConclusion);
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [showUpload, setShowUpload] = useState(false);
@@ -118,9 +124,16 @@ function DocumentsPage() {
             </span>
           )}
         </div>
-        <Button variant="primary" size="sm" onClick={() => setShowUpload(!showUpload)}>
-          {showUpload ? "Отмена" : "+ Загрузить"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <AITriggerButton
+            onClick={() => aiConclusion.trigger({ patient_id: patientId, diagnoses: [] })}
+            isPending={aiConclusion.isPending}
+            tooltip="AI: сгенерировать заключение"
+          />
+          <Button variant="primary" size="sm" onClick={() => setShowUpload(!showUpload)}>
+            {showUpload ? "Отмена" : "+ Загрузить"}
+          </Button>
+        </div>
       </div>
 
       {/* Upload form */}
@@ -135,6 +148,26 @@ function DocumentsPage() {
               }}
             />
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* AI Conclusion Result */}
+      <AnimatePresence>
+        {aiConclusion.result && (
+          <AIResultPanel
+            provider={aiConclusion.result.provider}
+            model={aiConclusion.result.model}
+            acceptLabel="✓ Копировать"
+            onAccept={() => {
+              navigator.clipboard.writeText(aiConclusion.result!.conclusion_text);
+              toast.success("Текст заключения скопирован в буфер обмена");
+              aiConclusion.reset();
+            }}
+            onReject={() => aiConclusion.reset()}
+            onRetry={() => aiConclusion.trigger({ patient_id: patientId, diagnoses: [] })}
+          >
+            <AIConclusionResult conclusionText={aiConclusion.result.conclusion_text} />
+          </AIResultPanel>
         )}
       </AnimatePresence>
 
