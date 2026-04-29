@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { patientsApi } from "@/features/patients/api";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,12 @@ import { CustomSelect } from "@/components/ui/select-custom";
 import { PrintLayout } from "@/components/ui/print-layout";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { aiApi } from "@/features/ai/api";
+import type { SuggestedDiagnosis } from "@/features/ai/api";
+import { useAI } from "@/features/ai/useAI";
+import { AITriggerButton } from "@/features/ai/components/AITriggerButton";
+import { AIResultPanel } from "@/features/ai/components/AIResultPanel";
+import { AIDiagnosisSuggestions } from "@/features/ai/components/AIDiagnosisSuggestions";
 
 export const Route = createFileRoute(
   "/_authenticated/patients/$patientId/diagnoses"
@@ -75,6 +81,24 @@ function DiagnosesPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showPrint, setShowPrint] = useState(false);
+
+  const ai = useAI("diagnosis-suggest", aiApi.suggestDiagnoses);
+  const [aiPrefill, setAiPrefill] = useState<{ icd_code: string; title: string } | null>(null);
+
+  const handleAISuggest = () => {
+    const existingCodes = (rawList || []).map((d: DiagnosisItem) => `${d.icd_code} ${d.title}`);
+    ai.trigger({
+      patient_id: patientId,
+      symptoms: "Текущие жалобы пациента",
+      existing_diagnoses: existingCodes,
+    });
+  };
+
+  const handleAcceptDiagnosis = (diagnosis: SuggestedDiagnosis) => {
+    setShowCreate(true);
+    setAiPrefill({ icd_code: diagnosis.icd_code, title: diagnosis.title });
+    ai.reset();
+  };
 
   const { data: rawList, isLoading } = useQuery({
     queryKey: ["patient-diagnoses-list", patientId],
@@ -145,7 +169,10 @@ function DiagnosesPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-foreground">Диагнозы</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-foreground">Диагнозы</h2>
+            <AITriggerButton onClick={handleAISuggest} isPending={ai.isPending} />
+          </div>
           {totalCount > 0 && (
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-secondary/10 text-secondary">
               {totalCount}
@@ -160,6 +187,23 @@ function DiagnosesPage() {
         </div>
       </div>
 
+      {/* AI Result Panel */}
+      <AnimatePresence>
+        {ai.result && (
+          <AIResultPanel
+            provider={ai.result.provider}
+            model={ai.result.model}
+            onReject={() => ai.reset()}
+            onRetry={handleAISuggest}
+          >
+            <AIDiagnosisSuggestions
+              suggestions={ai.result.suggestions}
+              onAcceptDiagnosis={handleAcceptDiagnosis}
+            />
+          </AIResultPanel>
+        )}
+      </AnimatePresence>
+
       {/* Create form */}
       <AnimatePresence>
         {showCreate && (
@@ -173,6 +217,8 @@ function DiagnosesPage() {
             <CreateDiagnosisForm
               onSubmit={(data) => createMutation.mutate(data)}
               isPending={createMutation.isPending}
+              prefill={aiPrefill}
+              onPrefillConsumed={() => setAiPrefill(null)}
             />
           </motion.div>
         )}
@@ -390,9 +436,13 @@ function DiagnosesPage() {
 function CreateDiagnosisForm({
   onSubmit,
   isPending,
+  prefill,
+  onPrefillConsumed,
 }: {
   onSubmit: (data: Record<string, unknown>) => void;
   isPending: boolean;
+  prefill?: { icd_code: string; title: string } | null;
+  onPrefillConsumed?: () => void;
 }) {
   const [icdCode, setIcdCode] = useState("");
   const [title, setTitle] = useState("");
@@ -401,6 +451,14 @@ function CreateDiagnosisForm({
   const [notes, setNotes] = useState("");
   const [icdSearch, setIcdSearch] = useState("");
   const [showIcdDropdown, setShowIcdDropdown] = useState(false);
+
+  useEffect(() => {
+    if (prefill) {
+      setIcdCode(prefill.icd_code);
+      setTitle(prefill.title);
+      onPrefillConsumed?.();
+    }
+  }, [prefill]);
 
   const { data: icdResults } = useQuery({
     queryKey: ["icd10-search", icdSearch],
