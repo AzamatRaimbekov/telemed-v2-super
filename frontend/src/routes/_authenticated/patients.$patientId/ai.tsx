@@ -9,6 +9,9 @@ import { AIDiagnosisSuggestions } from "@/features/ai/components/AIDiagnosisSugg
 import { AIExamResult } from "@/features/ai/components/AIExamResult";
 import { AISummaryResult } from "@/features/ai/components/AISummaryResult";
 import { AIConclusionResult } from "@/features/ai/components/AIConclusionResult";
+import { AITreatmentResult } from "@/features/ai/components/AITreatmentResult";
+import { AILabSuggestResult } from "@/features/ai/components/AILabSuggestResult";
+import { AIDischargeResult } from "@/features/ai/components/AIDischargeResult";
 import type { SuggestedDiagnosis } from "@/features/ai/api";
 import { toast } from "sonner";
 
@@ -26,6 +29,9 @@ function AiHubPage() {
   const aiExam = useAI("hub-exam", aiApi.generateExam);
   const aiSummary = useAI("hub-summary", aiApi.summarizePatient);
   const aiConclusion = useAI("hub-conclusion", aiApi.generateConclusion);
+  const aiTreatment = useAI("hub-treatment", aiApi.suggestTreatment);
+  const aiLabOrders = useAI("hub-lab-orders", aiApi.suggestLabOrders);
+  const aiDischarge = useAI("hub-discharge", aiApi.generateDischargeSummary);
 
   const actions = [
     {
@@ -68,6 +74,36 @@ function AiHubPage() {
         aiConclusion.trigger({ patient_id: patientId, diagnoses: [] });
       },
     },
+    {
+      key: "treatment",
+      label: "План лечения",
+      description: "AI предложит план лечения по диагнозу",
+      isPending: aiTreatment.isPending,
+      onClick: () => {
+        setActiveTask("treatment");
+        aiTreatment.trigger({ patient_id: patientId, diagnosis_code: "", diagnosis_title: "Текущий диагноз" });
+      },
+    },
+    {
+      key: "lab_orders",
+      label: "Назначение анализов",
+      description: "AI предложит набор анализов",
+      isPending: aiLabOrders.isPending,
+      onClick: () => {
+        setActiveTask("lab_orders");
+        aiLabOrders.trigger({ patient_id: patientId, diagnosis_code: "", diagnosis_title: "Текущий диагноз" });
+      },
+    },
+    {
+      key: "discharge",
+      label: "Выписной эпикриз",
+      description: "AI сформирует выписной эпикриз",
+      isPending: aiDischarge.isPending,
+      onClick: () => {
+        setActiveTask("discharge");
+        aiDischarge.trigger({ patient_id: patientId, diagnoses: [] });
+      },
+    },
   ];
 
   const handleAcceptDiagnosis = (d: SuggestedDiagnosis) => {
@@ -79,6 +115,9 @@ function AiHubPage() {
     aiExam.reset();
     aiSummary.reset();
     aiConclusion.reset();
+    aiTreatment.reset();
+    aiLabOrders.reset();
+    aiDischarge.reset();
     setActiveTask(null);
   };
 
@@ -187,6 +226,64 @@ function AiHubPage() {
             onRetry={() => aiConclusion.trigger({ patient_id: patientId, diagnoses: [] })}
           >
             <AIConclusionResult conclusionText={aiConclusion.result.conclusion_text} />
+          </AIResultPanel>
+        )}
+
+        {activeTask === "treatment" && aiTreatment.result && (
+          <AIResultPanel
+            provider={aiTreatment.result.provider}
+            model={aiTreatment.result.model}
+            acceptLabel="✓ Копировать"
+            onAccept={() => {
+              navigator.clipboard.writeText(aiTreatment.result!.plan);
+              toast.success("План лечения скопирован");
+            }}
+            onReject={resetAll}
+            onRetry={() => aiTreatment.trigger({ patient_id: patientId, diagnosis_code: "", diagnosis_title: "Текущий диагноз" })}
+          >
+            <AITreatmentResult
+              plan={aiTreatment.result.plan}
+              medications={aiTreatment.result.medications}
+              procedures={aiTreatment.result.procedures}
+            />
+          </AIResultPanel>
+        )}
+
+        {activeTask === "lab_orders" && aiLabOrders.result && (
+          <AIResultPanel
+            provider={aiLabOrders.result.provider}
+            model={aiLabOrders.result.model}
+            acceptLabel="✓ Копировать"
+            onAccept={() => {
+              navigator.clipboard.writeText(aiLabOrders.result!.suggested_tests.join(", "));
+              toast.success("Список анализов скопирован");
+            }}
+            onReject={resetAll}
+            onRetry={() => aiLabOrders.trigger({ patient_id: patientId, diagnosis_code: "", diagnosis_title: "Текущий диагноз" })}
+          >
+            <AILabSuggestResult
+              suggestedTests={aiLabOrders.result.suggested_tests}
+              reasoning={aiLabOrders.result.reasoning}
+            />
+          </AIResultPanel>
+        )}
+
+        {activeTask === "discharge" && aiDischarge.result && (
+          <AIResultPanel
+            provider={aiDischarge.result.provider}
+            model={aiDischarge.result.model}
+            acceptLabel="✓ Копировать"
+            onAccept={() => {
+              navigator.clipboard.writeText(aiDischarge.result!.discharge_text);
+              toast.success("Эпикриз скопирован");
+            }}
+            onReject={resetAll}
+            onRetry={() => aiDischarge.trigger({ patient_id: patientId, diagnoses: [] })}
+          >
+            <AIDischargeResult
+              dischargeText={aiDischarge.result.discharge_text}
+              recommendations={aiDischarge.result.recommendations}
+            />
           </AIResultPanel>
         )}
       </AnimatePresence>

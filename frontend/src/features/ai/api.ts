@@ -60,6 +60,51 @@ export interface ConclusionGenerateOutput {
   model: string;
 }
 
+export interface TreatmentSuggestInput {
+  patient_id: string;
+  diagnosis_code: string;
+  diagnosis_title: string;
+  age?: number;
+  comorbidities?: string;
+}
+
+export interface TreatmentSuggestOutput {
+  plan: string;
+  medications: string[];
+  procedures: string[];
+  provider: string;
+  model: string;
+}
+
+export interface LabOrderSuggestInput {
+  patient_id: string;
+  diagnosis_code: string;
+  diagnosis_title: string;
+  current_labs?: string;
+}
+
+export interface LabOrderSuggestOutput {
+  suggested_tests: string[];
+  reasoning: string;
+  provider: string;
+  model: string;
+}
+
+export interface DischargeSummaryInput {
+  patient_id: string;
+  diagnoses?: string[];
+  treatment?: string;
+  duration?: string;
+  lab_results?: string;
+}
+
+export interface DischargeSummaryOutput {
+  discharge_text: string;
+  recommendations: string[];
+  provider: string;
+  model: string;
+}
+
 export const aiApi = {
   suggestDiagnoses: (data: DiagnosisSuggestInput): Promise<DiagnosisSuggestOutput> =>
     apiClient.post("/ai/diagnosis/suggest", data).then((r) => r.data),
@@ -72,4 +117,13 @@ export const aiApi = {
 
   generateConclusion: (data: ConclusionGenerateInput): Promise<ConclusionGenerateOutput> =>
     apiClient.post("/ai/conclusion/generate", data).then((r) => r.data),
+
+  suggestTreatment: (data: TreatmentSuggestInput): Promise<TreatmentSuggestOutput> =>
+    apiClient.post("/ai/treatment/suggest", data).then((r) => r.data),
+
+  suggestLabOrders: (data: LabOrderSuggestInput): Promise<LabOrderSuggestOutput> =>
+    apiClient.post("/ai/lab-orders/suggest", data).then((r) => r.data),
+
+  generateDischargeSummary: (data: DischargeSummaryInput): Promise<DischargeSummaryOutput> =>
+    apiClient.post("/ai/discharge/generate", data).then((r) => r.data),
 };
