@@ -7,6 +7,12 @@ import { CustomSelect } from "@/components/ui/select-custom";
 import { InputField } from "@/components/ui/input-field";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { Button } from "@/components/ui/button";
+import { AnimatePresence } from "framer-motion";
+import { aiApi } from "@/features/ai/api";
+import { useAI } from "@/features/ai/useAI";
+import { AITriggerButton } from "@/features/ai/components/AITriggerButton";
+import { AIResultPanel } from "@/features/ai/components/AIResultPanel";
+import { AIExamResult } from "@/features/ai/components/AIExamResult";
 
 export const Route = createFileRoute(
   "/_authenticated/patients/$patientId/history/new"
@@ -104,6 +110,7 @@ function NewEntryPage() {
 
       {method === "manual" && (
         <ManualEntryForm
+          patientId={patientId}
           onSubmit={(data) => createMutation.mutate(data)}
           isPending={createMutation.isPending}
         />
@@ -225,6 +232,7 @@ function MethodSelection({ onSelect }: { onSelect: (m: Method) => void }) {
 // ─── Manual Entry Form ────────────────────────────────────────────────────────
 
 interface FormProps {
+  patientId?: string;
   onSubmit: (data: Record<string, unknown>) => void;
   isPending: boolean;
   defaultValues?: Partial<AIAnalysisResult>;
@@ -234,6 +242,7 @@ interface FormProps {
 }
 
 function ManualEntryForm({
+  patientId,
   onSubmit,
   isPending,
   defaultValues,
@@ -242,6 +251,7 @@ function ManualEntryForm({
   formRef,
 }: FormProps) {
   const now = new Date().toISOString().slice(0, 16);
+  const aiExam = useAI("exam-generate", aiApi.generateExam);
   const [entryType, setEntryType] = useState<EntryType>(
     (defaultValues?.entry_type as EntryType) || "daily_note"
   );
@@ -381,13 +391,57 @@ function ManualEntryForm({
               { key: "plan", label: "План" },
             ].map(({ key, label }) => (
               <div key={key}>
-                <FieldLabel label={label} fieldKey={key} />
+                {key === "complaints" ? (
+                  <div className="flex items-center gap-2 mb-1">
+                    <label className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider">
+                      {label}
+                    </label>
+                    {patientId && (
+                      <AITriggerButton
+                        onClick={() =>
+                          aiExam.trigger({
+                            patient_id: patientId,
+                            complaints: formData["complaints"] || "",
+                          })
+                        }
+                        isPending={aiExam.isPending}
+                        disabled={(formData["complaints"] || "").length < 3}
+                        tooltip="AI: сгенерировать осмотр по жалобам"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <FieldLabel label={label} fieldKey={key} />
+                )}
                 <textarea
                   value={formData[key] || ""}
                   onChange={(e) => setField(key, e.target.value)}
                   rows={3}
                   className={getFieldClass(key)}
                 />
+                {key === "complaints" && (
+                  <AnimatePresence>
+                    {aiExam.result && (
+                      <AIResultPanel
+                        provider={aiExam.result.provider}
+                        model={aiExam.result.model}
+                        onAccept={() => {
+                          setField("objective", aiExam.result!.examination_text);
+                          aiExam.reset();
+                        }}
+                        onReject={() => aiExam.reset()}
+                        onRetry={() =>
+                          aiExam.trigger({
+                            patient_id: patientId!,
+                            complaints: formData["complaints"] || "",
+                          })
+                        }
+                      >
+                        <AIExamResult examinationText={aiExam.result.examination_text} />
+                      </AIResultPanel>
+                    )}
+                  </AnimatePresence>
+                )}
               </div>
             ))}
           </div>
