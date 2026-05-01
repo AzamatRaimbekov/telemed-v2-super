@@ -19,9 +19,8 @@ prediction_type_enum = sa.Enum('bed_occupancy', 'medication_consumption', 'patie
 
 
 def upgrade() -> None:
-    prediction_type_enum.create(op.get_bind(), checkfirst=True)
     op.create_table('predictions',
-        sa.Column('prediction_type', prediction_type_enum, nullable=False),
+        sa.Column('prediction_type', sa.Enum('bed_occupancy', 'medication_consumption', 'patient_admissions', name='predictiontype', create_constraint=True), nullable=False),
         sa.Column('target_date', sa.Date(), nullable=False),
         sa.Column('predicted_value', sa.Float(), nullable=False),
         sa.Column('confidence_low', sa.Float(), nullable=True),

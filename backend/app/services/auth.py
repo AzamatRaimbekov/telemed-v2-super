@@ -24,8 +24,11 @@ class AuthService:
         clinic_id = str(user.clinic_id) if user.clinic_id else None
         access_token = create_access_token(str(user.id), user.role.value, clinic_id)
         refresh_token = create_refresh_token(str(user.id), user.role.value, clinic_id)
-        user.last_login_at = datetime.now(timezone.utc)
-        await self.session.flush()
+        try:
+            user.last_login_at = datetime.now(timezone.utc)
+            await self.session.flush()
+        except Exception:
+            await self.session.rollback()
         return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
     async def refresh(self, refresh_token: str) -> TokenResponse:

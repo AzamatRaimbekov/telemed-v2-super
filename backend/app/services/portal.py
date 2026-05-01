@@ -35,8 +35,11 @@ class PortalService:
             raise AuthenticationError("Invalid credentials")
         if not verify_password(password, patient.portal_password_hash):
             raise AuthenticationError("Invalid credentials")
-        patient.last_portal_login = datetime.now(timezone.utc)
-        await self.session.flush()
+        try:
+            patient.last_portal_login = datetime.now(timezone.utc)
+            await self.session.flush()
+        except Exception:
+            await self.session.rollback()
         access = create_access_token(str(patient.id), "PATIENT", str(patient.clinic_id))
         refresh = create_refresh_token(str(patient.id), "PATIENT", str(patient.clinic_id))
         return TokenResponse(access_token=access, refresh_token=refresh)
