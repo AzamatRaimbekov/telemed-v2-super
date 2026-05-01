@@ -15,39 +15,7 @@ from app.services.bms_simulator import start_bms_simulator, stop_bms_simulator
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
-    # Auto-run migrations on startup in production
-    if settings.APP_ENV == "production":
-        import subprocess
-        # Ensure DB exists
-        db_result = subprocess.run(["python", "create_db.py"], capture_output=True, text=True)
-        print(f"DB: {db_result.stdout.strip()}")
-        if db_result.returncode != 0:
-            print(f"DB error: {db_result.stderr[:300]}")
-        # Run migrations
-        result = subprocess.run(["python", "-m", "alembic", "upgrade", "head"], capture_output=True, text=True)
-        if result.returncode == 0:
-            print(f"Migrations OK")
-        else:
-            print(f"Migration warning: {result.stderr[:500]}")
-        # Auto-seed mock data (idempotent)
-        seed_scripts = [
-            ("seed_prod_all.py", "Production mock data"),
-            ("seed_catalogs.py", "Catalogs"),
-            ("seed_exercises.py", "Exercises"),
-            ("seed_rooms.py", "Rooms & beds"),
-            ("seed_rbac.py", "RBAC permissions"),
-            ("seed_monitoring.py", "Monitoring sensors & data"),
-            ("seed_pharmacy.py", "Pharmacy"),
-            ("seed_bms.py", "BMS building management"),
-        ]
-        for script, label in seed_scripts:
-            seed_result = subprocess.run(
-                ["python", script], capture_output=True, text=True, timeout=120
-            )
-            if seed_result.returncode == 0:
-                print(f"Seed [{label}] OK")
-            else:
-                print(f"Seed [{label}] warning: {seed_result.stderr[:300]}")
+    # Schema setup and seeding is handled by scripts/start.sh before uvicorn starts
     start_simulator()
     start_bms_simulator()
     yield
